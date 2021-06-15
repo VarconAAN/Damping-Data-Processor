@@ -24,7 +24,7 @@ namespace Damping_Data_Processor
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new select_input_folder_button());
+            Application.Run(new form1());
         }
 
 

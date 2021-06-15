@@ -16,20 +16,24 @@ using MathNet.Filtering;
 
 namespace Damping_Data_Processor
 {
-    public partial class select_input_folder_button : Form
+    public partial class form1 : Form
     {
 
         //GLOBAL VARIABLES
 
         //allocate vertical annotation
-        VerticalLineAnnotation lower_data_boundary_vertical_line_x = new VerticalLineAnnotation();
-        VerticalLineAnnotation upper_data_boundary_vertical_line_x = new VerticalLineAnnotation();
 
-        VerticalLineAnnotation lower_data_boundary_vertical_line_y = new VerticalLineAnnotation();
-        VerticalLineAnnotation upper_data_boundary_vertical_line_y = new VerticalLineAnnotation();
+        VerticalLineAnnotation lower_data_boundary_vertical_line = new VerticalLineAnnotation();
+        VerticalLineAnnotation upper_data_boundary_vertical_line = new VerticalLineAnnotation();
 
-        VerticalLineAnnotation lower_data_boundary_vertical_line_z = new VerticalLineAnnotation();
-        VerticalLineAnnotation upper_data_boundary_vertical_line_z = new VerticalLineAnnotation();
+        //VerticalLineAnnotation lower_data_boundary_vertical_line_x = new VerticalLineAnnotation();
+        //VerticalLineAnnotation upper_data_boundary_vertical_line_x = new VerticalLineAnnotation();
+
+        //VerticalLineAnnotation lower_data_boundary_vertical_line_y = new VerticalLineAnnotation();
+        //VerticalLineAnnotation upper_data_boundary_vertical_line_y = new VerticalLineAnnotation();
+
+        //VerticalLineAnnotation lower_data_boundary_vertical_line_z = new VerticalLineAnnotation();
+        //VerticalLineAnnotation upper_data_boundary_vertical_line_z = new VerticalLineAnnotation();
 
         string current_selected_dataset_filepath = string.Empty;
 
@@ -57,13 +61,46 @@ namespace Damping_Data_Processor
 
         double input_data_sample_rate = 1024;
 
-        public select_input_folder_button()
+        List<string> data_set_names = new List<string>();
+
+
+        public form1()
         {
+
+            data_set_names.Add("X");
+            data_set_names.Add("Y");
+            data_set_names.Add("Z");
 
             InitializeComponent();
         }
 
         //generic program functions
+
+        private int find_closest_value(double val, List<Double> list)
+        {
+            int max = list.Count;
+            int min = 0;
+            int index = max / 2;
+
+            while (max - min > 1)
+            {
+                if (val < list[index])
+                    max = index;
+                else if (val > list[index])
+                    min = index;
+                else
+                    return index;
+
+                index = (max - min) / 2 + min;
+            }
+
+            if (max != list.Count &&
+                    Math.Abs(list[max] - val) < Math.Abs(list[min] - val))
+            {
+                return max;
+            }
+            return min;
+        }
 
         public double[] convert_double_list_to_array_pad_with_zeros(List<double> data)
         {
@@ -143,7 +180,7 @@ namespace Damping_Data_Processor
 
         }
 
-        public List<List<double>> sample_plotting_data(List<double> X, List<double> Y, int max_samples)
+        public List<List<double>> sample_plotting_data(List<List<double>> data_sets,  int max_samples)
         {
             //X & Y muust be same length
             //if(X.Count != Y.Count)
@@ -151,30 +188,34 @@ namespace Damping_Data_Processor
 
             //}
 
-            List<List<double>> sampled_data = new List<List<double>>();
+            List<List<double>> sampled_data_sets = new List<List<double>>();
 
-            if (X.Count <= max_samples)
+            if (data_sets[0].Count <= max_samples)
             {
-                sampled_data.Add(X);
-                sampled_data.Add(Y);
-                return sampled_data;
+                return data_sets;
             }
 
-            int sample_rate = X.Count / max_samples;
+            int sample_rate = data_sets[0].Count / max_samples;
 
+            List<double> time_sampled = new List<double>();
             List<double> X_sampled = new List<double>();
             List<double> Y_sampled = new List<double>();
+            List<double> Z_sampled = new List<double>();
 
-            for(int i=0; i<X.Count; i = i + sample_rate)
+            for(int i=0; i< data_sets[0].Count; i = i + sample_rate)
             {
-                X_sampled.Add(X[i]);
-                Y_sampled.Add(Y[i]);
+                time_sampled.Add(data_sets[0][i]);
+                X_sampled.Add(data_sets[1][i]);
+                Y_sampled.Add(data_sets[2][i]);
+                Z_sampled.Add(data_sets[3][i]);
             }
 
-            sampled_data.Add(X_sampled);
-            sampled_data.Add(Y_sampled);
+            sampled_data_sets.Add(time_sampled);
+            sampled_data_sets.Add(X_sampled);
+            sampled_data_sets.Add(Y_sampled);
+            sampled_data_sets.Add(Z_sampled);
 
-            return sampled_data;
+            return sampled_data_sets;
 
         }
 
@@ -241,7 +282,7 @@ namespace Damping_Data_Processor
         {
             for (int i = 0; i < generic_input_data_double_master[0].Count; i++)
             {
-                generic_input_data_double_master[0][i] = generic_input_data_double_master[0][i] / 1024;
+                generic_input_data_double_master[0][i] = Convert.ToDouble(i+1)/ input_data_sample_rate;
             }
         }
 
@@ -311,6 +352,36 @@ namespace Damping_Data_Processor
 
         //program control functions
 
+        public void check_checked_chart_series()
+        {
+            if (display_x_checkbox.CheckState == CheckState.Checked)
+            {
+                data_chart.Series[0].Enabled = true;
+            }
+            else
+            {
+                data_chart.Series[0].Enabled = false;
+            }
+
+            if (display_y_checkbox.CheckState == CheckState.Checked)
+            {
+                data_chart.Series[1].Enabled = true;
+            }
+            else
+            {
+                data_chart.Series[1].Enabled = false;
+            }
+
+            if (display_z_checkbox.CheckState == CheckState.Checked)
+            {
+                data_chart.Series[2].Enabled = true;
+            }
+            else
+            {
+                data_chart.Series[2].Enabled = false;
+            }
+        }
+
         public void load_data_of_selected_dataset_update_charts()
         {
             generic_input_data_string = load_csv_as_2d_list_string_cols(current_selected_dataset_filepath);
@@ -323,7 +394,7 @@ namespace Damping_Data_Processor
             //convert from string list to double list
             generic_input_data_double_master = convert_list_of_list_string_to_double(generic_input_data_string);
             //converts the time data from ticks to seconds (1 tick = 1/1024 seconds)
-            //convert_ticks_to_seconds();
+            convert_ticks_to_seconds();
 
             //remove data offsets
             for (int i = 1; i < generic_input_data_double_master.Count; i++)
@@ -338,13 +409,12 @@ namespace Damping_Data_Processor
             ////double integration of acceleration data to get displacement
             //generic_input_data_double_integrated.Add(compute_integration_list(generic_input_data_double[0], compute_integration_list(generic_input_data_double[0], generic_input_data_double[1])));
 
-            clear_and_plot_chart(x_data_chart, "X", generic_input_data_double_clone[0], generic_input_data_double_clone[1]);
-            clear_and_plot_chart(y_data_chart, "Y", generic_input_data_double_clone[0], generic_input_data_double_clone[2]);
-            clear_and_plot_chart(z_data_chart, "Z", generic_input_data_double_clone[0], generic_input_data_double_clone[3]);
+
+
+            plot_data_on_chart(data_chart, data_set_names, generic_input_data_double_clone);
             
-            draw_vertical_annotations(x_data_chart, lower_data_boundary_vertical_line_x, upper_data_boundary_vertical_line_x, generic_input_data_double_clone[0]);
-            draw_vertical_annotations(y_data_chart, lower_data_boundary_vertical_line_y, upper_data_boundary_vertical_line_y, generic_input_data_double_clone[0]);
-            draw_vertical_annotations(z_data_chart, lower_data_boundary_vertical_line_z, upper_data_boundary_vertical_line_z, generic_input_data_double_clone[0]);
+            draw_vertical_annotations(data_chart, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, generic_input_data_double_clone[0]);
+
 
         }
 
@@ -466,32 +536,40 @@ namespace Damping_Data_Processor
 
         //manipulate chart functions
 
-        public void update_all_annotation_positions (double annotation_1_pos, double annotation_2_pos)
-        {
-            lower_data_boundary_vertical_line_x.X = annotation_1_pos;
-            upper_data_boundary_vertical_line_x.X = annotation_2_pos;
+        //public void update_all_annotation_positions (double annotation_1_pos, double annotation_2_pos)
+        //{
+        //    lower_data_boundary_vertical_line_x.X = annotation_1_pos;
+        //    upper_data_boundary_vertical_line_x.X = annotation_2_pos;
 
-            lower_data_boundary_vertical_line_y.X = annotation_1_pos;
-            upper_data_boundary_vertical_line_y.X = annotation_2_pos;
+        //    lower_data_boundary_vertical_line_y.X = annotation_1_pos;
+        //    upper_data_boundary_vertical_line_y.X = annotation_2_pos;
 
-            lower_data_boundary_vertical_line_z.X = annotation_1_pos;
-            upper_data_boundary_vertical_line_z.X = annotation_2_pos;
-        }
+        //    lower_data_boundary_vertical_line_z.X = annotation_1_pos;
+        //    upper_data_boundary_vertical_line_z.X = annotation_2_pos;
+        //}
 
-        public void clear_and_plot_chart(Chart chart_name, string data_name, List<double> data_x, List<double> data_y)
+        public void plot_data_on_chart(Chart chart_name, List<string> data_sets_names, List<List<double>> data_sets)
         {
             //sample data to reduce lag in program
-            List<List<double>> sampled_data = sample_plotting_data(data_x, data_y, chart_width);
-            List<double> sampled_data_x = sampled_data[0];
-            List<double> sampled_data_y = sampled_data[1];
+            //List<List<double>> sampled_data = sample_plotting_data(data_x, data_y, chart_width);
+            //List<double> sampled_data_x = sampled_data[0];
+            //List<double> sampled_data_y = sampled_data[1];
 
+            List<List<double>> sampled_data_sets = sample_plotting_data(data_sets, chart_width);
 
             //create series and plot
             chart_name.Series.Clear();
-            System.Windows.Forms.DataVisualization.Charting.Series series = chart_name.Series.Add(data_name);
-            series.ChartType = SeriesChartType.Line;
-            series.Points.DataBindXY(sampled_data_x, sampled_data_y);
-            series.BorderWidth = 2;
+
+            for (int i = 1; i < sampled_data_sets.Count; i++)
+            {
+                System.Windows.Forms.DataVisualization.Charting.Series series = chart_name.Series.Add(data_sets_names[i-1]);
+                series.ChartType = SeriesChartType.Line;
+                series.Points.DataBindXY(sampled_data_sets[0], sampled_data_sets[i]);
+                series.BorderWidth = 1;
+            }
+
+            data_chart.ChartAreas[0].AxisX.Title = "Time (Seconds)";
+            data_chart.ChartAreas[0].AxisY.Title = "Amplitude";
         }
 
 
@@ -507,8 +585,8 @@ namespace Damping_Data_Processor
             line1.IsInfinitive = true;
             line1.ClipToChartArea = chart_name.ChartAreas[0].Name;
             //line1.Name = "line 1";
-            line1.LineColor = Color.Red;
-            line1.LineWidth = 2;         // use your numbers!
+            line1.LineColor = Color.Purple;
+            line1.LineWidth = 3;         // use your numbers!
             line1.X = time_data_list[0];
             //add to the chart
             chart_name.Annotations.Add(line1);
@@ -523,8 +601,8 @@ namespace Damping_Data_Processor
             line2.IsInfinitive = true;
             line2.ClipToChartArea = chart_name.ChartAreas[0].Name;
             //line2.Name = "line 2";
-            line2.LineColor = Color.Red;
-            line2.LineWidth = 2;         // use your numbers!
+            line2.LineColor = Color.Purple;
+            line2.LineWidth = 3;         // use your numbers!
             line2.X = time_data_list[time_data_list.Count - 3];
             //add to the chart
             chart_name.Annotations.Add(line2);
@@ -561,28 +639,38 @@ namespace Damping_Data_Processor
             double x_index_trim_upper = 0;
 
             //get boundary values from vertical annotations
-            if (upper_data_boundary_vertical_line_x.X > lower_data_boundary_vertical_line_x.X)
+            if (upper_data_boundary_vertical_line.X > lower_data_boundary_vertical_line.X)
             {
-                x_index_trim_lower = Convert.ToInt32(lower_data_boundary_vertical_line_x.X);
-                x_index_trim_upper = Convert.ToInt32(upper_data_boundary_vertical_line_x.X) ;
+                //x_index_trim_lower = Convert.ToInt32(lower_data_boundary_vertical_line.X);
+                //x_index_trim_upper = Convert.ToInt32(upper_data_boundary_vertical_line.X) ;                
+                x_index_trim_lower = lower_data_boundary_vertical_line.X;
+                x_index_trim_upper = upper_data_boundary_vertical_line.X ;
             }
             else
             {
-                x_index_trim_upper = Convert.ToInt32(lower_data_boundary_vertical_line_x.X) ;
-                x_index_trim_lower = Convert.ToInt32(upper_data_boundary_vertical_line_x.X) ;
+                //x_index_trim_upper = Convert.ToInt32(lower_data_boundary_vertical_line.X) ;
+                //x_index_trim_lower = Convert.ToInt32(upper_data_boundary_vertical_line.X) ;
+                x_index_trim_upper = lower_data_boundary_vertical_line.X;
+                x_index_trim_lower = upper_data_boundary_vertical_line.X;
             }
 
-            int x_index_trim_lower_index = generic_input_data_double_clone[0].IndexOf(x_index_trim_lower);
-            int x_index_trim_upper_index = generic_input_data_double_clone[0].IndexOf(x_index_trim_upper);
+            //int x_index_trim_lower_index = generic_input_data_double_clone[0].IndexOf(x_index_trim_lower);
+            //int x_index_trim_upper_index = generic_input_data_double_clone[0].IndexOf(x_index_trim_upper);
+
+            int x_index_trim_lower_index = find_closest_value(x_index_trim_lower, generic_input_data_double_clone[0]);
+            int x_index_trim_upper_index = find_closest_value(x_index_trim_upper, generic_input_data_double_clone[0]);
 
             update_trimmed_input_data(x_index_trim_lower_index, x_index_trim_upper_index);
 
-            clear_and_plot_chart(x_data_chart, "X", generic_input_data_double_clone[0], generic_input_data_double_clone[1]);
-            clear_and_plot_chart(y_data_chart, "Y", generic_input_data_double_clone[0], generic_input_data_double_clone[2]);
-            clear_and_plot_chart(z_data_chart, "Z", generic_input_data_double_clone[0], generic_input_data_double_clone[3]);
-            draw_vertical_annotations(x_data_chart, lower_data_boundary_vertical_line_x, upper_data_boundary_vertical_line_x, generic_input_data_double_clone[0]);
-            draw_vertical_annotations(y_data_chart, lower_data_boundary_vertical_line_y, upper_data_boundary_vertical_line_y, generic_input_data_double_clone[0]);
-            draw_vertical_annotations(z_data_chart, lower_data_boundary_vertical_line_z, upper_data_boundary_vertical_line_z, generic_input_data_double_clone[0]);
+            plot_data_on_chart(data_chart, data_set_names, generic_input_data_double_clone);
+            //clear_and_plot_chart(y_data_chart, "Y", generic_input_data_double_clone[0], generic_input_data_double_clone[2]);
+            //clear_and_plot_chart(z_data_chart, "Z", generic_input_data_double_clone[0], generic_input_data_double_clone[3]);
+            draw_vertical_annotations(data_chart, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, generic_input_data_double_clone[0]);
+            //draw_vertical_annotations(y_data_chart, lower_data_boundary_vertical_line_y, upper_data_boundary_vertical_line_y, generic_input_data_double_clone[0]);
+            //draw_vertical_annotations(z_data_chart, lower_data_boundary_vertical_line_z, upper_data_boundary_vertical_line_z, generic_input_data_double_clone[0]);
+           
+            check_checked_chart_series();
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -658,57 +746,15 @@ namespace Damping_Data_Processor
             load_data_of_selected_dataset_update_charts();
         }
 
-        private void x_data_chart_AnnotationPositionChanged(object sender, EventArgs e)
-        {
-            update_all_annotation_positions(lower_data_boundary_vertical_line_x.X, upper_data_boundary_vertical_line_x.X);
-        }
-
-        private void y_data_chart_AnnotationPositionChanged(object sender, EventArgs e)
-        {
-            update_all_annotation_positions(lower_data_boundary_vertical_line_y.X, upper_data_boundary_vertical_line_y.X);
-        }
-
-        private void z_data_chart_AnnotationPositionChanged(object sender, EventArgs e)
-        {
-            update_all_annotation_positions(lower_data_boundary_vertical_line_z.X, upper_data_boundary_vertical_line_z.X);
-        }
-
         private void reset_data_trimming_button_Click(object sender, EventArgs e)
         {
             load_data_of_selected_dataset_update_charts();
+
+            check_checked_chart_series();
         }
 
         private void apply_filter_button_Click(object sender, EventArgs e)
         {
-
-            ////signal + noise
-            //double fs = 1000; //sampling rate
-            //double fw = 5; //signal frequency
-            //double fn = 50; //noise frequency
-            //double n = 5; //number of periods to show
-            //double A = 10; //signal amplitude
-            //double N = 1; //noise amplitude
-            //int size = (int)(n * fs / fw); //sample size
-
-            //var t = Enumerable.Range(1, size).Select(p => p * 1 / fs).ToArray();
-            //var y = t.Select(p => (A * Math.Sin(2 * Math.PI * fw * p)) + (N * Math.Sin(2 * Math.PI * fn * p))).ToArray(); //Original
-
-            ////lowpass filter
-            //double fc = 10; //cutoff frequency
-            //var lowpass = OnlineFirFilter.CreateLowpass(ImpulseResponse.Finite, fs, fc);
-
-            ////bandpass filter
-            //double fc1 = 0; //low cutoff frequency
-            //double fc2 = 10; //high cutoff frequency
-            //var bandpass = OnlineFirFilter.CreateBandpass(ImpulseResponse.Finite, fs, fc1, fc2);
-
-            //double[] yf1 = lowpass.ProcessSamples(y); //Lowpass
-            //double[] yf2 = bandpass.ProcessSamples(y); //Bandpass
-
-            //clear_and_plot_chart(x_data_chart, "X", t.ToList(), y.ToList());
-            //clear_and_plot_chart(y_data_chart, "Y", t.ToList(), yf1.ToList());
-            //clear_and_plot_chart(z_data_chart, "Z", t.ToList(), yf2.ToList());
-
 
             generic_input_data_double_clone_filtered = generic_input_data_double_clone;
 
@@ -726,11 +772,26 @@ namespace Damping_Data_Processor
                 generic_input_data_double_clone_filtered[i] = bandpass.ProcessSamples(convert_double_list_to_array(generic_input_data_double_clone[i])).ToList();
             }
 
-
             //replot data
-            clear_and_plot_chart(x_data_chart, "X", generic_input_data_double_clone_filtered[0], generic_input_data_double_clone_filtered[1]);
-            clear_and_plot_chart(y_data_chart, "Y", generic_input_data_double_clone_filtered[0], generic_input_data_double_clone_filtered[2]);
-            clear_and_plot_chart(z_data_chart, "Z", generic_input_data_double_clone_filtered[0], generic_input_data_double_clone_filtered[3]);
+            plot_data_on_chart(data_chart, data_set_names, generic_input_data_double_clone_filtered);
+
+            check_checked_chart_series();
+
+        }
+
+        private void display_x_checkbox_CheckedChanged(object sender, EventArgs e)
+        {
+            check_checked_chart_series();
+        }
+
+        private void display_y_checkbox_CheckedChanged(object sender, EventArgs e)
+        {
+            check_checked_chart_series();
+        }
+
+        private void display_z_checkbox_CheckedChanged(object sender, EventArgs e)
+        {
+            check_checked_chart_series();
         }
     }
 }
