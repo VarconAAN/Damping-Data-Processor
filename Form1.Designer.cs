@@ -29,9 +29,9 @@ namespace Damping_Data_Processor
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.data_chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.trim_data_button = new System.Windows.Forms.Button();
             this.calculate_damp_ratio_and_freq_button = new System.Windows.Forms.Button();
@@ -60,24 +60,24 @@ namespace Damping_Data_Processor
             // 
             // data_chart
             // 
-            chartArea2.Name = "ChartArea1";
-            this.data_chart.ChartAreas.Add(chartArea2);
-            legend2.Name = "Legend1";
-            this.data_chart.Legends.Add(legend2);
-            this.data_chart.Location = new System.Drawing.Point(404, 33);
+            chartArea1.Name = "ChartArea1";
+            this.data_chart.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.data_chart.Legends.Add(legend1);
+            this.data_chart.Location = new System.Drawing.Point(370, 33);
             this.data_chart.Name = "data_chart";
-            series2.ChartArea = "ChartArea1";
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            this.data_chart.Series.Add(series2);
-            this.data_chart.Size = new System.Drawing.Size(1350, 737);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.data_chart.Series.Add(series1);
+            this.data_chart.Size = new System.Drawing.Size(1384, 737);
             this.data_chart.TabIndex = 0;
             this.data_chart.Text = "chart1";
             this.data_chart.MouseClick += new System.Windows.Forms.MouseEventHandler(this.x_data_chart_Click);
             // 
             // trim_data_button
             // 
-            this.trim_data_button.Location = new System.Drawing.Point(3, 367);
+            this.trim_data_button.Location = new System.Drawing.Point(3, 390);
             this.trim_data_button.Name = "trim_data_button";
             this.trim_data_button.Size = new System.Drawing.Size(175, 27);
             this.trim_data_button.TabIndex = 1;
@@ -87,7 +87,8 @@ namespace Damping_Data_Processor
             // 
             // calculate_damp_ratio_and_freq_button
             // 
-            this.calculate_damp_ratio_and_freq_button.Location = new System.Drawing.Point(3, 604);
+            this.calculate_damp_ratio_and_freq_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.calculate_damp_ratio_and_freq_button.Location = new System.Drawing.Point(3, 500);
             this.calculate_damp_ratio_and_freq_button.Name = "calculate_damp_ratio_and_freq_button";
             this.calculate_damp_ratio_and_freq_button.Size = new System.Drawing.Size(356, 26);
             this.calculate_damp_ratio_and_freq_button.TabIndex = 2;
@@ -97,7 +98,7 @@ namespace Damping_Data_Processor
             // 
             // save_trim_data_csv_button
             // 
-            this.save_trim_data_csv_button.Location = new System.Drawing.Point(3, 767);
+            this.save_trim_data_csv_button.Location = new System.Drawing.Point(0, 617);
             this.save_trim_data_csv_button.Name = "save_trim_data_csv_button";
             this.save_trim_data_csv_button.Size = new System.Drawing.Size(356, 40);
             this.save_trim_data_csv_button.TabIndex = 3;
@@ -177,7 +178,7 @@ namespace Damping_Data_Processor
             // reset_data_trimming_button
             // 
             this.reset_data_trimming_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.reset_data_trimming_button.Location = new System.Drawing.Point(184, 367);
+            this.reset_data_trimming_button.Location = new System.Drawing.Point(184, 390);
             this.reset_data_trimming_button.Name = "reset_data_trimming_button";
             this.reset_data_trimming_button.Size = new System.Drawing.Size(175, 27);
             this.reset_data_trimming_button.TabIndex = 13;
@@ -190,7 +191,7 @@ namespace Damping_Data_Processor
             this.display_z_checkbox.AutoSize = true;
             this.display_z_checkbox.Checked = true;
             this.display_z_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.display_z_checkbox.Location = new System.Drawing.Point(365, 79);
+            this.display_z_checkbox.Location = new System.Drawing.Point(1105, 12);
             this.display_z_checkbox.Name = "display_z_checkbox";
             this.display_z_checkbox.Size = new System.Drawing.Size(33, 17);
             this.display_z_checkbox.TabIndex = 15;
@@ -203,7 +204,7 @@ namespace Damping_Data_Processor
             this.display_y_checkbox.AutoSize = true;
             this.display_y_checkbox.Checked = true;
             this.display_y_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.display_y_checkbox.Location = new System.Drawing.Point(365, 56);
+            this.display_y_checkbox.Location = new System.Drawing.Point(1066, 10);
             this.display_y_checkbox.Name = "display_y_checkbox";
             this.display_y_checkbox.Size = new System.Drawing.Size(33, 17);
             this.display_y_checkbox.TabIndex = 16;
@@ -219,7 +220,7 @@ namespace Damping_Data_Processor
             0,
             0,
             65536});
-            this.low_freq_cutoff_numupdown.Location = new System.Drawing.Point(3, 419);
+            this.low_freq_cutoff_numupdown.Location = new System.Drawing.Point(3, 442);
             this.low_freq_cutoff_numupdown.Maximum = new decimal(new int[] {
             9999999,
             0,
@@ -242,7 +243,7 @@ namespace Damping_Data_Processor
             0,
             0,
             65536});
-            this.high_freq_cutoff_numupdown.Location = new System.Drawing.Point(184, 419);
+            this.high_freq_cutoff_numupdown.Location = new System.Drawing.Point(184, 442);
             this.high_freq_cutoff_numupdown.Maximum = new decimal(new int[] {
             99999999,
             0,
@@ -265,7 +266,7 @@ namespace Damping_Data_Processor
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 404);
+            this.label2.Location = new System.Drawing.Point(3, 427);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(88, 13);
             this.label2.TabIndex = 25;
@@ -274,7 +275,7 @@ namespace Damping_Data_Processor
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(266, 403);
+            this.label3.Location = new System.Drawing.Point(266, 426);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(90, 13);
             this.label3.TabIndex = 26;
@@ -282,7 +283,7 @@ namespace Damping_Data_Processor
             // 
             // apply_filter_button
             // 
-            this.apply_filter_button.Location = new System.Drawing.Point(3, 445);
+            this.apply_filter_button.Location = new System.Drawing.Point(3, 468);
             this.apply_filter_button.Name = "apply_filter_button";
             this.apply_filter_button.Size = new System.Drawing.Size(175, 26);
             this.apply_filter_button.TabIndex = 27;
@@ -292,19 +293,20 @@ namespace Damping_Data_Processor
             // 
             // remove_filter_button
             // 
-            this.remove_filter_button.Location = new System.Drawing.Point(184, 445);
+            this.remove_filter_button.Location = new System.Drawing.Point(184, 468);
             this.remove_filter_button.Name = "remove_filter_button";
             this.remove_filter_button.Size = new System.Drawing.Size(175, 26);
             this.remove_filter_button.TabIndex = 28;
             this.remove_filter_button.Text = "Remove Filter";
             this.remove_filter_button.UseVisualStyleBackColor = true;
+            this.remove_filter_button.Click += new System.EventHandler(this.remove_filter_button_Click);
             // 
             // display_x_checkbox
             // 
             this.display_x_checkbox.AutoSize = true;
             this.display_x_checkbox.Checked = true;
             this.display_x_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.display_x_checkbox.Location = new System.Drawing.Point(365, 33);
+            this.display_x_checkbox.Location = new System.Drawing.Point(1027, 10);
             this.display_x_checkbox.Name = "display_x_checkbox";
             this.display_x_checkbox.Size = new System.Drawing.Size(33, 17);
             this.display_x_checkbox.TabIndex = 29;

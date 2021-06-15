@@ -12,6 +12,7 @@ using System.Numerics;
 using FFTW.NET;
 using MathNet.Filtering.FIR;
 using MathNet.Filtering;
+using DSPLib;
 
 
 namespace Damping_Data_Processor
@@ -351,6 +352,8 @@ namespace Damping_Data_Processor
         }
 
         //program control functions
+
+
 
         public void check_checked_chart_series()
         {
@@ -756,7 +759,7 @@ namespace Damping_Data_Processor
         private void apply_filter_button_Click(object sender, EventArgs e)
         {
 
-            generic_input_data_double_clone_filtered = generic_input_data_double_clone;
+            generic_input_data_double_clone_filtered = new List<List<double>>(generic_input_data_double_clone);
 
             //get cutoff freqs
             double low_cutoff_freq = Convert.ToDouble(low_freq_cutoff_numupdown.Value);
@@ -791,6 +794,14 @@ namespace Damping_Data_Processor
 
         private void display_z_checkbox_CheckedChanged(object sender, EventArgs e)
         {
+            check_checked_chart_series();
+        }
+
+        private void remove_filter_button_Click(object sender, EventArgs e)
+        {
+            //replot data
+            plot_data_on_chart(data_chart, data_set_names, generic_input_data_double_clone);
+
             check_checked_chart_series();
         }
     }
