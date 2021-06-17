@@ -29,16 +29,15 @@ namespace Damping_Data_Processor
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea11 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend11 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series11 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea12 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend12 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series12 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.data_chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.trim_data_button = new System.Windows.Forms.Button();
             this.calculate_damp_ratio_and_freq_button = new System.Windows.Forms.Button();
-            this.save_trim_data_csv_button = new System.Windows.Forms.Button();
             this.select_input_folder_button1 = new System.Windows.Forms.Button();
             this.input_folder_textbox = new System.Windows.Forms.TextBox();
             this.input_csv_checkedlistbox = new System.Windows.Forms.CheckedListBox();
@@ -72,16 +71,16 @@ namespace Damping_Data_Processor
             // 
             // data_chart
             // 
-            chartArea11.Name = "ChartArea1";
-            this.data_chart.ChartAreas.Add(chartArea11);
-            legend11.Name = "Legend1";
-            this.data_chart.Legends.Add(legend11);
+            chartArea3.Name = "ChartArea1";
+            this.data_chart.ChartAreas.Add(chartArea3);
+            legend3.Name = "Legend1";
+            this.data_chart.Legends.Add(legend3);
             this.data_chart.Location = new System.Drawing.Point(456, 33);
             this.data_chart.Name = "data_chart";
-            series11.ChartArea = "ChartArea1";
-            series11.Legend = "Legend1";
-            series11.Name = "Series1";
-            this.data_chart.Series.Add(series11);
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.data_chart.Series.Add(series3);
             this.data_chart.Size = new System.Drawing.Size(1298, 578);
             this.data_chart.TabIndex = 0;
             this.data_chart.Text = "chart1";
@@ -89,7 +88,7 @@ namespace Damping_Data_Processor
             // 
             // trim_data_button
             // 
-            this.trim_data_button.Location = new System.Drawing.Point(3, 390);
+            this.trim_data_button.Location = new System.Drawing.Point(43, 390);
             this.trim_data_button.Name = "trim_data_button";
             this.trim_data_button.Size = new System.Drawing.Size(175, 27);
             this.trim_data_button.TabIndex = 1;
@@ -100,23 +99,13 @@ namespace Damping_Data_Processor
             // calculate_damp_ratio_and_freq_button
             // 
             this.calculate_damp_ratio_and_freq_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.calculate_damp_ratio_and_freq_button.Location = new System.Drawing.Point(3, 500);
+            this.calculate_damp_ratio_and_freq_button.Location = new System.Drawing.Point(43, 500);
             this.calculate_damp_ratio_and_freq_button.Name = "calculate_damp_ratio_and_freq_button";
             this.calculate_damp_ratio_and_freq_button.Size = new System.Drawing.Size(175, 49);
             this.calculate_damp_ratio_and_freq_button.TabIndex = 2;
             this.calculate_damp_ratio_and_freq_button.Text = "Calculate Damping Ratio and Frequency";
             this.calculate_damp_ratio_and_freq_button.UseVisualStyleBackColor = true;
             this.calculate_damp_ratio_and_freq_button.Click += new System.EventHandler(this.calculate_damp_ratio_and_freq_button_Click);
-            // 
-            // save_trim_data_csv_button
-            // 
-            this.save_trim_data_csv_button.Location = new System.Drawing.Point(6, 765);
-            this.save_trim_data_csv_button.Name = "save_trim_data_csv_button";
-            this.save_trim_data_csv_button.Size = new System.Drawing.Size(356, 33);
-            this.save_trim_data_csv_button.TabIndex = 3;
-            this.save_trim_data_csv_button.Text = "Save Trimmed Data to .csv";
-            this.save_trim_data_csv_button.UseVisualStyleBackColor = true;
-            this.save_trim_data_csv_button.Click += new System.EventHandler(this.save_trim_data_csv_button_Click);
             // 
             // select_input_folder_button1
             // 
@@ -191,7 +180,7 @@ namespace Damping_Data_Processor
             // reset_data_trimming_button
             // 
             this.reset_data_trimming_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.reset_data_trimming_button.Location = new System.Drawing.Point(184, 390);
+            this.reset_data_trimming_button.Location = new System.Drawing.Point(224, 390);
             this.reset_data_trimming_button.Name = "reset_data_trimming_button";
             this.reset_data_trimming_button.Size = new System.Drawing.Size(175, 27);
             this.reset_data_trimming_button.TabIndex = 13;
@@ -207,7 +196,7 @@ namespace Damping_Data_Processor
             0,
             0,
             65536});
-            this.low_freq_cutoff_numupdown.Location = new System.Drawing.Point(3, 442);
+            this.low_freq_cutoff_numupdown.Location = new System.Drawing.Point(43, 442);
             this.low_freq_cutoff_numupdown.Maximum = new decimal(new int[] {
             9999999,
             0,
@@ -230,7 +219,7 @@ namespace Damping_Data_Processor
             0,
             0,
             65536});
-            this.high_freq_cutoff_numupdown.Location = new System.Drawing.Point(184, 442);
+            this.high_freq_cutoff_numupdown.Location = new System.Drawing.Point(224, 442);
             this.high_freq_cutoff_numupdown.Maximum = new decimal(new int[] {
             99999999,
             0,
@@ -253,7 +242,7 @@ namespace Damping_Data_Processor
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 427);
+            this.label2.Location = new System.Drawing.Point(43, 427);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(88, 13);
             this.label2.TabIndex = 25;
@@ -262,7 +251,7 @@ namespace Damping_Data_Processor
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(266, 426);
+            this.label3.Location = new System.Drawing.Point(306, 426);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(90, 13);
             this.label3.TabIndex = 26;
@@ -270,7 +259,7 @@ namespace Damping_Data_Processor
             // 
             // apply_filter_button
             // 
-            this.apply_filter_button.Location = new System.Drawing.Point(3, 468);
+            this.apply_filter_button.Location = new System.Drawing.Point(43, 468);
             this.apply_filter_button.Name = "apply_filter_button";
             this.apply_filter_button.Size = new System.Drawing.Size(175, 26);
             this.apply_filter_button.TabIndex = 27;
@@ -280,7 +269,7 @@ namespace Damping_Data_Processor
             // 
             // remove_filter_button
             // 
-            this.remove_filter_button.Location = new System.Drawing.Point(184, 468);
+            this.remove_filter_button.Location = new System.Drawing.Point(224, 468);
             this.remove_filter_button.Name = "remove_filter_button";
             this.remove_filter_button.Size = new System.Drawing.Size(175, 26);
             this.remove_filter_button.TabIndex = 28;
@@ -290,16 +279,16 @@ namespace Damping_Data_Processor
             // 
             // freq_chart
             // 
-            chartArea12.Name = "ChartArea1";
-            this.freq_chart.ChartAreas.Add(chartArea12);
-            legend12.Name = "Legend1";
-            this.freq_chart.Legends.Add(legend12);
+            chartArea4.Name = "ChartArea1";
+            this.freq_chart.ChartAreas.Add(chartArea4);
+            legend4.Name = "Legend1";
+            this.freq_chart.Legends.Add(legend4);
             this.freq_chart.Location = new System.Drawing.Point(456, 617);
             this.freq_chart.Name = "freq_chart";
-            series12.ChartArea = "ChartArea1";
-            series12.Legend = "Legend1";
-            series12.Name = "Series1";
-            this.freq_chart.Series.Add(series12);
+            series4.ChartArea = "ChartArea1";
+            series4.Legend = "Legend1";
+            series4.Name = "Series1";
+            this.freq_chart.Series.Add(series4);
             this.freq_chart.Size = new System.Drawing.Size(1298, 188);
             this.freq_chart.TabIndex = 30;
             this.freq_chart.Text = "chart1";
@@ -312,23 +301,25 @@ namespace Damping_Data_Processor
             this.summary_results_textbox.Multiline = true;
             this.summary_results_textbox.Name = "summary_results_textbox";
             this.summary_results_textbox.ReadOnly = true;
-            this.summary_results_textbox.Size = new System.Drawing.Size(356, 181);
+            this.summary_results_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.summary_results_textbox.Size = new System.Drawing.Size(444, 227);
             this.summary_results_textbox.TabIndex = 31;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(121, 559);
+            this.label4.Location = new System.Drawing.Point(166, 558);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(118, 17);
             this.label4.TabIndex = 32;
             this.label4.Text = "Results Summary";
+            this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
             // freq_plot_cutoff_numupdown
             // 
             this.freq_plot_cutoff_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.freq_plot_cutoff_numupdown.Location = new System.Drawing.Point(301, 504);
+            this.freq_plot_cutoff_numupdown.Location = new System.Drawing.Point(341, 504);
             this.freq_plot_cutoff_numupdown.Maximum = new decimal(new int[] {
             99999999,
             0,
@@ -351,7 +342,7 @@ namespace Damping_Data_Processor
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(184, 504);
+            this.label5.Location = new System.Drawing.Point(224, 504);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(108, 13);
             this.label5.TabIndex = 34;
@@ -360,7 +351,7 @@ namespace Damping_Data_Processor
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(181, 518);
+            this.label6.Location = new System.Drawing.Point(221, 518);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(114, 13);
             this.label6.TabIndex = 35;
@@ -369,7 +360,7 @@ namespace Damping_Data_Processor
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(181, 533);
+            this.label7.Location = new System.Drawing.Point(221, 533);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(29, 13);
             this.label7.TabIndex = 36;
@@ -379,16 +370,16 @@ namespace Damping_Data_Processor
             // 
             this.select_data_direction_check_list_box.CheckOnClick = true;
             this.select_data_direction_check_list_box.FormattingEnabled = true;
-            this.select_data_direction_check_list_box.Location = new System.Drawing.Point(365, 33);
+            this.select_data_direction_check_list_box.Location = new System.Drawing.Point(365, 30);
             this.select_data_direction_check_list_box.Name = "select_data_direction_check_list_box";
-            this.select_data_direction_check_list_box.Size = new System.Drawing.Size(87, 169);
+            this.select_data_direction_check_list_box.Size = new System.Drawing.Size(87, 304);
             this.select_data_direction_check_list_box.TabIndex = 41;
             this.select_data_direction_check_list_box.SelectedIndexChanged += new System.EventHandler(this.select_data_direction_check_list_box_SelectedIndexChanged);
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(365, 205);
+            this.label8.Location = new System.Drawing.Point(365, 337);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(85, 13);
             this.label8.TabIndex = 42;
@@ -433,7 +424,6 @@ namespace Damping_Data_Processor
             this.Controls.Add(this.input_csv_checkedlistbox);
             this.Controls.Add(this.input_folder_textbox);
             this.Controls.Add(this.select_input_folder_button1);
-            this.Controls.Add(this.save_trim_data_csv_button);
             this.Controls.Add(this.calculate_damp_ratio_and_freq_button);
             this.Controls.Add(this.trim_data_button);
             this.Controls.Add(this.data_chart);
@@ -455,7 +445,6 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.DataVisualization.Charting.Chart data_chart;
         private System.Windows.Forms.Button trim_data_button;
         private System.Windows.Forms.Button calculate_damp_ratio_and_freq_button;
-        private System.Windows.Forms.Button save_trim_data_csv_button;
         private System.Windows.Forms.Button select_input_folder_button1;
         private System.Windows.Forms.TextBox input_folder_textbox;
         private System.Windows.Forms.CheckedListBox input_csv_checkedlistbox;

@@ -26,15 +26,6 @@ namespace Damping_Data_Processor
         VerticalLineAnnotation lower_data_boundary_vertical_line = new VerticalLineAnnotation();
         VerticalLineAnnotation upper_data_boundary_vertical_line = new VerticalLineAnnotation();
 
-        //VerticalLineAnnotation lower_data_boundary_vertical_line_x = new VerticalLineAnnotation();
-        //VerticalLineAnnotation upper_data_boundary_vertical_line_x = new VerticalLineAnnotation();
-
-        //VerticalLineAnnotation lower_data_boundary_vertical_line_y = new VerticalLineAnnotation();
-        //VerticalLineAnnotation upper_data_boundary_vertical_line_y = new VerticalLineAnnotation();
-
-        //VerticalLineAnnotation lower_data_boundary_vertical_line_z = new VerticalLineAnnotation();
-        //VerticalLineAnnotation upper_data_boundary_vertical_line_z = new VerticalLineAnnotation();
-
         string current_selected_dataset_filepath = string.Empty;
 
         //pixel width of charts, used to samplke data for plotting
@@ -64,6 +55,11 @@ namespace Damping_Data_Processor
         List<string> data_direction_name = new List<string>();
 
         string results_summary_text = string.Empty;
+
+        Boolean is_data_filtered = false;
+
+        int x_index_trim_lower_index = 0;
+        int x_index_trim_upper_index = 0;
 
 
         public form1()
@@ -109,64 +105,82 @@ namespace Damping_Data_Processor
             return datasets_xyz;
         }
 
-        public void plot_freq_response(List<double> freq_span, List<double> real_spectrum, string data_direction_name)
+        public void plot_freq_response(List<List<double>> freq_span, List<List<double>> real_spectrum, List<string> data_direction_names)
         {
             //created trimmed data based on the user selected cutoff plot freq
-            List<double> freq = new List<double>();
-            List<double> mag = new List<double>();
+            List<List<double>> freq = new List<List<double>>();
+            List<List<double>> mag = new List<List<double>>();
 
+            //get user input value
             double plot_cuttoff_freq = Convert.ToDouble(freq_plot_cutoff_numupdown.Value);
 
-            for (int i = 0; i < freq_span.Count; i++)
-            {
-                freq.Add(freq_span[i]);
-                mag.Add(real_spectrum[i]);
 
-                if (freq_span[i] > plot_cuttoff_freq)
+
+            //cycle through and grab trimmed value
+            for (int list_index = 0; list_index < freq_span.Count; list_index++)
+            {
+                //temp lists
+                List<double> freq_temp = new List<double>();
+                List<double> mag_temp = new List<double>();
+
+                for (int i = 0; i < freq_span[list_index].Count; i++)
                 {
-                    break;
+                    freq_temp.Add(freq_span[list_index][i]);
+                    mag_temp.Add(real_spectrum[list_index][i]);
+
+                    if (freq_span[list_index][i] > plot_cuttoff_freq)
+                    {
+                        break;
+                    }
+
                 }
 
+                freq.Add(freq_temp);
+                mag.Add(mag_temp);
             }
 
-            List<List<double>> freq_response_plot_data = new List<List<double>>();
-            freq_response_plot_data.Add(freq);
-            freq_response_plot_data.Add(mag);
-
-
-            //create data label for plot
-            List<string> data_set_label = new List<string>();
-            data_set_label.Add("Freq. Response");
 
             //plot the data
-            plot_data_on_chart(freq_chart, data_set_label, freq_response_plot_data, "Frequency (Hz)", "Amplitude");
+            plot_data_on_freq_chart(freq_chart, data_direction_names, freq, mag, "Frequency (Hz)", "Amplitude");
         }
 
-        public double dft_analysis(List<double> signal_data, string data_direction_name)
+        public List<double> dft_analysis(List<List<double>> signal_data, List<string> data_direction_name)
         {
-            // Instantiate a new DFT
-            DFT dft = new DFT();
+            List<double> natural_frequncy = new List<double>();
 
-            // Initialize the DFT
-            // You only need to do this once or if you change any of the DFT parameters.
-            dft.Initialize(Convert.ToUInt32(signal_data.Count));
+            List<List<double>> real_spectrum = new List<List<double>>();
+            List<List<double>> freq_span = new List<List<double>>();
 
-            // Call the DFT and get the scaled spectrum back
-            Complex[] complex_spectrum = dft.Execute(convert_double_list_to_array(signal_data));
+            for (int list_index = 0; list_index < signal_data.Count; list_index++)
+            {
+                // Instantiate a new DFT
+                DFT dft = new DFT();
 
-            // Convert the complex spectrum to magnitude
-            List<double> real_spectrum = DSP.ConvertComplex.ToMagnitude(complex_spectrum).ToList();
+                // Initialize the DFT
+                // You only need to do this once or if you change any of the DFT parameters.
+                dft.Initialize(Convert.ToUInt32(signal_data[list_index].Count));
 
-            // contains a properly scaled Spectrum from 0 - 50,000 Hz (1/2 the Sampling Frequency)
+                // Call the DFT and get the scaled spectrum back
+                Complex[] complex_spectrum = dft.Execute(convert_double_list_to_array(signal_data[list_index]));
 
-            // For plotting on an XY Scatter plot, generate the X Axis frequency Span
-            List<double> freq_span = dft.FrequencySpan(input_data_sample_rate).ToList();
+                // Convert the complex spectrum to magnitude
+                real_spectrum.Add(DSP.ConvertComplex.ToMagnitude(complex_spectrum).ToList());
 
-            double natural_frequency = freq_span[real_spectrum.IndexOf(real_spectrum.Max())];
+                // contains a properly scaled Spectrum from 0 - 50,000 Hz (1/2 the Sampling Frequency)
+
+                // For plotting on an XY Scatter plot, generate the X Axis frequency Span
+                freq_span.Add(dft.FrequencySpan(input_data_sample_rate).ToList());
+
+                //remove first entry of 0Hz
+                real_spectrum[list_index].RemoveAt(0);
+                freq_span[list_index].RemoveAt(0);
+
+                natural_frequncy.Add(freq_span[list_index][real_spectrum[list_index].IndexOf(real_spectrum[list_index].Max())]);
+            }
 
             plot_freq_response(freq_span, real_spectrum, data_direction_name);
 
-            return natural_frequency;
+            return natural_frequncy;
         }
 
         private int find_closest_value(double val, List<Double> list)
@@ -456,6 +470,14 @@ namespace Damping_Data_Processor
             //vector sum sets of 2 directions of data and add to main data set
             generic_input_data_double_master = vector_sum_xyz_datasets(generic_input_data_double_master);
 
+            //remove data offsets after adding the vector summed data
+            for (int i = 1; i < generic_input_data_double_master.Count; i++)
+            {
+                generic_input_data_double_master[i] = remove_data_offset(generic_input_data_double_master[i]);
+            }
+
+
+
             generic_input_data_double_clone = generic_input_data_double_master;
 
             //add trimmed time data (from integration
@@ -612,6 +634,28 @@ namespace Damping_Data_Processor
             chart_name.ChartAreas[0].AxisX.LabelStyle.Format = "0.00";
         }
 
+        public void plot_data_on_freq_chart(Chart chart_name, List<string> data_sets_names, List<List<double>> freq_span, List<List<double>> mag_values, string x_axis_label, string y_axis_label)
+        {
+
+            //List<List<double>> sampled_data_sets = sample_plotting_data(data_sets, chart_width);
+
+            //create series and plot
+            chart_name.Series.Clear();
+
+            for (int i = 0; i < freq_span.Count; i++)
+            {
+                System.Windows.Forms.DataVisualization.Charting.Series series = chart_name.Series.Add(data_sets_names[i] + " Freq. Response");
+                series.ChartType = SeriesChartType.Line;
+                series.Points.DataBindXY(freq_span[i], mag_values[i]);
+                series.BorderWidth = 2;
+            }
+
+            chart_name.ChartAreas[0].AxisX.Title = x_axis_label;
+            chart_name.ChartAreas[0].AxisY.Title = y_axis_label;
+
+            chart_name.ChartAreas[0].AxisX.LabelStyle.Format = "0.00";
+        }
+
         public void draw_vertical_annotations(Chart chart_name, VerticalLineAnnotation line1, VerticalLineAnnotation line2, List<double> time_data_list)
         {
             // the vertical line and its properties
@@ -696,8 +740,8 @@ namespace Damping_Data_Processor
             //int x_index_trim_lower_index = generic_input_data_double_clone[0].IndexOf(x_index_trim_lower);
             //int x_index_trim_upper_index = generic_input_data_double_clone[0].IndexOf(x_index_trim_upper);
 
-            int x_index_trim_lower_index = find_closest_value(x_index_trim_lower, generic_input_data_double_clone[0]);
-            int x_index_trim_upper_index = find_closest_value(x_index_trim_upper, generic_input_data_double_clone[0]);
+            x_index_trim_lower_index = find_closest_value(x_index_trim_lower, generic_input_data_double_clone[0]);
+            x_index_trim_upper_index = find_closest_value(x_index_trim_upper, generic_input_data_double_clone[0]);
 
             if (Math.Abs(x_index_trim_upper_index - x_index_trim_lower_index) < 15)
             {
@@ -729,19 +773,43 @@ namespace Damping_Data_Processor
         {
             //empty the results box
             summary_results_textbox.Text = string.Empty;
-            //remove all plots from dreq response plot 
-            freq_chart.Series.Clear(); 
 
-            for (int i = 0; i < select_data_direction_check_list_box.Items.Count; i++)
+            List<List<double>> selected_data_sets = new List<List<double>>();
+            List<string> selected_data_set_names = new List<string>();
+
+            //determine which data directions are currently selected add them to a list to be freq analyzed
+            for (int data_direction_index = 0; data_direction_index < select_data_direction_check_list_box.Items.Count; data_direction_index++)
             {
-                if (select_data_direction_check_list_box.GetItemCheckState(i) == CheckState.Checked)
+                if (select_data_direction_check_list_box.GetItemCheckState(data_direction_index) == CheckState.Checked)
                 {
-                    double natural_frequency = dft_analysis(generic_input_data_double_clone[i+1], data_direction_name[i]);
-                    results_summary_text = "The natural frequency was found to be " + Math.Round(natural_frequency, 3) + " Hz using the " + data_direction_name[i] + " direction data set.\n\r";
-                    summary_results_textbox.Text = summary_results_textbox.Text + results_summary_text;
-                    List<int> local_maximas = find_local_maximas(generic_input_data_double_clone[1], 200);
+                    selected_data_set_names.Add(data_direction_name[data_direction_index]);
+
+                    if (is_data_filtered == true)
+                    {
+                        selected_data_sets.Add(generic_input_data_double_clone_filtered[data_direction_index + 1]);
+                    }
+                    else
+                    {
+                        selected_data_sets.Add(generic_input_data_double_clone[data_direction_index + 1]);
+                    }
                 }
             }
+
+            List<double> natural_frequencies = dft_analysis(selected_data_sets, selected_data_set_names);
+
+            //after the natural frequencies have been analyzed run loop again to get results
+            for (int data_direction_index = 0; data_direction_index < natural_frequencies.Count; data_direction_index++)
+            {
+                results_summary_text = "The natural frequency was found to be " + Math.Round(natural_frequencies[data_direction_index], 3) + " Hz using the " + selected_data_set_names[data_direction_index] + " direction data set.\r\n";
+                summary_results_textbox.Text = summary_results_textbox.Text + results_summary_text;
+            }
+
+
+
+
+            //List<int> local_maximas = find_local_maximas(generic_input_data_double_clone[1], 200);
+
+
         }
 
         private void save_trim_data_csv_button_Click(object sender, EventArgs e)
@@ -790,6 +858,9 @@ namespace Damping_Data_Processor
 
         private void select_data_set_combobox_SelectionChangeCommitted(object sender, EventArgs e)
         {
+            //reset data so filtered data isnt filtered
+            is_data_filtered = false;
+
             for (int i = 0; i < csv_input_filepaths_short.Count; i++)
             {
                 if (csv_input_filepaths_short[i] == select_data_set_combobox.SelectedItem.ToString())
@@ -804,6 +875,12 @@ namespace Damping_Data_Processor
 
         private void reset_data_trimming_button_Click(object sender, EventArgs e)
         {
+            //reset data so filtered data isnt filtered
+            is_data_filtered = false;
+
+            x_index_trim_lower_index = 0;
+            x_index_trim_upper_index = 0;
+
             load_data_of_selected_dataset_update_charts();
 
             check_checked_chart_series();
@@ -811,6 +888,7 @@ namespace Damping_Data_Processor
 
         private void apply_filter_button_Click(object sender, EventArgs e)
         {
+            is_data_filtered = true;
 
             generic_input_data_double_clone_filtered = new List<List<double>>(generic_input_data_double_clone);
 
@@ -825,8 +903,16 @@ namespace Damping_Data_Processor
             //filter all datasets using the filter object
             for (int i = 1; i < generic_input_data_double_clone.Count; i++)
             {
-                generic_input_data_double_clone_filtered[i] = bandpass.ProcessSamples(convert_double_list_to_array(generic_input_data_double_clone[i])).ToList();
+                if (x_index_trim_upper_index > 0)
+                {
+                    generic_input_data_double_clone_filtered[i] = (bandpass.ProcessSamples(convert_double_list_to_array(generic_input_data_double_master[i])).ToList()).GetRange(x_index_trim_lower_index, x_index_trim_upper_index - x_index_trim_lower_index);
+                }
+                else
+                {
+                    generic_input_data_double_clone_filtered[i] = (bandpass.ProcessSamples(convert_double_list_to_array(generic_input_data_double_master[i])).ToList());
+                }
             }
+
 
             //replot data
             plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone_filtered, "Time (Seconds)", "Amplitude");
@@ -837,6 +923,9 @@ namespace Damping_Data_Processor
 
         private void remove_filter_button_Click(object sender, EventArgs e)
         {
+            //reset data so filtered data isnt filtered
+            is_data_filtered = false;
+
             //replot data
             plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", "Amplitude");
 
@@ -856,6 +945,11 @@ namespace Damping_Data_Processor
         private void select_data_direction_check_list_box_SelectedIndexChanged(object sender, EventArgs e)
         {
             check_checked_chart_series();
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
