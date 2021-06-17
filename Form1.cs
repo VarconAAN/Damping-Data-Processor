@@ -9,7 +9,6 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Numerics;
-using FFTW.NET;
 using MathNet.Filtering.FIR;
 using MathNet.Filtering;
 using DSPLib;
@@ -62,20 +61,113 @@ namespace Damping_Data_Processor
 
         double input_data_sample_rate = 1024;
 
-        List<string> data_set_names = new List<string>();
+        List<string> data_direction_name = new List<string>();
+
+        string results_summary_text = string.Empty;
 
 
         public form1()
         {
-
-            data_set_names.Add("X");
-            data_set_names.Add("Y");
-            data_set_names.Add("Z");
-
             InitializeComponent();
+
+            data_direction_name.Add("X");
+            data_direction_name.Add("Y");
+            data_direction_name.Add("Z");
+            data_direction_name.Add("XY VS");
+            data_direction_name.Add("XZ VS");
+            data_direction_name.Add("YZ VS");
+
+            foreach (string data_direction in data_direction_name)
+            {
+                select_data_direction_check_list_box.Items.Add(data_direction, CheckState.Checked);
+            }
+
+            select_data_direction_check_list_box.SetItemChecked(3, false);
+            select_data_direction_check_list_box.SetItemChecked(4, false);
+            select_data_direction_check_list_box.SetItemChecked(5, false);
         }
 
         //generic program functions
+
+        public List<List<double>> vector_sum_xyz_datasets(List<List<double>> datasets_xyz)
+        {
+            List<double> xy = new List<double>();
+            List<double> xz = new List<double>();
+            List<double> yz = new List<double>();
+
+            for (int i = 0; i < datasets_xyz[0].Count; i++)
+            {
+                xy.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) * Math.Pow(datasets_xyz[2][i], 2)));
+                xz.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) * Math.Pow(datasets_xyz[3][i], 2)));
+                yz.Add(Math.Sqrt(Math.Pow(datasets_xyz[2][i], 2) * Math.Pow(datasets_xyz[3][i], 2)));
+            }
+
+            datasets_xyz.Add(xy);
+            datasets_xyz.Add(xz);
+            datasets_xyz.Add(yz);
+
+            return datasets_xyz;
+        }
+
+        public void plot_freq_response(List<double> freq_span, List<double> real_spectrum, string data_direction_name)
+        {
+            //created trimmed data based on the user selected cutoff plot freq
+            List<double> freq = new List<double>();
+            List<double> mag = new List<double>();
+
+            double plot_cuttoff_freq = Convert.ToDouble(freq_plot_cutoff_numupdown.Value);
+
+            for (int i = 0; i < freq_span.Count; i++)
+            {
+                freq.Add(freq_span[i]);
+                mag.Add(real_spectrum[i]);
+
+                if (freq_span[i] > plot_cuttoff_freq)
+                {
+                    break;
+                }
+
+            }
+
+            List<List<double>> freq_response_plot_data = new List<List<double>>();
+            freq_response_plot_data.Add(freq);
+            freq_response_plot_data.Add(mag);
+
+
+            //create data label for plot
+            List<string> data_set_label = new List<string>();
+            data_set_label.Add("Freq. Response");
+
+            //plot the data
+            plot_data_on_chart(freq_chart, data_set_label, freq_response_plot_data, "Frequency (Hz)", "Amplitude");
+        }
+
+        public double dft_analysis(List<double> signal_data, string data_direction_name)
+        {
+            // Instantiate a new DFT
+            DFT dft = new DFT();
+
+            // Initialize the DFT
+            // You only need to do this once or if you change any of the DFT parameters.
+            dft.Initialize(Convert.ToUInt32(signal_data.Count));
+
+            // Call the DFT and get the scaled spectrum back
+            Complex[] complex_spectrum = dft.Execute(convert_double_list_to_array(signal_data));
+
+            // Convert the complex spectrum to magnitude
+            List<double> real_spectrum = DSP.ConvertComplex.ToMagnitude(complex_spectrum).ToList();
+
+            // contains a properly scaled Spectrum from 0 - 50,000 Hz (1/2 the Sampling Frequency)
+
+            // For plotting on an XY Scatter plot, generate the X Axis frequency Span
+            List<double> freq_span = dft.FrequencySpan(input_data_sample_rate).ToList();
+
+            double natural_frequency = freq_span[real_spectrum.IndexOf(real_spectrum.Max())];
+
+            plot_freq_response(freq_span, real_spectrum, data_direction_name);
+
+            return natural_frequency;
+        }
 
         private int find_closest_value(double val, List<Double> list)
         {
@@ -113,7 +205,7 @@ namespace Damping_Data_Processor
                 {
                     while_flag = false;
                 }
-                j=j+2;
+                j = j + 2;
             }
 
 
@@ -126,62 +218,17 @@ namespace Damping_Data_Processor
             return double_array;
         }
 
-        public double[] convert_double_list_to_array (List<double> data)
+        public double[] convert_double_list_to_array(List<double> data)
         {
             double[] double_array = new double[data.Count];
-            for(int i = 0; i<data.Count; i++)
+            for (int i = 0; i < data.Count; i++)
             {
                 double_array[i] = data[i];
             }
             return double_array;
         }
 
-        public void calculate_natural_frequency (List<double> data)
-        {
-            ////Complex[] output = new Complex[data.Count];
-
-            //using (var pinIn = new PinnedArray<double>(convert_double_list_to_array(data)))
-            ////using (var pinOut = new PinnedArray<Complex>(output))
-            //using (var output = new FftwArrayComplex(DFT.GetComplexBufferSize(pinIn.GetSize())))
-            //{
-            //    DFT.FFT(pinIn, output);
-            //}
-
-            //double max_freq = 0;
-            //List<double> test = new List<double>();
-
-            //// Use the same arrays for as many transformations as you like.
-            //// If you can use the same arrays for your transformations, this is faster than calling DFT.FFT / DFT.IFFT
-            //using (var timeDomain = new FftwArrayComplex(data.Count))
-            //using (var frequencyDomain = new FftwArrayComplex(timeDomain.GetSize()))
-            //using (var fft = FftwPlanC2C.Create(timeDomain, frequencyDomain, DftDirection.Forwards))
-            ////using (var ifft = FftwPlanC2C.Create(frequencyDomain, timeDomain, DftDirection.Backwards))
-            //{
-            //    // Set the input after the plan was created as the input may be overwritten
-            //    // during planning
-            //    for (int i = 0; i < timeDomain.Length; i++)
-            //    {
-            //        timeDomain[i] = data[i];
-            //    }
-
-            //    // timeDomain -> frequencyDomain
-            //    fft.Execute();
-
-            //    for (int i = frequencyDomain.Length / 2; i < frequencyDomain.Length; i++)
-            //        frequencyDomain[i] = 0;
-
-
-            //    for (int i = 0; i < frequencyDomain.Length; i++)
-            //    {
-            //        test.Add(Convert.ToDouble(frequencyDomain[i]));
-            //    }
-
-            //}
-            //max_freq = test.Max();
-
-        }
-
-        public List<List<double>> sample_plotting_data(List<List<double>> data_sets,  int max_samples)
+        public List<List<double>> sample_plotting_data(List<List<double>> data_sets, int max_samples)
         {
             //X & Y muust be same length
             //if(X.Count != Y.Count)
@@ -198,23 +245,32 @@ namespace Damping_Data_Processor
 
             int sample_rate = data_sets[0].Count / max_samples;
 
-            List<double> time_sampled = new List<double>();
-            List<double> X_sampled = new List<double>();
-            List<double> Y_sampled = new List<double>();
-            List<double> Z_sampled = new List<double>();
+            //List<double> time_sampled = new List<double>();
+            //List<double> X_sampled = new List<double>();
+            //List<double> Y_sampled = new List<double>();
+            //List<double> Z_sampled = new List<double>();
 
-            for(int i=0; i< data_sets[0].Count; i = i + sample_rate)
+            for (int list_index = 0; list_index < data_sets.Count; list_index++)
             {
-                time_sampled.Add(data_sets[0][i]);
-                X_sampled.Add(data_sets[1][i]);
-                Y_sampled.Add(data_sets[2][i]);
-                Z_sampled.Add(data_sets[3][i]);
+
+                List<double> sampled_data = new List<double>();
+
+                for (int i = 0; i < data_sets[list_index].Count; i = i + sample_rate)
+                {
+                    sampled_data.Add(data_sets[list_index][i]);
+
+                    //time_sampled.Add(data_sets[0][i]);
+                    //X_sampled.Add(data_sets[1][i]);
+                    //Y_sampled.Add(data_sets[2][i]);
+                    //Z_sampled.Add(data_sets[3][i]);
+                }
+                sampled_data_sets.Add(sampled_data);
             }
 
-            sampled_data_sets.Add(time_sampled);
-            sampled_data_sets.Add(X_sampled);
-            sampled_data_sets.Add(Y_sampled);
-            sampled_data_sets.Add(Z_sampled);
+            //sampled_data_sets.Add(time_sampled);
+            //sampled_data_sets.Add(X_sampled);
+            //sampled_data_sets.Add(Y_sampled);
+            //sampled_data_sets.Add(Z_sampled);
 
             return sampled_data_sets;
 
@@ -283,7 +339,7 @@ namespace Damping_Data_Processor
         {
             for (int i = 0; i < generic_input_data_double_master[0].Count; i++)
             {
-                generic_input_data_double_master[0][i] = Convert.ToDouble(i+1)/ input_data_sample_rate;
+                generic_input_data_double_master[0][i] = Convert.ToDouble(i + 1) / input_data_sample_rate;
             }
         }
 
@@ -353,35 +409,27 @@ namespace Damping_Data_Processor
 
         //program control functions
 
-
-
         public void check_checked_chart_series()
         {
-            if (display_x_checkbox.CheckState == CheckState.Checked)
+            for (int i = 0; i < select_data_direction_check_list_box.Items.Count; i++)
             {
-                data_chart.Series[0].Enabled = true;
-            }
-            else
-            {
-                data_chart.Series[0].Enabled = false;
-            }
-
-            if (display_y_checkbox.CheckState == CheckState.Checked)
-            {
-                data_chart.Series[1].Enabled = true;
-            }
-            else
-            {
-                data_chart.Series[1].Enabled = false;
-            }
-
-            if (display_z_checkbox.CheckState == CheckState.Checked)
-            {
-                data_chart.Series[2].Enabled = true;
-            }
-            else
-            {
-                data_chart.Series[2].Enabled = false;
+                if (select_data_direction_check_list_box.GetItemCheckState(i) == CheckState.Checked)
+                {
+                    //try catch added because user could click on control before and chart data was loaded casuing error
+                    try
+                    {
+                        data_chart.Series[i].Enabled = true;
+                    }
+                    catch { }
+                }
+                else
+                {
+                    try
+                    {
+                        data_chart.Series[i].Enabled = false;
+                    }
+                    catch { }
+                }
             }
         }
 
@@ -405,6 +453,9 @@ namespace Damping_Data_Processor
                 generic_input_data_double_master[i] = remove_data_offset(generic_input_data_double_master[i]);
             }
 
+            //vector sum sets of 2 directions of data and add to main data set
+            generic_input_data_double_master = vector_sum_xyz_datasets(generic_input_data_double_master);
+
             generic_input_data_double_clone = generic_input_data_double_master;
 
             //add trimmed time data (from integration
@@ -414,8 +465,8 @@ namespace Damping_Data_Processor
 
 
 
-            plot_data_on_chart(data_chart, data_set_names, generic_input_data_double_clone);
-            
+            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", "Amplitude");
+
             draw_vertical_annotations(data_chart, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, generic_input_data_double_clone[0]);
 
 
@@ -539,24 +590,8 @@ namespace Damping_Data_Processor
 
         //manipulate chart functions
 
-        //public void update_all_annotation_positions (double annotation_1_pos, double annotation_2_pos)
-        //{
-        //    lower_data_boundary_vertical_line_x.X = annotation_1_pos;
-        //    upper_data_boundary_vertical_line_x.X = annotation_2_pos;
-
-        //    lower_data_boundary_vertical_line_y.X = annotation_1_pos;
-        //    upper_data_boundary_vertical_line_y.X = annotation_2_pos;
-
-        //    lower_data_boundary_vertical_line_z.X = annotation_1_pos;
-        //    upper_data_boundary_vertical_line_z.X = annotation_2_pos;
-        //}
-
-        public void plot_data_on_chart(Chart chart_name, List<string> data_sets_names, List<List<double>> data_sets)
+        public void plot_data_on_chart(Chart chart_name, List<string> data_sets_names, List<List<double>> data_sets, string x_axis_label, string y_axis_label)
         {
-            //sample data to reduce lag in program
-            //List<List<double>> sampled_data = sample_plotting_data(data_x, data_y, chart_width);
-            //List<double> sampled_data_x = sampled_data[0];
-            //List<double> sampled_data_y = sampled_data[1];
 
             List<List<double>> sampled_data_sets = sample_plotting_data(data_sets, chart_width);
 
@@ -565,16 +600,17 @@ namespace Damping_Data_Processor
 
             for (int i = 1; i < sampled_data_sets.Count; i++)
             {
-                System.Windows.Forms.DataVisualization.Charting.Series series = chart_name.Series.Add(data_sets_names[i-1]);
+                System.Windows.Forms.DataVisualization.Charting.Series series = chart_name.Series.Add(data_sets_names[i - 1]);
                 series.ChartType = SeriesChartType.Line;
                 series.Points.DataBindXY(sampled_data_sets[0], sampled_data_sets[i]);
                 series.BorderWidth = 1;
             }
 
-            data_chart.ChartAreas[0].AxisX.Title = "Time (Seconds)";
-            data_chart.ChartAreas[0].AxisY.Title = "Amplitude";
-        }
+            chart_name.ChartAreas[0].AxisX.Title = x_axis_label;
+            chart_name.ChartAreas[0].AxisY.Title = y_axis_label;
 
+            chart_name.ChartAreas[0].AxisX.LabelStyle.Format = "0.00";
+        }
 
         public void draw_vertical_annotations(Chart chart_name, VerticalLineAnnotation line1, VerticalLineAnnotation line2, List<double> time_data_list)
         {
@@ -606,7 +642,7 @@ namespace Damping_Data_Processor
             //line2.Name = "line 2";
             line2.LineColor = Color.Purple;
             line2.LineWidth = 3;         // use your numbers!
-            line2.X = time_data_list[time_data_list.Count - 3];
+            line2.X = time_data_list[time_data_list.Count - 10];
             //add to the chart
             chart_name.Annotations.Add(line2);
         }
@@ -647,7 +683,7 @@ namespace Damping_Data_Processor
                 //x_index_trim_lower = Convert.ToInt32(lower_data_boundary_vertical_line.X);
                 //x_index_trim_upper = Convert.ToInt32(upper_data_boundary_vertical_line.X) ;                
                 x_index_trim_lower = lower_data_boundary_vertical_line.X;
-                x_index_trim_upper = upper_data_boundary_vertical_line.X ;
+                x_index_trim_upper = upper_data_boundary_vertical_line.X;
             }
             else
             {
@@ -663,15 +699,23 @@ namespace Damping_Data_Processor
             int x_index_trim_lower_index = find_closest_value(x_index_trim_lower, generic_input_data_double_clone[0]);
             int x_index_trim_upper_index = find_closest_value(x_index_trim_upper, generic_input_data_double_clone[0]);
 
+            if (Math.Abs(x_index_trim_upper_index - x_index_trim_lower_index) < 15)
+            {
+                string message = "Cannot trim data to less than 15 data points";
+                string title = "Error";
+                MessageBox.Show(message, title);
+                return;
+            }
+
             update_trimmed_input_data(x_index_trim_lower_index, x_index_trim_upper_index);
 
-            plot_data_on_chart(data_chart, data_set_names, generic_input_data_double_clone);
+            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", "Amplitude");
             //clear_and_plot_chart(y_data_chart, "Y", generic_input_data_double_clone[0], generic_input_data_double_clone[2]);
             //clear_and_plot_chart(z_data_chart, "Z", generic_input_data_double_clone[0], generic_input_data_double_clone[3]);
             draw_vertical_annotations(data_chart, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, generic_input_data_double_clone[0]);
             //draw_vertical_annotations(y_data_chart, lower_data_boundary_vertical_line_y, upper_data_boundary_vertical_line_y, generic_input_data_double_clone[0]);
             //draw_vertical_annotations(z_data_chart, lower_data_boundary_vertical_line_z, upper_data_boundary_vertical_line_z, generic_input_data_double_clone[0]);
-           
+
             check_checked_chart_series();
 
         }
@@ -683,13 +727,21 @@ namespace Damping_Data_Processor
 
         private void calculate_damp_ratio_and_freq_button_Click(object sender, EventArgs e)
         {
-            calculate_natural_frequency(generic_input_data_double_clone[1]);
+            //empty the results box
+            summary_results_textbox.Text = string.Empty;
+            //remove all plots from dreq response plot 
+            freq_chart.Series.Clear(); 
 
-
-
-            List<int> zero_crossings = calculate_amount_zero_crossings(generic_input_data_double_clone[1]);
-            List<int> local_maximas = find_local_maximas(generic_input_data_double_clone[1], 200);
-            double frequency = calculate_freq_based_zero_crossings(generic_input_data_double_clone[0], local_maximas);
+            for (int i = 0; i < select_data_direction_check_list_box.Items.Count; i++)
+            {
+                if (select_data_direction_check_list_box.GetItemCheckState(i) == CheckState.Checked)
+                {
+                    double natural_frequency = dft_analysis(generic_input_data_double_clone[i+1], data_direction_name[i]);
+                    results_summary_text = "The natural frequency was found to be " + Math.Round(natural_frequency, 3) + " Hz using the " + data_direction_name[i] + " direction data set.\n\r";
+                    summary_results_textbox.Text = summary_results_textbox.Text + results_summary_text;
+                    List<int> local_maximas = find_local_maximas(generic_input_data_double_clone[1], 200);
+                }
+            }
         }
 
         private void save_trim_data_csv_button_Click(object sender, EventArgs e)
@@ -738,15 +790,16 @@ namespace Damping_Data_Processor
 
         private void select_data_set_combobox_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            for(int i=0; i< csv_input_filepaths_short.Count; i++)
+            for (int i = 0; i < csv_input_filepaths_short.Count; i++)
             {
-                if(csv_input_filepaths_short[i] == select_data_set_combobox.SelectedItem.ToString())
+                if (csv_input_filepaths_short[i] == select_data_set_combobox.SelectedItem.ToString())
                 {
                     current_selected_dataset_filepath = csv_input_filepaths[i];
                     break;
                 }
             }
             load_data_of_selected_dataset_update_charts();
+            check_checked_chart_series();
         }
 
         private void reset_data_trimming_button_Click(object sender, EventArgs e)
@@ -776,32 +829,32 @@ namespace Damping_Data_Processor
             }
 
             //replot data
-            plot_data_on_chart(data_chart, data_set_names, generic_input_data_double_clone_filtered);
+            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone_filtered, "Time (Seconds)", "Amplitude");
 
             check_checked_chart_series();
 
-        }
-
-        private void display_x_checkbox_CheckedChanged(object sender, EventArgs e)
-        {
-            check_checked_chart_series();
-        }
-
-        private void display_y_checkbox_CheckedChanged(object sender, EventArgs e)
-        {
-            check_checked_chart_series();
-        }
-
-        private void display_z_checkbox_CheckedChanged(object sender, EventArgs e)
-        {
-            check_checked_chart_series();
         }
 
         private void remove_filter_button_Click(object sender, EventArgs e)
         {
             //replot data
-            plot_data_on_chart(data_chart, data_set_names, generic_input_data_double_clone);
+            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", "Amplitude");
 
+            check_checked_chart_series();
+        }
+
+        private void input_csv_checkedlistbox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label8_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void select_data_direction_check_list_box_SelectedIndexChanged(object sender, EventArgs e)
+        {
             check_checked_chart_series();
         }
     }
