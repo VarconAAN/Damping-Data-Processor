@@ -29,12 +29,16 @@ namespace Damping_Data_Processor
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(form1));
             this.data_chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.trim_data_button = new System.Windows.Forms.Button();
             this.calculate_damp_ratio_and_freq_button = new System.Windows.Forms.Button();
@@ -52,7 +56,7 @@ namespace Damping_Data_Processor
             this.label3 = new System.Windows.Forms.Label();
             this.apply_filter_button = new System.Windows.Forms.Button();
             this.remove_filter_button = new System.Windows.Forms.Button();
-            this.freq_chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.freq_dft_chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.summary_results_textbox = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.freq_plot_cutoff_numupdown = new System.Windows.Forms.NumericUpDown();
@@ -62,25 +66,29 @@ namespace Damping_Data_Processor
             this.select_data_direction_check_list_box = new System.Windows.Forms.CheckedListBox();
             this.label8 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
+            this.freq_peaks_chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.data_chart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.freq_chart)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.freq_dft_chart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.freq_plot_cutoff_numupdown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.freq_peaks_chart)).BeginInit();
             this.SuspendLayout();
             // 
             // data_chart
             // 
-            chartArea3.Name = "ChartArea1";
-            this.data_chart.ChartAreas.Add(chartArea3);
-            legend3.Name = "Legend1";
-            this.data_chart.Legends.Add(legend3);
+            chartArea1.Name = "ChartArea1";
+            this.data_chart.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.data_chart.Legends.Add(legend1);
             this.data_chart.Location = new System.Drawing.Point(456, 33);
             this.data_chart.Name = "data_chart";
-            series3.ChartArea = "ChartArea1";
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.data_chart.Series.Add(series3);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.data_chart.Series.Add(series1);
             this.data_chart.Size = new System.Drawing.Size(1298, 578);
             this.data_chart.TabIndex = 0;
             this.data_chart.Text = "chart1";
@@ -277,21 +285,22 @@ namespace Damping_Data_Processor
             this.remove_filter_button.UseVisualStyleBackColor = true;
             this.remove_filter_button.Click += new System.EventHandler(this.remove_filter_button_Click);
             // 
-            // freq_chart
+            // freq_dft_chart
             // 
-            chartArea4.Name = "ChartArea1";
-            this.freq_chart.ChartAreas.Add(chartArea4);
-            legend4.Name = "Legend1";
-            this.freq_chart.Legends.Add(legend4);
-            this.freq_chart.Location = new System.Drawing.Point(456, 617);
-            this.freq_chart.Name = "freq_chart";
-            series4.ChartArea = "ChartArea1";
-            series4.Legend = "Legend1";
-            series4.Name = "Series1";
-            this.freq_chart.Series.Add(series4);
-            this.freq_chart.Size = new System.Drawing.Size(1298, 188);
-            this.freq_chart.TabIndex = 30;
-            this.freq_chart.Text = "chart1";
+            chartArea2.Name = "ChartArea1";
+            this.freq_dft_chart.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.freq_dft_chart.Legends.Add(legend2);
+            this.freq_dft_chart.Location = new System.Drawing.Point(456, 632);
+            this.freq_dft_chart.Name = "freq_dft_chart";
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.freq_dft_chart.Series.Add(series2);
+            this.freq_dft_chart.Size = new System.Drawing.Size(705, 184);
+            this.freq_dft_chart.TabIndex = 30;
+            this.freq_dft_chart.Text = "chart1";
+            this.freq_dft_chart.Click += new System.EventHandler(this.freq_chart_Click);
             // 
             // summary_results_textbox
             // 
@@ -389,17 +398,54 @@ namespace Damping_Data_Processor
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(1522, 806);
+            this.label9.Location = new System.Drawing.Point(1519, 3);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(232, 13);
             this.label9.TabIndex = 43;
             this.label9.Text = "Created by Atlin Anderson for Varcon Inc (2021)";
+            // 
+            // freq_peaks_chart
+            // 
+            chartArea3.Name = "ChartArea1";
+            this.freq_peaks_chart.ChartAreas.Add(chartArea3);
+            legend3.Name = "Legend1";
+            this.freq_peaks_chart.Legends.Add(legend3);
+            this.freq_peaks_chart.Location = new System.Drawing.Point(1167, 632);
+            this.freq_peaks_chart.Name = "freq_peaks_chart";
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.freq_peaks_chart.Series.Add(series3);
+            this.freq_peaks_chart.Size = new System.Drawing.Size(587, 184);
+            this.freq_peaks_chart.TabIndex = 44;
+            this.freq_peaks_chart.Text = "chart1";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(699, 616);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(259, 13);
+            this.label10.TabIndex = 45;
+            this.label10.Text = "Frequency Response (Discrete Frequency Transform)";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(1332, 616);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(237, 13);
+            this.label11.TabIndex = 46;
+            this.label11.Text = "Frequency Estimation (Distance Between Peaks)";
             // 
             // form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1763, 828);
+            this.Controls.Add(this.label11);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.freq_peaks_chart);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.select_data_direction_check_list_box);
@@ -409,7 +455,7 @@ namespace Damping_Data_Processor
             this.Controls.Add(this.freq_plot_cutoff_numupdown);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.summary_results_textbox);
-            this.Controls.Add(this.freq_chart);
+            this.Controls.Add(this.freq_dft_chart);
             this.Controls.Add(this.remove_filter_button);
             this.Controls.Add(this.apply_filter_button);
             this.Controls.Add(this.label3);
@@ -427,14 +473,16 @@ namespace Damping_Data_Processor
             this.Controls.Add(this.calculate_damp_ratio_and_freq_button);
             this.Controls.Add(this.trim_data_button);
             this.Controls.Add(this.data_chart);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "form1";
-            this.Text = "Form1";
+            this.Text = "Structrual Damping Data Processor";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.data_chart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.freq_chart)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.freq_dft_chart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.freq_plot_cutoff_numupdown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.freq_peaks_chart)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -459,7 +507,7 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button apply_filter_button;
         private System.Windows.Forms.Button remove_filter_button;
-        private System.Windows.Forms.DataVisualization.Charting.Chart freq_chart;
+        private System.Windows.Forms.DataVisualization.Charting.Chart freq_dft_chart;
         private System.Windows.Forms.TextBox summary_results_textbox;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.NumericUpDown freq_plot_cutoff_numupdown;
@@ -469,6 +517,9 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.CheckedListBox select_data_direction_check_list_box;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.DataVisualization.Charting.Chart freq_peaks_chart;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label11;
     }
 }
 
