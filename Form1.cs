@@ -44,8 +44,6 @@ namespace Damping_Data_Processor
         // the data set but with trimmed local maximas data points
         List<List<double>> generic_input_data_double_clone_maximas = new List<List<double>>();
 
-        string output_folder = @"C:\Users\aanderson\OneDrive - Varcon Inc\Documents\Projects\Damping Data Processor\Output\";
-
         //folder picked by user with all input data
         string input_folder = string.Empty;
 
@@ -64,6 +62,12 @@ namespace Damping_Data_Processor
 
         int x_index_trim_lower_index = 0;
         int x_index_trim_upper_index = 0;
+
+        string y_axis_label_data_chart = "Acceleration (m/s^2)";
+
+        List<string> dataset_result_summary_text_list = new List<string>();
+
+        int current_selected_csv_checkedlistbox_index = 0;
 
 
         public form1()
@@ -89,6 +93,60 @@ namespace Damping_Data_Processor
 
         //generic program functions
 
+        public List<double> average_remove_outliers(List<double> data)
+        {
+            //remove outliers that are higher than 90% of average and less than 10 % of averag
+            List<double> data_trimmed = new List<double>();
+
+            double x = 0;
+
+            for (int i = 0; i < data.Count; i++)
+            {
+                x = x + Math.Pow(data[i] - data.Average(), 2);
+            }
+            double std_deviation = Math.Sqrt(x / data.Count);
+
+            for (int i = 0; i < data.Count; i++)
+            {
+                if (data[i] < data.Average() + std_deviation * 3 && data[i] > data.Average() - std_deviation * 3)
+                {
+                    data_trimmed.Add(data[i]);
+                }
+            }
+            return data_trimmed;
+
+        }
+
+        public List<double> exponential_curve_fit(List<double> x_data, List<double> y_data, double C_offset = 0)
+        {
+            //returns the coefficents of the exp curve
+
+            //exp form
+            //y = A * exp(K * t)
+            //linear form
+            //y - C = K*t + log(A)
+
+            List<double> y_data_log = new List<double>();
+
+            for (int i = 0; i < y_data.Count(); i++)
+            {
+                //remove offset
+                y_data_log.Add(y_data[i] - C_offset);
+                //convert to linear curve
+                y_data_log[i] = Math.Log(y_data_log[i]);
+            }
+
+            Tuple<double, double> p = Fit.Line(x_data.ToArray(), y_data_log.ToArray());
+            double a = Math.Exp(p.Item1);
+            double k = p.Item2;
+
+            List<double> exp_coffecients = new List<double>();
+            exp_coffecients.Add(a);
+            exp_coffecients.Add(k);
+
+            return exp_coffecients;
+        }
+
         double[] Exponential(double[] x, double[] y, DirectRegressionMethod method = DirectRegressionMethod.QR)
         {
             //curve fit exponential curve
@@ -99,19 +157,22 @@ namespace Damping_Data_Processor
 
         public void plot_freq_peaks_response(List<int> time_peaks, List<double> frequency_peaks, string series_name)
         {
-            System.Windows.Forms.DataVisualization.Charting.Series series = freq_peaks_chart.Series.Add(series_name+ " Freq. Resp.");
+            System.Windows.Forms.DataVisualization.Charting.Series series = freq_peaks_chart.Series.Add(series_name + " Freq. Resp.");
             series.ChartType = SeriesChartType.Point;
             series.Points.DataBindXY(time_peaks, frequency_peaks);
             series.BorderWidth = 1;
 
 
-            freq_peaks_chart.ChartAreas[0].AxisX.Title = "Time (seconds)";
+            freq_peaks_chart.ChartAreas[0].AxisX.Title = "Freq. Calc. #";
             freq_peaks_chart.ChartAreas[0].AxisY.Title = "Frequency (Hz)";
+
+            //rescale y axis
+            freq_peaks_chart.ChartAreas[0].AxisY.IsStartedFromZero = false;
 
         }
 
 
-        public List<double> calculate_natural_frequency_peaks(List<int> peak_int_indexs, double sample_rate,  string series_name)
+        public List<double> calculate_natural_frequency_peaks(List<int> peak_int_indexs, double sample_rate, string series_name)
         {
             //get the freqs by using the integer indecies of the maximas and the sample rate
             List<double> frequency_peaks = new List<double>();
@@ -119,13 +180,25 @@ namespace Damping_Data_Processor
             for (int i = 1; i < peak_int_indexs.Count; i++)
             {
                 double samples_between_peaks = Convert.ToDouble(peak_int_indexs[i] - peak_int_indexs[i - 1]);
-                frequency_peaks.Add(1/(samples_between_peaks/1024));
+                frequency_peaks.Add((1 / (samples_between_peaks / 1024)) / 2);
             }
 
-            //remove last data point to match lengths for plotting
+            frequency_peaks = average_remove_outliers(frequency_peaks);
+            //remove last data point as signal is not usually trimmed perfectly
+            frequency_peaks.RemoveAt(frequency_peaks.Count - 1);
+
+            //abitrary list to display clauclated frequencies
+            List<int> count_list = new List<int>();
+            for (int i = 1; i < frequency_peaks.Count + 1; i++)
+            {
+                count_list.Add(i);
+            }
+
+
+            //remove last data point to match lengths for plotting (list not used anymnore)
             peak_int_indexs.RemoveAt(peak_int_indexs.Count - 1);
 
-            plot_freq_peaks_response(peak_int_indexs, frequency_peaks, series_name);
+            plot_freq_peaks_response(count_list, frequency_peaks, series_name);
 
             return frequency_peaks;
         }
@@ -532,7 +605,7 @@ namespace Damping_Data_Processor
 
 
 
-            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", "Amplitude");
+            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", y_axis_label_data_chart);
 
             draw_vertical_annotations(data_chart, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, generic_input_data_double_clone[0]);
 
@@ -541,7 +614,19 @@ namespace Damping_Data_Processor
 
         public void update_program_after_input_folder_select()
         {
+            input_csv_checkedlistbox.Items.Clear();
+
+            //clear all saved summaries
+            dataset_result_summary_text_list.Clear();
+
             select_folder(out input_folder);
+
+            if (input_folder == string.Empty)
+            {
+                return;
+            }
+            input_folder = input_folder + @"\";
+
             input_folder_textbox.Text = input_folder;
             csv_input_filepaths = (Directory.GetFiles(input_folder, "*.csv", System.IO.SearchOption.AllDirectories)).ToList();
 
@@ -549,6 +634,8 @@ namespace Damping_Data_Processor
             for (int i = 0; i < csv_input_filepaths.Count; i++)
             {
                 csv_input_filepaths_short.Add(csv_input_filepaths[i].Replace(input_folder, String.Empty));
+                //add blank enrties for each possible loaded dataset
+                dataset_result_summary_text_list.Add(string.Empty);
             }
 
             for (int i = 0; i < csv_input_filepaths.Count; i++)
@@ -798,12 +885,8 @@ namespace Damping_Data_Processor
 
             update_trimmed_input_data(x_index_trim_lower_index, x_index_trim_upper_index);
 
-            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", "Amplitude");
-            //clear_and_plot_chart(y_data_chart, "Y", generic_input_data_double_clone[0], generic_input_data_double_clone[2]);
-            //clear_and_plot_chart(z_data_chart, "Z", generic_input_data_double_clone[0], generic_input_data_double_clone[3]);
+            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", y_axis_label_data_chart);
             draw_vertical_annotations(data_chart, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, generic_input_data_double_clone[0]);
-            //draw_vertical_annotations(y_data_chart, lower_data_boundary_vertical_line_y, upper_data_boundary_vertical_line_y, generic_input_data_double_clone[0]);
-            //draw_vertical_annotations(z_data_chart, lower_data_boundary_vertical_line_z, upper_data_boundary_vertical_line_z, generic_input_data_double_clone[0]);
 
             check_checked_chart_series();
 
@@ -816,6 +899,8 @@ namespace Damping_Data_Processor
 
         private void calculate_damp_ratio_and_freq_button_Click(object sender, EventArgs e)
         {
+            //clear summary text
+            results_summary_text = string.Empty;
             //empty the results box
             summary_results_textbox.Text = string.Empty;
             // clear the freq plot
@@ -823,6 +908,9 @@ namespace Damping_Data_Processor
 
             List<List<double>> selected_data_sets = new List<List<double>>();
             List<string> selected_data_set_names = new List<string>();
+
+            //set header for text file
+            results_summary_text = csv_input_filepaths_short[current_selected_csv_checkedlistbox_index] + "\r\n";
 
             //determine which data directions are currently selected add them to a list to be freq analyzed
             for (int data_direction_index = 0; data_direction_index < select_data_direction_check_list_box.Items.Count; data_direction_index++)
@@ -848,11 +936,17 @@ namespace Damping_Data_Processor
             for (int data_direction_index = 0; data_direction_index < natural_frequencies.Count; data_direction_index++)
             {
 
+                List<double> selected_data_set_abs = new List<double>();
+                for (int i = 0; i < selected_data_sets[data_direction_index].Count; i++)
+                {
+                    selected_data_set_abs.Add(Math.Abs(selected_data_sets[data_direction_index][i]));
+                }
 
-                int window_size = Convert.ToInt32(Math.Round(natural_frequencies[data_direction_index] * input_data_sample_rate * 0.95));
-                List<int> local_maximas = find_local_maximas(selected_data_sets[data_direction_index], window_size);
+                int window_size = Convert.ToInt32(Math.Round((natural_frequencies[data_direction_index] * input_data_sample_rate * 0.95) / 2));
+                List<int> local_maximas = find_local_maximas(selected_data_set_abs, window_size);
 
                 List<double> natural_frequncy_peaks = calculate_natural_frequency_peaks(local_maximas, input_data_sample_rate, selected_data_set_names[data_direction_index]);
+                double average_natural_frequency_peaks = natural_frequncy_peaks.Average();
 
                 //gather the data points of the local maximas
                 List<double> time_maximas = new List<double>();
@@ -860,32 +954,39 @@ namespace Damping_Data_Processor
 
                 for (int i = 0; i < local_maximas.Count; i++)
                 {
-                    time_maximas.Add(selected_data_sets[0][i]);
-                    selected_data_set_maximas.Add(selected_data_sets[data_direction_index][i]);
+                    time_maximas.Add(generic_input_data_double_clone[0][local_maximas[i]]);
+                    selected_data_set_maximas.Add(selected_data_set_abs[local_maximas[i]]);
                 }
 
                 //calculate simplified damping ratio based on loagrithmic decrement
                 List<double> damp_ratios = new List<double>();
                 for (int i = 1; i < selected_data_set_maximas.Count; i++)
                 {
-                    damp_ratios.Add(1/Math.Sqrt(1+Math.Pow(2*Math.PI/(Math.Log(selected_data_set_maximas[i-1]/ selected_data_set_maximas[i])),2)));
+                    double damp_ratio_temp = 1 / Math.Sqrt(1 + Math.Pow(2 * Math.PI / (Math.Log(selected_data_set_maximas[i - 1] / selected_data_set_maximas[i])), 2));
+                    if (Double.IsNaN(damp_ratio_temp) != true)
+                    {
+                        damp_ratios.Add(damp_ratio_temp);
+                    }
                 }
 
                 double damp_ratio_average = damp_ratios.Average();
 
-                    //y=p[0] ^ (p[1] *x)
-                    //List<double> p_exp_coeff = Exponential(time_maximas.ToArray(), selected_data_set_maximas.ToArray()).ToList();
-                    //Tuple<double,double> p_exp_coeff = Exponential(time_maximas.ToArray(), selected_data_set_maximas.ToArray());
+                //y=p[0] e ^ (p[1] *x)
+                //returns the coeffcienets of the fitted curve
+                List<double> p_exp_coeff = exponential_curve_fit(time_maximas, selected_data_set_maximas);
+                double damp_ratio_exp = Math.Abs(p_exp_coeff[1] / (2 * Math.PI * natural_frequencies[data_direction_index]));
 
 
-                results_summary_text = "The natural frequency of the " + selected_data_set_names[data_direction_index] + " direction data set:\r\n";
-                results_summary_text = results_summary_text + "DFT: " + Math.Round(natural_frequencies[data_direction_index], 3) + " Hz. \r\n";
-                results_summary_text = results_summary_text + "Peaks: " + Math.Round(natural_frequncy_peaks.Average(), 3) + " Hz. \r\n";
-                results_summary_text = results_summary_text + "Damping Ratio (Simplified): " + Math.Round(damp_ratio_average, 3) +  "\r\n";
+                results_summary_text = results_summary_text + "The natural frequency of the " + selected_data_set_names[data_direction_index] + " direction data set was calculated using 2 methods:\r\n";
+                results_summary_text = results_summary_text + "DFT: " + Math.Round(natural_frequencies[data_direction_index], 6) + " Hz. \r\n";
+                results_summary_text = results_summary_text + "Peaks: " + Math.Round(average_natural_frequency_peaks, 6) + " Hz. \r\n";
+                results_summary_text = results_summary_text + "The damping ratio of the " + selected_data_set_names[data_direction_index] + " direction data set was calculated using 2 methods:\r\n";
+                results_summary_text = results_summary_text + "Log. Decrement: " + Math.Round(damp_ratio_average * 100, 3) + "%\r\n";
+                results_summary_text = results_summary_text + "Exp. Curve Fit: " + Math.Round(damp_ratio_exp * 100, 3) + "%\r\n\r\n";
 
                 summary_results_textbox.Text = summary_results_textbox.Text + results_summary_text;
-
             }
+            dataset_result_summary_text_list[current_selected_csv_checkedlistbox_index] = results_summary_text;
         }
 
         private void save_trim_data_csv_button_Click(object sender, EventArgs e)
@@ -894,13 +995,8 @@ namespace Damping_Data_Processor
             csv_data.Add(generic_input_data_double_clone[0].Select(x => (x.ToString())).ToList());
             csv_data.Add(generic_input_data_double_clone[1].Select(x => (x.ToString())).ToList());
 
-            string output_file_path = output_folder + "trimmed data.csv";
-            save_list_of_list_string_as_csv(csv_data, output_file_path);
-        }
-
-        private void select_input_folder_button1_Click(object sender, EventArgs e)
-        {
-            update_program_after_input_folder_select();
+            //string output_file_path = output_folder + "trimmed data.csv";
+            //save_list_of_list_string_as_csv(csv_data, output_file_path);
         }
 
         private void deselect_all_button_Click(object sender, EventArgs e)
@@ -942,6 +1038,7 @@ namespace Damping_Data_Processor
 
             //clear freq plot
             freq_dft_chart.Series.Clear();
+            freq_peaks_chart.Series.Clear();
 
 
             for (int i = 0; i < csv_input_filepaths_short.Count; i++)
@@ -949,6 +1046,9 @@ namespace Damping_Data_Processor
                 if (csv_input_filepaths_short[i] == select_data_set_combobox.SelectedItem.ToString())
                 {
                     current_selected_dataset_filepath = csv_input_filepaths[i];
+
+                    //keeps track of what csv is selected based on the checkedlistbox to save the results summary correctly
+                    current_selected_csv_checkedlistbox_index = i;
                     break;
                 }
             }
@@ -998,7 +1098,7 @@ namespace Damping_Data_Processor
 
 
             //replot data
-            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone_filtered, "Time (Seconds)", "Amplitude");
+            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone_filtered, "Time (Seconds)", y_axis_label_data_chart);
 
             check_checked_chart_series();
 
@@ -1010,7 +1110,7 @@ namespace Damping_Data_Processor
             is_data_filtered = false;
 
             //replot data
-            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", "Amplitude");
+            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", y_axis_label_data_chart);
 
             check_checked_chart_series();
         }
@@ -1038,6 +1138,30 @@ namespace Damping_Data_Processor
         private void freq_chart_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void generate_results_button_Click(object sender, EventArgs e)
+        {
+            string dataset_result_summary_text_concatenated = string.Empty;
+
+            for (int i = 0; i < dataset_result_summary_text_list.Count; i++)
+            {
+                dataset_result_summary_text_concatenated = dataset_result_summary_text_concatenated + dataset_result_summary_text_list[i];
+            }
+
+            System.IO.File.WriteAllText(input_folder + "Damping Data Results Summary" + ".txt", dataset_result_summary_text_concatenated);
+
+        }
+
+        private void selectInputFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            update_program_after_input_folder_select();
+        }
+
+        private void clearSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Controls.Clear();
+            this.InitializeComponent();
         }
     }
 }
