@@ -67,7 +67,6 @@ namespace Damping_Data_Processor
             this.freq_peaks_chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.label10 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
-            this.generate_results_button = new System.Windows.Forms.Button();
             this.menu_strip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectInputFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,6 +74,13 @@ namespace Damping_Data_Processor
             this.loadSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label12 = new System.Windows.Forms.Label();
+            this.selectDataSetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.select_data_set_tool_strip_combo_box = new System.Windows.Forms.ToolStripComboBox();
+            this.exportResultsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.data_chart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
@@ -125,19 +131,19 @@ namespace Damping_Data_Processor
             // input_folder_textbox
             // 
             this.input_folder_textbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.input_folder_textbox.Location = new System.Drawing.Point(3, 30);
+            this.input_folder_textbox.Location = new System.Drawing.Point(2, 44);
             this.input_folder_textbox.Multiline = true;
             this.input_folder_textbox.Name = "input_folder_textbox";
             this.input_folder_textbox.ReadOnly = true;
-            this.input_folder_textbox.Size = new System.Drawing.Size(356, 32);
+            this.input_folder_textbox.Size = new System.Drawing.Size(268, 38);
             this.input_folder_textbox.TabIndex = 5;
             // 
             // input_csv_checkedlistbox
             // 
             this.input_csv_checkedlistbox.FormattingEnabled = true;
-            this.input_csv_checkedlistbox.Location = new System.Drawing.Point(3, 68);
+            this.input_csv_checkedlistbox.Location = new System.Drawing.Point(3, 158);
             this.input_csv_checkedlistbox.Name = "input_csv_checkedlistbox";
-            this.input_csv_checkedlistbox.Size = new System.Drawing.Size(356, 214);
+            this.input_csv_checkedlistbox.Size = new System.Drawing.Size(356, 124);
             this.input_csv_checkedlistbox.TabIndex = 6;
             this.input_csv_checkedlistbox.SelectedIndexChanged += new System.EventHandler(this.input_csv_checkedlistbox_SelectedIndexChanged);
             // 
@@ -424,21 +430,13 @@ namespace Damping_Data_Processor
             this.label11.TabIndex = 46;
             this.label11.Text = "Frequency Estimation (Distance Between Peaks)";
             // 
-            // generate_results_button
-            // 
-            this.generate_results_button.Location = new System.Drawing.Point(3, 819);
-            this.generate_results_button.Name = "generate_results_button";
-            this.generate_results_button.Size = new System.Drawing.Size(444, 26);
-            this.generate_results_button.TabIndex = 47;
-            this.generate_results_button.Text = "Generate Results Summary (.txt file)";
-            this.generate_results_button.UseVisualStyleBackColor = true;
-            this.generate_results_button.Click += new System.EventHandler(this.generate_results_button_Click);
-            // 
             // menu_strip
             // 
             this.menu_strip.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.menu_strip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.selectDataSetToolStripMenuItem,
+            this.exportResultsToolStripMenuItem});
             this.menu_strip.Location = new System.Drawing.Point(0, 0);
             this.menu_strip.Name = "menu_strip";
             this.menu_strip.Size = new System.Drawing.Size(1763, 24);
@@ -493,12 +491,72 @@ namespace Damping_Data_Processor
             this.label12.Text = "Results Summary";
             this.label12.Click += new System.EventHandler(this.label4_Click);
             // 
+            // selectDataSetToolStripMenuItem
+            // 
+            this.selectDataSetToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.select_data_set_tool_strip_combo_box});
+            this.selectDataSetToolStripMenuItem.Name = "selectDataSetToolStripMenuItem";
+            this.selectDataSetToolStripMenuItem.Size = new System.Drawing.Size(96, 20);
+            this.selectDataSetToolStripMenuItem.Text = "Select Data Set";
+            // 
+            // select_data_set_tool_strip_combo_box
+            // 
+            this.select_data_set_tool_strip_combo_box.Name = "select_data_set_tool_strip_combo_box";
+            this.select_data_set_tool_strip_combo_box.Size = new System.Drawing.Size(121, 23);
+            this.select_data_set_tool_strip_combo_box.DropDown += new System.EventHandler(this.toolStripComboBox1_DropDown);
+            this.select_data_set_tool_strip_combo_box.SelectedIndexChanged += new System.EventHandler(this.select_data_set_tool_strip_combo_box_SelectedIndexChanged);
+            // 
+            // exportResultsToolStripMenuItem
+            // 
+            this.exportResultsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem});
+            this.exportResultsToolStripMenuItem.Name = "exportResultsToolStripMenuItem";
+            this.exportResultsToolStripMenuItem.Size = new System.Drawing.Size(93, 20);
+            this.exportResultsToolStripMenuItem.Text = "Export Results";
+            // 
+            // exportResultsSummaryEditedDatasetsToolStripMenuItem
+            // 
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Name = "exportResultsSummaryEditedDatasetsToolStripMenuItem";
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Size = new System.Drawing.Size(308, 22);
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Text = "Export Results Summary and Edited Datasets";
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Click += new System.EventHandler(this.exportResultsSummaryEditedDatasetsToolStripMenuItem_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(86, 28);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(108, 13);
+            this.label4.TabIndex = 49;
+            this.label4.Text = "Selected Input Folder";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(86, 85);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(94, 13);
+            this.label13.TabIndex = 51;
+            this.label13.Text = "Selected Data Set";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.Location = new System.Drawing.Point(2, 101);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.Size = new System.Drawing.Size(268, 25);
+            this.textBox1.TabIndex = 50;
+            // 
             // form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1763, 861);
-            this.Controls.Add(this.generate_results_button);
+            this.Controls.Add(this.label13);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.freq_peaks_chart);
@@ -577,7 +635,6 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.DataVisualization.Charting.Chart freq_peaks_chart;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.Button generate_results_button;
         private System.Windows.Forms.MenuStrip menu_strip;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem selectInputFolderToolStripMenuItem;
@@ -585,6 +642,13 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.ToolStripMenuItem loadSessionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem clearSessionToolStripMenuItem;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.ToolStripMenuItem selectDataSetToolStripMenuItem;
+        private System.Windows.Forms.ToolStripComboBox select_data_set_tool_strip_combo_box;
+        private System.Windows.Forms.ToolStripMenuItem exportResultsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportResultsSummaryEditedDatasetsToolStripMenuItem;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 

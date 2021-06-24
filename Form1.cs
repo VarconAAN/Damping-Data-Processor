@@ -74,6 +74,59 @@ namespace Damping_Data_Processor
         {
             InitializeComponent();
 
+
+        }
+
+        //generic program functions
+
+        public void clear_all_global_variables()
+        {
+            current_selected_dataset_filepath = string.Empty;
+
+            //pixel width of charts, used to samplke data for plotting
+            chart_width = 1389;
+
+            //the imported string list from csv
+            generic_input_data_string.Clear();
+            //the converted and processed data save as a master copy (kept as an original in case user wants to revert to original data)
+            generic_input_data_double_master.Clear();
+            //a copy of the master data but edit and trimming can be made to this data set (will be reset when user reverts to master)
+             generic_input_data_double_clone.Clear();
+            //same as cloned dataset but with applied filter
+            generic_input_data_double_clone_filtered.Clear();
+            // the data set but with trimmed local maximas data points
+            generic_input_data_double_clone_maximas.Clear();
+
+            //folder picked by user with all input data
+            input_folder = string.Empty;
+
+            //stores all csv filepath found in the slected input folder
+            csv_input_filepaths.Clear(); ;
+            //stores all csv filepath found in the slected input folder (in short form for readability)
+            csv_input_filepaths_short.Clear();
+
+            double input_data_sample_rate = 1024;
+
+            data_direction_name.Clear();
+
+            string results_summary_text = string.Empty;
+
+            Boolean is_data_filtered = false;
+
+            int x_index_trim_lower_index = 0;
+            int x_index_trim_upper_index = 0;
+
+            string y_axis_label_data_chart = "Acceleration (m/s^2)";
+
+            List<string> dataset_result_summary_text_list = new List<string>();
+
+            int current_selected_csv_checkedlistbox_index = 0;
+        }
+
+        public void populate_select_data_direction_checked_list()
+        {
+            data_direction_name.Clear();
+
             data_direction_name.Add("X");
             data_direction_name.Add("Y");
             data_direction_name.Add("Z");
@@ -90,8 +143,6 @@ namespace Damping_Data_Processor
             select_data_direction_check_list_box.SetItemChecked(4, false);
             select_data_direction_check_list_box.SetItemChecked(5, false);
         }
-
-        //generic program functions
 
         public List<double> average_remove_outliers(List<double> data)
         {
@@ -1030,6 +1081,8 @@ namespace Damping_Data_Processor
 
         private void select_data_set_combobox_SelectionChangeCommitted(object sender, EventArgs e)
         {
+            populate_select_data_direction_checked_list();
+
             //reset data so filtered data isnt filtered
             is_data_filtered = false;
 
@@ -1140,18 +1193,7 @@ namespace Damping_Data_Processor
 
         }
 
-        private void generate_results_button_Click(object sender, EventArgs e)
-        {
-            string dataset_result_summary_text_concatenated = string.Empty;
 
-            for (int i = 0; i < dataset_result_summary_text_list.Count; i++)
-            {
-                dataset_result_summary_text_concatenated = dataset_result_summary_text_concatenated + dataset_result_summary_text_list[i];
-            }
-
-            System.IO.File.WriteAllText(input_folder + "Damping Data Results Summary" + ".txt", dataset_result_summary_text_concatenated);
-
-        }
 
         private void selectInputFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1162,6 +1204,62 @@ namespace Damping_Data_Processor
         {
             this.Controls.Clear();
             this.InitializeComponent();
+            clear_all_global_variables();
+        }
+
+        private void toolStripComboBox1_DropDown(object sender, EventArgs e)
+        {
+            select_data_set_tool_strip_combo_box.Items.Clear();
+
+            for (int i = 0; i < csv_input_filepaths_short.Count; i++)
+            {
+                if (input_csv_checkedlistbox.GetItemCheckState(i) == CheckState.Checked)
+                {
+                    select_data_set_tool_strip_combo_box.Items.Add(csv_input_filepaths_short[i]);
+                }
+            }
+        }
+
+        private void select_data_set_tool_strip_combo_box_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            populate_select_data_direction_checked_list();
+
+            //reset data so filtered data isnt filtered
+            is_data_filtered = false;
+
+            //clear results window
+            summary_results_textbox.Text = string.Empty;
+
+            //clear freq plot
+            freq_dft_chart.Series.Clear();
+            freq_peaks_chart.Series.Clear();
+
+
+            for (int i = 0; i < csv_input_filepaths_short.Count; i++)
+            {
+                if (csv_input_filepaths_short[i] == select_data_set_combobox.SelectedItem.ToString())
+                {
+                    current_selected_dataset_filepath = csv_input_filepaths[i];
+
+                    //keeps track of what csv is selected based on the checkedlistbox to save the results summary correctly
+                    current_selected_csv_checkedlistbox_index = i;
+                    break;
+                }
+            }
+            load_data_of_selected_dataset_update_charts();
+            check_checked_chart_series();
+        }
+
+        private void exportResultsSummaryEditedDatasetsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string dataset_result_summary_text_concatenated = string.Empty;
+
+            for (int i = 0; i < dataset_result_summary_text_list.Count; i++)
+            {
+                dataset_result_summary_text_concatenated = dataset_result_summary_text_concatenated + dataset_result_summary_text_list[i];
+            }
+
+            System.IO.File.WriteAllText(input_folder + "Damping Data Results Summary" + ".txt", dataset_result_summary_text_concatenated);
         }
     }
 }
