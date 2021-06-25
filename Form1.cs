@@ -33,6 +33,7 @@ namespace Damping_Data_Processor
         //pixel width of charts, used to samplke data for plotting
         int chart_width = 1389;
 
+        // these data sets are for the current loaded data sets
         //the imported string list from csv
         List<List<string>> generic_input_data_string = new List<List<string>>();
         //the converted and processed data save as a master copy (kept as an original in case user wants to revert to original data)
@@ -43,6 +44,11 @@ namespace Damping_Data_Processor
         List<List<double>> generic_input_data_double_clone_filtered = new List<List<double>>();
         // the data set but with trimmed local maximas data points
         List<List<double>> generic_input_data_double_clone_maximas = new List<List<double>>();
+
+        //these following variables are catalogs of all data set used in thew session
+        List<List<List<double>>> generic_input_data_double_master_catalog = new List<List<List<double>>>();
+        List<List<List<double>>> generic_input_data_double_clone_catalog = new List<List<List<double>>>();
+        List<List<List<double>>> generic_input_data_double_clone_filtered_catalog = new List<List<List<double>>>();
 
         //folder picked by user with all input data
         string input_folder = string.Empty;
@@ -74,10 +80,21 @@ namespace Damping_Data_Processor
         {
             InitializeComponent();
 
-
+  
         }
 
         //generic program functions
+
+        public string get_filename_from_filepath (string filepath)
+        {
+            int slash_index = filepath.LastIndexOf(@"\");
+            int dot_index = filepath.LastIndexOf(@".");
+
+            //remove filepath and filetype and keep raw filename
+            string filename = filepath.Substring(slash_index+1, dot_index- slash_index-1);
+
+            return filename;
+        }
 
         public void clear_all_global_variables()
         {
@@ -124,6 +141,16 @@ namespace Damping_Data_Processor
             List<string> dataset_result_summary_text_list = new List<string>();
 
             int current_selected_csv_checkedlistbox_index = 0;
+        }
+
+        public List<List<string>> transpose_list_of_list_string (List<List<string>> data)
+        {
+            List<List<string>> transposed_data = data.SelectMany(inner => inner.Select((item, index) => new { item, index }))
+            .GroupBy(i => i.index, i => i.item)
+            .Select(g => g.ToList())
+            .ToList();
+
+            return transposed_data;
         }
 
         public void populate_select_data_direction_checked_list()
@@ -542,6 +569,17 @@ namespace Damping_Data_Processor
             return double_data;
         }
 
+        public List<List<string>> convert_list_of_list_double_to_string(List<List<double>> list_of_lists_data)
+        {
+            List<List<string>> string_data = new List<List<string>>();
+
+            foreach (List<double> list_of_data in list_of_lists_data)
+            {
+                string_data.Add(list_of_data.Select(x => (x).ToString()).ToList());
+            }
+            return string_data;
+        }
+
         public void update_trimmed_input_data(int lower_boundary_index, int upper_boundary_index)
         {
             //trim all data out side the indexes
@@ -645,12 +683,6 @@ namespace Damping_Data_Processor
             //vector sum sets of 2 directions of data and add to main data set
             generic_input_data_double_master = vector_sum_xyz_datasets(generic_input_data_double_master);
 
-            //remove data offsets again  after adding the vector summed data
-            for (int i = 1; i < generic_input_data_double_master.Count; i++)
-            {
-                generic_input_data_double_master[i] = remove_data_offset(generic_input_data_double_master[i]);
-            }
-
             //clone the master data set
             generic_input_data_double_clone = generic_input_data_double_master;
 
@@ -695,6 +727,11 @@ namespace Damping_Data_Processor
                 csv_input_filepaths_short.Add(csv_input_filepaths[i].Replace(input_folder, String.Empty));
                 //add blank enrties for each possible loaded dataset (for the summary results list)
                 dataset_result_summary_text_list.Add(string.Empty);
+
+                //add blank entries for the catalog lists
+                generic_input_data_double_master_catalog.Add(new List<List<double>>());
+                generic_input_data_double_clone_catalog.Add(new List<List<double>>());
+                generic_input_data_double_clone_filtered_catalog.Add(new List<List<double>>());
             }
 
             for (int i = 0; i < csv_input_filepaths.Count; i++)
@@ -801,6 +838,29 @@ namespace Damping_Data_Processor
         }
 
         //manipulate chart functions
+
+        public void plot_peaks_chart(List<int> peak_indexs, List<double> abs_data, string series_name)
+        {
+            //clear existing series
+            Series series_name1 = new Series(series_name);
+            data_chart.Series.Remove(series_name1);
+
+
+            List<double> peak_times = new List<double>();
+            List<double> peak_amplitudes = new List<double>();
+
+            for(int i =0; i< peak_indexs.Count; i++)
+            {
+                    peak_times.Add(generic_input_data_double_clone_filtered[0][peak_indexs[i]]);
+                    peak_amplitudes.Add(abs_data[peak_indexs[i]]);
+            }
+
+            System.Windows.Forms.DataVisualization.Charting.Series series = data_chart.Series.Add(series_name);
+            series.ChartType = SeriesChartType.Point;
+            series.Color = Color.Red;
+            series.Points.DataBindXY(peak_times, peak_amplitudes);
+            series.BorderWidth = 3;
+        }
 
         public void plot_data_on_chart(Chart chart_name, List<string> data_sets_names, List<List<double>> data_sets, string x_axis_label, string y_axis_label)
         {
@@ -971,10 +1031,15 @@ namespace Damping_Data_Processor
             double low_cutoff_freq = Convert.ToDouble(low_freq_cutoff_numupdown.Value);
             double high_cutoff_freq = Convert.ToDouble(high_freq_cutoff_numupdown.Value);
 
+            //get timestamps of trimmed data
+            double first_timestamp = Math.Round(generic_input_data_double_clone[0][0], 1);
+            double second_timestamp = Math.Round(generic_input_data_double_clone[0][generic_input_data_double_clone[0].Count - 1], 1);
+
             //set header for text file
             results_summary_text = "/////////////////////////////////////////////////////////////////////////////\r\n";
             results_summary_text = results_summary_text + csv_input_filepaths_short[current_selected_csv_checkedlistbox_index] + "\r\n";
             results_summary_text = results_summary_text + "/////////////////////////////////////////////////////////////////////////////\r\n";
+            results_summary_text = results_summary_text + first_timestamp+" seconds to "+ second_timestamp + " seconds.\r\n";
             if (is_data_filtered==true) 
             {
                 results_summary_text = results_summary_text + "The data sets were bandpass filtered with cutoff frequencies of " + low_cutoff_freq + " Hz and " + high_cutoff_freq + " Hz.\r\n";
@@ -1012,6 +1077,9 @@ namespace Damping_Data_Processor
 
                 int window_size = Convert.ToInt32(Math.Round((natural_frequencies[data_direction_index] * input_data_sample_rate * 0.95) / 2));
                 List<int> local_maximas = find_local_maximas(selected_data_set_abs, window_size);
+
+
+                plot_peaks_chart(local_maximas, selected_data_set_abs, selected_data_set_names[data_direction_index]+ " Peaks");
 
                 List<double> natural_frequncy_peaks = calculate_natural_frequency_peaks(local_maximas, input_data_sample_rate, selected_data_set_names[data_direction_index]);
                 double average_natural_frequency_peaks = natural_frequncy_peaks.Average();
@@ -1057,16 +1125,6 @@ namespace Damping_Data_Processor
             summary_results_textbox.Text = results_summary_text;
 
             dataset_result_summary_text_list[select_data_set_tool_strip_combo_box.SelectedIndex] = results_summary_text;
-        }
-
-        private void save_trim_data_csv_button_Click(object sender, EventArgs e)
-        {
-            List<List<string>> csv_data = new List<List<string>>();
-            csv_data.Add(generic_input_data_double_clone[0].Select(x => (x.ToString())).ToList());
-            csv_data.Add(generic_input_data_double_clone[1].Select(x => (x.ToString())).ToList());
-
-            //string output_file_path = output_folder + "trimmed data.csv";
-            //save_list_of_list_string_as_csv(csv_data, output_file_path);
         }
 
         private void reset_data_trimming_button_Click(object sender, EventArgs e)
@@ -1138,11 +1196,6 @@ namespace Damping_Data_Processor
             check_checked_chart_series();
         }
 
-        private void input_csv_checkedlistbox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void label8_Click(object sender, EventArgs e)
         {
 
@@ -1206,7 +1259,64 @@ namespace Damping_Data_Processor
             }
             save_results_folder = save_results_folder + @"\";
 
+            //save the results text
             System.IO.File.WriteAllText(save_results_folder + "Damping Data Results Summary" + ".txt", dataset_result_summary_text_concatenated);
+
+            //save all data sets master , trimmed, trimmed filtered
+
+            //create header for data exports
+            List<string> header = new List<string>();
+            header.Add("Time (Seconds)");
+            header.Add("X " + y_axis_label_data_chart);
+            header.Add("Y " + y_axis_label_data_chart);
+            header.Add("Z " + y_axis_label_data_chart);
+            header.Add("XY VS" + y_axis_label_data_chart);
+            header.Add("XZ VS" + y_axis_label_data_chart);
+            header.Add("YZ VS" + y_axis_label_data_chart);
+
+            //CONVERT DATA SETS TO STRINGS
+            List<List<string>> csv_data_master = convert_list_of_list_double_to_string(generic_input_data_double_master);
+            List<List<string>> csv_data_clone = convert_list_of_list_double_to_string(generic_input_data_double_clone);
+            List<List<string>> csv_data_clone_filter = convert_list_of_list_double_to_string(generic_input_data_double_clone_filtered);
+
+            //add headers to data sets
+            for(int i= 0; i< header.Count; i++)
+            {
+                csv_data_master[i].Insert(0, header[i]);
+                csv_data_clone[i].Insert(0, header[i]);
+                if (is_data_filtered == true)
+                {
+                    csv_data_clone_filter[i].Insert(0, header[i]);
+                }
+            }
+
+            csv_data_master = transpose_list_of_list_string(csv_data_master);
+            csv_data_clone = transpose_list_of_list_string(csv_data_clone);
+            if (is_data_filtered == true)
+            {
+                csv_data_clone_filter = transpose_list_of_list_string(csv_data_clone_filter);
+            }
+
+            //get cutoff freqs
+            double low_cutoff_freq = Convert.ToDouble(low_freq_cutoff_numupdown.Value);
+            double high_cutoff_freq = Convert.ToDouble(high_freq_cutoff_numupdown.Value);
+
+            //get timestamps of trimmed data
+            double first_timestamp = Math.Round(generic_input_data_double_clone[0][0],1);
+            double second_timestamp = Math.Round(generic_input_data_double_clone[0][generic_input_data_double_clone[0].Count-1],1);
+
+            string dataset_name = get_filename_from_filepath(csv_input_filepaths_short[select_data_set_tool_strip_combo_box.SelectedIndex]);
+            string dataset_name_trimmed = dataset_name +"["+ first_timestamp+"s - "+ second_timestamp+"s]";
+            string dataset_name_trimmed_filtered = dataset_name_trimmed +"["+ low_cutoff_freq+ "Hz - " + high_cutoff_freq +"Hz]";
+
+            //save the files at their filepath
+            save_list_of_list_string_as_csv(csv_data_master, save_results_folder + "Acceleration Datasets " + dataset_name + " [Unedited].csv");
+            save_list_of_list_string_as_csv(csv_data_clone, save_results_folder + "Acceleration Datasets " + dataset_name_trimmed + " [Trimmed].csv");
+            if (is_data_filtered == true)
+            {
+                save_list_of_list_string_as_csv(csv_data_clone_filter, save_results_folder + "Acceleration Datasets " + dataset_name_trimmed_filtered + " [Trimmed & Filtered].csv");
+            }
+
         }
 
         private void select_data_set_tool_strip_combo_box_SelectedIndexChanged_1(object sender, EventArgs e)
