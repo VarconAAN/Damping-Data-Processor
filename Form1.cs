@@ -69,7 +69,7 @@ namespace Damping_Data_Processor
         int x_index_trim_lower_index = 0;
         int x_index_trim_upper_index = 0;
 
-        string y_axis_label_data_chart = "Acceleration (m/s^2)";
+        string y_axis_label_data_chart = @"Acceleration [m/s^2]";
 
         List<string> dataset_result_summary_text_list = new List<string>();
 
@@ -84,6 +84,26 @@ namespace Damping_Data_Processor
         }
 
         //generic program functions
+
+        public double calculate_coffecient_of_determination(List<double> sample_data, List<double> fitted_data_full, List<int> index_of_sample_data)
+        {
+            double coffecient_of_determination = 0;
+            //total sum of squares
+            double ss_tot = 0;
+            //residual sum of squares
+            double ss_res = 0;
+
+            double sample_average = sample_data.Average();
+            for(int i =0; i< sample_data.Count; i++)
+            {
+                ss_tot += Math.Pow((sample_data[i] - sample_average), 2);
+
+                ss_res += Math.Pow((sample_data[i]- fitted_data_full[index_of_sample_data[i]]), 2);
+            }
+
+            coffecient_of_determination = 1 - ss_res / ss_tot;
+            return coffecient_of_determination;
+        }
 
         public string get_filename_from_filepath (string filepath)
         {
@@ -839,27 +859,124 @@ namespace Damping_Data_Processor
 
         //manipulate chart functions
 
-        public void plot_peaks_chart(List<int> peak_indexs, List<double> abs_data, string series_name)
+        public void trim_data_function ()
+        {
+            double x_index_trim_lower = 0;
+            double x_index_trim_upper = 0;
+
+            //get boundary values from vertical annotations
+            if (upper_data_boundary_vertical_line.X > lower_data_boundary_vertical_line.X)
+            {
+                //x_index_trim_lower = Convert.ToInt32(lower_data_boundary_vertical_line.X);
+                //x_index_trim_upper = Convert.ToInt32(upper_data_boundary_vertical_line.X) ;                
+                x_index_trim_lower = lower_data_boundary_vertical_line.X;
+                x_index_trim_upper = upper_data_boundary_vertical_line.X;
+            }
+            else
+            {
+                //x_index_trim_upper = Convert.ToInt32(lower_data_boundary_vertical_line.X) ;
+                //x_index_trim_lower = Convert.ToInt32(upper_data_boundary_vertical_line.X) ;
+                x_index_trim_upper = lower_data_boundary_vertical_line.X;
+                x_index_trim_lower = upper_data_boundary_vertical_line.X;
+            }
+
+            //int x_index_trim_lower_index = generic_input_data_double_clone[0].IndexOf(x_index_trim_lower);
+            //int x_index_trim_upper_index = generic_input_data_double_clone[0].IndexOf(x_index_trim_upper);
+
+            x_index_trim_lower_index = find_closest_value(x_index_trim_lower, generic_input_data_double_clone[0]);
+            x_index_trim_upper_index = find_closest_value(x_index_trim_upper, generic_input_data_double_clone[0]);
+
+            if (Math.Abs(x_index_trim_upper_index - x_index_trim_lower_index) < 15)
+            {
+                string message = "Cannot trim data to less than 15 data points";
+                string title = "Error";
+                MessageBox.Show(message, title);
+                return;
+            }
+
+            update_trimmed_input_data(x_index_trim_lower_index, x_index_trim_upper_index);
+
+            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", y_axis_label_data_chart);
+            draw_vertical_annotations(data_chart, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, generic_input_data_double_clone[0]);
+
+            check_checked_chart_series();
+        }
+
+        public List<double>  plot_fitted_exponential_curve(double A, double k, string dataset_name)
+        {
+            List<double> exp_curve_values = new List<double>();
+
+            for (int i =0; i< generic_input_data_double_clone[0].Count; i++)
+            {
+                exp_curve_values.Add(A * Math.Exp(k * generic_input_data_double_clone[0][i]));
+            }
+
+            string series_name = dataset_name+" Exp. Fit";
+
+            //plot with settings
+            try
+            {
+                System.Windows.Forms.DataVisualization.Charting.Series series = data_chart.Series.Add(series_name);
+                data_chart.Series[series_name].Points.Clear();
+                series.ChartType = SeriesChartType.Line;
+                series.Color = Color.DarkRed;
+                series.Points.DataBindXY(generic_input_data_double_clone[0], exp_curve_values);
+                series.BorderWidth = 2;
+            }
+            catch
+            {
+                data_chart.Series[series_name].Points.Clear();
+                data_chart.Series[series_name].ChartType = SeriesChartType.Line;
+                data_chart.Series[series_name].Color = Color.DarkRed;
+                data_chart.Series[series_name].Points.DataBindXY(generic_input_data_double_clone[0], exp_curve_values);
+                data_chart.Series[series_name].BorderWidth = 2;
+            }
+
+
+            return exp_curve_values;
+        }
+
+        public List<double> plot_peaks_chart(List<int> peak_indexs, List<double> abs_data, string series_name)
         {
             //clear existing series
-            Series series_name1 = new Series(series_name);
-            data_chart.Series.Remove(series_name1);
-
+            //Series series_name1 = new Series(series_name);
+            //data_chart.Series.Remove(series_name1);
+            //try
+            //{
+            //    data_chart.Series[series_name].Dispose();
+            //    data_chart.Series.Remove(new Series(series_name));
+            //}
+            //catch{ }
 
             List<double> peak_times = new List<double>();
             List<double> peak_amplitudes = new List<double>();
 
-            for(int i =0; i< peak_indexs.Count; i++)
+            //dont include last point it can be a bad data point
+            for(int i =0; i< peak_indexs.Count-1; i++)
             {
                     peak_times.Add(generic_input_data_double_clone_filtered[0][peak_indexs[i]]);
                     peak_amplitudes.Add(abs_data[peak_indexs[i]]);
             }
+            try
+            {
+                System.Windows.Forms.DataVisualization.Charting.Series series = data_chart.Series.Add(series_name);
+                data_chart.Series[series_name].Points.Clear();
+                series.ChartType = SeriesChartType.Point;
+                series.Color = Color.Red;
+                series.Points.DataBindXY(peak_times, peak_amplitudes);
+                series.BorderWidth = 3;
+            }
+            catch
+            {
+                data_chart.Series[series_name].Points.Clear();
+                data_chart.Series[series_name].ChartType = SeriesChartType.Point;
+                data_chart.Series[series_name].Color = Color.Red;
+                data_chart.Series[series_name].Points.DataBindXY(peak_times, peak_amplitudes);
+                data_chart.Series[series_name].BorderWidth = 3;
+            }
 
-            System.Windows.Forms.DataVisualization.Charting.Series series = data_chart.Series.Add(series_name);
-            series.ChartType = SeriesChartType.Point;
-            series.Color = Color.Red;
-            series.Points.DataBindXY(peak_times, peak_amplitudes);
-            series.BorderWidth = 3;
+
+            return peak_amplitudes;
         }
 
         public void plot_data_on_chart(Chart chart_name, List<string> data_sets_names, List<List<double>> data_sets, string x_axis_label, string y_axis_label)
@@ -968,45 +1085,7 @@ namespace Damping_Data_Processor
 
         private void trim_data_button_Click(object sender, EventArgs e)
         {
-            double x_index_trim_lower = 0;
-            double x_index_trim_upper = 0;
-
-            //get boundary values from vertical annotations
-            if (upper_data_boundary_vertical_line.X > lower_data_boundary_vertical_line.X)
-            {
-                //x_index_trim_lower = Convert.ToInt32(lower_data_boundary_vertical_line.X);
-                //x_index_trim_upper = Convert.ToInt32(upper_data_boundary_vertical_line.X) ;                
-                x_index_trim_lower = lower_data_boundary_vertical_line.X;
-                x_index_trim_upper = upper_data_boundary_vertical_line.X;
-            }
-            else
-            {
-                //x_index_trim_upper = Convert.ToInt32(lower_data_boundary_vertical_line.X) ;
-                //x_index_trim_lower = Convert.ToInt32(upper_data_boundary_vertical_line.X) ;
-                x_index_trim_upper = lower_data_boundary_vertical_line.X;
-                x_index_trim_lower = upper_data_boundary_vertical_line.X;
-            }
-
-            //int x_index_trim_lower_index = generic_input_data_double_clone[0].IndexOf(x_index_trim_lower);
-            //int x_index_trim_upper_index = generic_input_data_double_clone[0].IndexOf(x_index_trim_upper);
-
-            x_index_trim_lower_index = find_closest_value(x_index_trim_lower, generic_input_data_double_clone[0]);
-            x_index_trim_upper_index = find_closest_value(x_index_trim_upper, generic_input_data_double_clone[0]);
-
-            if (Math.Abs(x_index_trim_upper_index - x_index_trim_lower_index) < 15)
-            {
-                string message = "Cannot trim data to less than 15 data points";
-                string title = "Error";
-                MessageBox.Show(message, title);
-                return;
-            }
-
-            update_trimmed_input_data(x_index_trim_lower_index, x_index_trim_upper_index);
-
-            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", y_axis_label_data_chart);
-            draw_vertical_annotations(data_chart, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, generic_input_data_double_clone[0]);
-
-            check_checked_chart_series();
+            trim_data_function();
 
         }
 
@@ -1017,6 +1096,7 @@ namespace Damping_Data_Processor
 
         private void calculate_damp_ratio_and_freq_button_Click(object sender, EventArgs e)
         {
+
             //clear summary text
             results_summary_text = string.Empty;
             //empty the results box
@@ -1039,7 +1119,7 @@ namespace Damping_Data_Processor
             results_summary_text = "/////////////////////////////////////////////////////////////////////////////\r\n";
             results_summary_text = results_summary_text + csv_input_filepaths_short[current_selected_csv_checkedlistbox_index] + "\r\n";
             results_summary_text = results_summary_text + "/////////////////////////////////////////////////////////////////////////////\r\n";
-            results_summary_text = results_summary_text + first_timestamp+" seconds to "+ second_timestamp + " seconds.\r\n";
+            results_summary_text = results_summary_text + "Trimmed from " +first_timestamp+" seconds to "+ second_timestamp + " seconds.\r\n";
             if (is_data_filtered==true) 
             {
                 results_summary_text = results_summary_text + "The data sets were bandpass filtered with cutoff frequencies of " + low_cutoff_freq + " Hz and " + high_cutoff_freq + " Hz.\r\n";
@@ -1079,7 +1159,8 @@ namespace Damping_Data_Processor
                 List<int> local_maximas = find_local_maximas(selected_data_set_abs, window_size);
 
 
-                plot_peaks_chart(local_maximas, selected_data_set_abs, selected_data_set_names[data_direction_index]+ " Peaks");
+                List<double> peak_amplitudes = plot_peaks_chart(local_maximas, selected_data_set_abs, selected_data_set_names[data_direction_index]+ " Peaks");
+            
 
                 List<double> natural_frequncy_peaks = calculate_natural_frequency_peaks(local_maximas, input_data_sample_rate, selected_data_set_names[data_direction_index]);
                 double average_natural_frequency_peaks = natural_frequncy_peaks.Average();
@@ -1112,13 +1193,17 @@ namespace Damping_Data_Processor
                 List<double> p_exp_coeff = exponential_curve_fit(time_maximas, selected_data_set_maximas);
                 double damp_ratio_exp = Math.Abs(p_exp_coeff[1] / (2 * Math.PI * natural_frequencies[data_direction_index]));
 
+                List<double> exp_curve_fit_values = plot_fitted_exponential_curve(p_exp_coeff[0], p_exp_coeff[1], selected_data_set_names[data_direction_index]);
+
+                double coffecient_of_determination = calculate_coffecient_of_determination(peak_amplitudes, exp_curve_fit_values, local_maximas);
 
                 results_summary_text = results_summary_text + "The natural frequency of the " + selected_data_set_names[data_direction_index] + " direction data set was calculated using 2 methods:\r\n";
                 results_summary_text = results_summary_text + "DFT: " + Math.Round(natural_frequencies[data_direction_index], 6) + " Hz. \r\n";
                 results_summary_text = results_summary_text + "Peaks: " + Math.Round(average_natural_frequency_peaks, 6) + " Hz. \r\n";
                 results_summary_text = results_summary_text + "The damping ratio of the " + selected_data_set_names[data_direction_index] + " direction data set was calculated using 2 methods:\r\n";
                 results_summary_text = results_summary_text + "Log. Decrement: " + Math.Round(damp_ratio_average * 100, 3) + "%\r\n";
-                results_summary_text = results_summary_text + "Exp. Curve Fit: " + Math.Round(damp_ratio_exp * 100, 3) + "%\r\n\r\n";
+                results_summary_text = results_summary_text + "Exp. Curve Fit: " + Math.Round(damp_ratio_exp * 100, 3) + "%\r\n";
+                results_summary_text = results_summary_text + "The R Sqaured value was found as: " + Math.Round(coffecient_of_determination, 3) + "\r\n\r\n";
 
                 //summary_results_textbox.Text = summary_results_textbox.Text + results_summary_text;
             }
