@@ -80,7 +80,25 @@ namespace Damping_Data_Processor
         {
             InitializeComponent();
 
-  
+            //set zooming rules for all charts
+            //data_chart.ChartAreas[0].AxisY.ScaleView.Zoomable = true;
+            //data_chart.ChartAreas[0].AxisY.ScaleView.SmallScrollMinSize=1;
+            //data_chart.ChartAreas[0].CursorY.AutoScroll = true;
+            //data_chart.ChartAreas[0].CursorY.IsUserSelectionEnabled = true;
+
+            //freq_dft_chart.ChartAreas[0].AxisY.ScaleView.Zoomable = true;
+            //freq_dft_chart.ChartAreas[0].AxisY.ScaleView.SmallScrollMinSize = 1;
+            //freq_dft_chart.ChartAreas[0].CursorY.AutoScroll = true;
+            //freq_dft_chart.ChartAreas[0].CursorY.IsUserSelectionEnabled = true;
+
+            //freq_peaks_chart.ChartAreas[0].AxisY.ScaleView.Zoomable = true;
+            //freq_peaks_chart.ChartAreas[0].AxisY.ScaleView.SmallScrollMinSize = 1;
+            //freq_peaks_chart.ChartAreas[0].CursorY.AutoScroll = true;
+            //freq_peaks_chart.ChartAreas[0].CursorY.IsUserSelectionEnabled = true;
+
+
+
+
         }
 
         //generic program functions
@@ -264,6 +282,7 @@ namespace Damping_Data_Processor
             series.ChartType = SeriesChartType.Point;
             series.Points.DataBindXY(time_peaks, frequency_peaks);
             series.BorderWidth = 1;
+            series.ToolTip = "#SERIESNAME\nX: #VALX\nY: #VAL";
 
 
             freq_peaks_chart.ChartAreas[0].AxisX.Title = "Freq. Calc. #";
@@ -922,6 +941,7 @@ namespace Damping_Data_Processor
                 series.Color = Color.DarkRed;
                 series.Points.DataBindXY(generic_input_data_double_clone[0], exp_curve_values);
                 series.BorderWidth = 2;
+                series.ToolTip = "#SERIESNAME\nX: #VALX\nY: #VAL";
             }
             catch
             {
@@ -930,6 +950,7 @@ namespace Damping_Data_Processor
                 data_chart.Series[series_name].Color = Color.DarkRed;
                 data_chart.Series[series_name].Points.DataBindXY(generic_input_data_double_clone[0], exp_curve_values);
                 data_chart.Series[series_name].BorderWidth = 2;
+                data_chart.Series[series_name].ToolTip = "#SERIESNAME\nX: #VALX\nY: #VAL";
             }
 
 
@@ -965,6 +986,7 @@ namespace Damping_Data_Processor
                 series.Color = Color.Red;
                 series.Points.DataBindXY(peak_times, peak_amplitudes);
                 series.BorderWidth = 3;
+                series.ToolTip = "#SERIESNAME\nX: #VALX\nY: #VAL";
             }
             catch
             {
@@ -973,6 +995,7 @@ namespace Damping_Data_Processor
                 data_chart.Series[series_name].Color = Color.Red;
                 data_chart.Series[series_name].Points.DataBindXY(peak_times, peak_amplitudes);
                 data_chart.Series[series_name].BorderWidth = 3;
+                data_chart.Series[series_name].ToolTip = "#SERIESNAME\nX: #VALX\nY: #VAL";
             }
 
 
@@ -993,6 +1016,7 @@ namespace Damping_Data_Processor
                 series.ChartType = SeriesChartType.Line;
                 series.Points.DataBindXY(sampled_data_sets[0], sampled_data_sets[i]);
                 series.BorderWidth = 1;
+                series.ToolTip = "#SERIESNAME\nX: #VALX\nY: #VAL";
             }
 
             chart_name.ChartAreas[0].AxisX.Title = x_axis_label;
@@ -1015,6 +1039,7 @@ namespace Damping_Data_Processor
                 series.ChartType = SeriesChartType.Line;
                 series.Points.DataBindXY(freq_span[i], mag_values[i]);
                 series.BorderWidth = 2;
+                series.ToolTip = "#SERIESNAME\nX: #VALX\nY: #VAL";
             }
 
             chart_name.ChartAreas[0].AxisX.Title = x_axis_label;
@@ -1429,5 +1454,7 @@ namespace Damping_Data_Processor
 
             check_checked_chart_series();
         }
+
+
     }
 }
