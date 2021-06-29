@@ -75,6 +75,7 @@ namespace Damping_Data_Processor
             this.label13 = new System.Windows.Forms.Label();
             this.selected_data_set_textbox = new System.Windows.Forms.TextBox();
             this.select_data_set_tool_strip_combo_box = new System.Windows.Forms.ToolStripComboBox();
+            this.displayResultsSummaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.data_chart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
@@ -438,7 +439,8 @@ namespace Damping_Data_Processor
             // exportResultsToolStripMenuItem
             // 
             this.exportResultsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportResultsSummaryEditedDatasetsToolStripMenuItem});
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem,
+            this.displayResultsSummaryToolStripMenuItem});
             this.exportResultsToolStripMenuItem.Name = "exportResultsToolStripMenuItem";
             this.exportResultsToolStripMenuItem.Size = new System.Drawing.Size(93, 23);
             this.exportResultsToolStripMenuItem.Text = "Export Results";
@@ -486,6 +488,13 @@ namespace Damping_Data_Processor
             this.select_data_set_tool_strip_combo_box.Name = "select_data_set_tool_strip_combo_box";
             this.select_data_set_tool_strip_combo_box.Size = new System.Drawing.Size(400, 23);
             this.select_data_set_tool_strip_combo_box.SelectedIndexChanged += new System.EventHandler(this.select_data_set_tool_strip_combo_box_SelectedIndexChanged_1);
+            // 
+            // displayResultsSummaryToolStripMenuItem
+            // 
+            this.displayResultsSummaryToolStripMenuItem.Name = "displayResultsSummaryToolStripMenuItem";
+            this.displayResultsSummaryToolStripMenuItem.Size = new System.Drawing.Size(308, 22);
+            this.displayResultsSummaryToolStripMenuItem.Text = "Display Results Summary";
+            this.displayResultsSummaryToolStripMenuItem.Click += new System.EventHandler(this.displayResultsSummaryToolStripMenuItem_Click);
             // 
             // form1
             // 
@@ -576,6 +585,7 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.TextBox selected_data_set_textbox;
         private System.Windows.Forms.ToolStripComboBox select_data_set_tool_strip_combo_box;
+        private System.Windows.Forms.ToolStripMenuItem displayResultsSummaryToolStripMenuItem;
     }
 }
 

@@ -50,6 +50,10 @@ namespace Damping_Data_Processor
         List<List<List<double>>> generic_input_data_double_clone_catalog = new List<List<List<double>>>();
         List<List<List<double>>> generic_input_data_double_clone_filtered_catalog = new List<List<List<double>>>();
 
+        //keep track of what cutoff frequencies are used
+        List<double> low_cutoff_freq_tracker = new List<double>();
+        List<double> high_cutoff_freq_tracker = new List<double>();
+
         //folder picked by user with all input data
         string input_folder = string.Empty;
 
@@ -102,6 +106,27 @@ namespace Damping_Data_Processor
         }
 
         //generic program functions
+
+        public string concat_dataset_results_summary()
+        {
+            string dataset_result_summary_text_concatenated = string.Empty;
+
+            for (int i = 0; i < dataset_result_summary_text_list.Count; i++)
+            {
+                dataset_result_summary_text_concatenated = dataset_result_summary_text_concatenated + dataset_result_summary_text_list[i];
+            }
+
+            //check if there is no results
+            if (String.IsNullOrEmpty(dataset_result_summary_text_concatenated))
+            {
+                string message = "There are no results to export. The results are generated after clicking -" + calculate_damp_ratio_and_freq_button.Text + "- Button";
+                string title = "Error";
+                MessageBox.Show(message, title);
+                return string.Empty;
+            }
+
+            return dataset_result_summary_text_concatenated;
+        }
 
         public double calculate_coffecient_of_determination(List<double> sample_data, List<double> fitted_data_full, List<int> index_of_sample_data)
         {
@@ -179,6 +204,15 @@ namespace Damping_Data_Processor
             List<string> dataset_result_summary_text_list = new List<string>();
 
             int current_selected_csv_checkedlistbox_index = 0;
+
+            //these following variables are catalogs of all data set used in thew session
+            generic_input_data_double_master_catalog.Clear();
+            generic_input_data_double_clone_catalog.Clear();
+            generic_input_data_double_clone_filtered_catalog.Clear();
+
+            //keep track of what cutoff frequencies are used
+            low_cutoff_freq_tracker.Clear();
+            high_cutoff_freq_tracker.Clear();
         }
 
         public List<List<string>> transpose_list_of_list_string (List<List<string>> data)
@@ -725,6 +759,9 @@ namespace Damping_Data_Processor
             //clone the master data set
             generic_input_data_double_clone = generic_input_data_double_master;
 
+            //add data to catalog
+            generic_input_data_double_master_catalog[select_data_set_tool_strip_combo_box.SelectedIndex] = generic_input_data_double_master;
+
             //plot data on chart
             plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", y_axis_label_data_chart);
 
@@ -771,6 +808,10 @@ namespace Damping_Data_Processor
                 generic_input_data_double_master_catalog.Add(new List<List<double>>());
                 generic_input_data_double_clone_catalog.Add(new List<List<double>>());
                 generic_input_data_double_clone_filtered_catalog.Add(new List<List<double>>());
+
+                //add blank freqs to the tracker
+                low_cutoff_freq_tracker.Add(0);
+                high_cutoff_freq_tracker.Add(0);
             }
 
             for (int i = 0; i < csv_input_filepaths.Count; i++)
@@ -885,22 +926,15 @@ namespace Damping_Data_Processor
 
             //get boundary values from vertical annotations
             if (upper_data_boundary_vertical_line.X > lower_data_boundary_vertical_line.X)
-            {
-                //x_index_trim_lower = Convert.ToInt32(lower_data_boundary_vertical_line.X);
-                //x_index_trim_upper = Convert.ToInt32(upper_data_boundary_vertical_line.X) ;                
+            {             
                 x_index_trim_lower = lower_data_boundary_vertical_line.X;
                 x_index_trim_upper = upper_data_boundary_vertical_line.X;
             }
             else
             {
-                //x_index_trim_upper = Convert.ToInt32(lower_data_boundary_vertical_line.X) ;
-                //x_index_trim_lower = Convert.ToInt32(upper_data_boundary_vertical_line.X) ;
                 x_index_trim_upper = lower_data_boundary_vertical_line.X;
                 x_index_trim_lower = upper_data_boundary_vertical_line.X;
             }
-
-            //int x_index_trim_lower_index = generic_input_data_double_clone[0].IndexOf(x_index_trim_lower);
-            //int x_index_trim_upper_index = generic_input_data_double_clone[0].IndexOf(x_index_trim_upper);
 
             x_index_trim_lower_index = find_closest_value(x_index_trim_lower, generic_input_data_double_clone[0]);
             x_index_trim_upper_index = find_closest_value(x_index_trim_upper, generic_input_data_double_clone[0]);
@@ -914,6 +948,9 @@ namespace Damping_Data_Processor
             }
 
             update_trimmed_input_data(x_index_trim_lower_index, x_index_trim_upper_index);
+
+            //add data to catalog
+            generic_input_data_double_clone_catalog[select_data_set_tool_strip_combo_box.SelectedIndex] = generic_input_data_double_clone;
 
             plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone, "Time (Seconds)", y_axis_label_data_chart);
             draw_vertical_annotations(data_chart, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, generic_input_data_double_clone[0]);
@@ -1260,6 +1297,10 @@ namespace Damping_Data_Processor
             double low_cutoff_freq = Convert.ToDouble(low_freq_cutoff_numupdown.Value);
             double high_cutoff_freq = Convert.ToDouble(high_freq_cutoff_numupdown.Value);
 
+            //save data to tracker for cutoiff freqs
+            low_cutoff_freq_tracker[select_data_set_tool_strip_combo_box.SelectedIndex] = low_cutoff_freq;
+            high_cutoff_freq_tracker[select_data_set_tool_strip_combo_box.SelectedIndex] = high_cutoff_freq;
+
             //create filter object
             var bandpass = OnlineFirFilter.CreateBandpass(ImpulseResponse.Finite, input_data_sample_rate, low_cutoff_freq, high_cutoff_freq);
             //var bandpass = OnlineFirFilter.CreateLowpass(ImpulseResponse.Finite, input_data_sample_rate, high_cutoff_freq);
@@ -1292,6 +1333,9 @@ namespace Damping_Data_Processor
             plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone_filtered, "Time (Seconds)", y_axis_label_data_chart);
 
             check_checked_chart_series();
+
+            //add data to catalog
+            generic_input_data_double_clone_filtered_catalog[select_data_set_tool_strip_combo_box.SelectedIndex] = generic_input_data_double_clone_filtered;
 
         }
 
@@ -1342,23 +1386,16 @@ namespace Damping_Data_Processor
 
         private void exportResultsSummaryEditedDatasetsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string dataset_result_summary_text_concatenated = string.Empty;
 
-            for (int i = 0; i < dataset_result_summary_text_list.Count; i++)
-            {
-                dataset_result_summary_text_concatenated = dataset_result_summary_text_concatenated + dataset_result_summary_text_list[i];
-            }
+            string dataset_result_summary_text_concatenated = concat_dataset_results_summary();
 
-            //check if there is no results
+            //check to see if results are ready for export
             if (String.IsNullOrEmpty(dataset_result_summary_text_concatenated))
             {
-                string message = "There are no results to export. The results are generated after clicking -" + calculate_damp_ratio_and_freq_button.Text+ "- Button";
-                string title = "Error";
-                MessageBox.Show(message, title);
                 return;
             }
 
-            string save_results_folder = string.Empty;
+                string save_results_folder = string.Empty;
 
             //open windows explorer to retrieve the save folder folder
             select_folder(out save_results_folder);
@@ -1372,7 +1409,7 @@ namespace Damping_Data_Processor
             //save the results text
             System.IO.File.WriteAllText(save_results_folder + "Damping Data Results Summary" + ".txt", dataset_result_summary_text_concatenated);
 
-            //save all data sets master , trimmed, trimmed filtered
+            //save all data sets master , trimmed, trimmed filtered using the catalog
 
             //create header for data exports
             List<string> header = new List<string>();
@@ -1384,47 +1421,58 @@ namespace Damping_Data_Processor
             header.Add("XZ VS" + y_axis_label_data_chart);
             header.Add("YZ VS" + y_axis_label_data_chart);
 
-            //CONVERT DATA SETS TO STRINGS
-            List<List<string>> csv_data_master = convert_list_of_list_double_to_string(generic_input_data_double_master);
-            List<List<string>> csv_data_clone = convert_list_of_list_double_to_string(generic_input_data_double_clone);
-            List<List<string>> csv_data_clone_filter = convert_list_of_list_double_to_string(generic_input_data_double_clone_filtered);
-
-            //add headers to data sets
-            for(int i= 0; i< header.Count; i++)
+            for (int catalog_index = 0; catalog_index < generic_input_data_double_master_catalog.Count; catalog_index++)
             {
-                csv_data_master[i].Insert(0, header[i]);
-                csv_data_clone[i].Insert(0, header[i]);
-                if (is_data_filtered == true)
+
+                if (generic_input_data_double_master_catalog[catalog_index].Count == 0)
                 {
-                    csv_data_clone_filter[i].Insert(0, header[i]);
+                    continue;
                 }
-            }
 
-            csv_data_master = transpose_list_of_list_string(csv_data_master);
-            csv_data_clone = transpose_list_of_list_string(csv_data_clone);
-            if (is_data_filtered == true)
-            {
-                csv_data_clone_filter = transpose_list_of_list_string(csv_data_clone_filter);
-            }
+                //CONVERT DATA SETS TO STRINGS
+                List<List<string>> csv_data_master = convert_list_of_list_double_to_string(generic_input_data_double_master_catalog[catalog_index]);
+                List<List<string>> csv_data_clone = convert_list_of_list_double_to_string(generic_input_data_double_clone_catalog[catalog_index]);
+                List<List<string>> csv_data_clone_filter = convert_list_of_list_double_to_string(generic_input_data_double_clone_filtered_catalog[catalog_index]);
 
-            //get cutoff freqs
-            double low_cutoff_freq = Convert.ToDouble(low_freq_cutoff_numupdown.Value);
-            double high_cutoff_freq = Convert.ToDouble(high_freq_cutoff_numupdown.Value);
+                //add headers to data sets
+                for (int i = 0; i < header.Count; i++)
+                {
+                    csv_data_master[i].Insert(0, header[i]);
+                    csv_data_clone[i].Insert(0, header[i]);
+                    if (is_data_filtered == true)
+                    {
+                        csv_data_clone_filter[i].Insert(0, header[i]);
+                    }
+                }
 
-            //get timestamps of trimmed data
-            double first_timestamp = Math.Round(generic_input_data_double_clone[0][0],1);
-            double second_timestamp = Math.Round(generic_input_data_double_clone[0][generic_input_data_double_clone[0].Count-1],1);
+                csv_data_master = transpose_list_of_list_string(csv_data_master);
+                csv_data_clone = transpose_list_of_list_string(csv_data_clone);
+                if (generic_input_data_double_clone_filtered_catalog[catalog_index].Count!=0)
+                {
+                    csv_data_clone_filter = transpose_list_of_list_string(csv_data_clone_filter);
+                }
 
-            string dataset_name = get_filename_from_filepath(csv_input_filepaths_short[select_data_set_tool_strip_combo_box.SelectedIndex]);
-            string dataset_name_trimmed = dataset_name +"["+ first_timestamp+"s - "+ second_timestamp+"s]";
-            string dataset_name_trimmed_filtered = dataset_name_trimmed +"["+ low_cutoff_freq+ "Hz - " + high_cutoff_freq +"Hz]";
+                //get cutoff freqs (CHANGE THIS IS AN INCORRECT WAY TO GET TEHSE VALUES)
+                double low_cutoff_freq = low_cutoff_freq_tracker[catalog_index];
+                double high_cutoff_freq = high_cutoff_freq_tracker[catalog_index];
 
-            //save the files at their filepath
-            save_list_of_list_string_as_csv(csv_data_master, save_results_folder + "Acceleration Datasets " + dataset_name + " [Unedited].csv");
-            save_list_of_list_string_as_csv(csv_data_clone, save_results_folder + "Acceleration Datasets " + dataset_name_trimmed + " [Trimmed].csv");
-            if (is_data_filtered == true)
-            {
-                save_list_of_list_string_as_csv(csv_data_clone_filter, save_results_folder + "Acceleration Datasets " + dataset_name_trimmed_filtered + " [Trimmed & Filtered].csv");
+                //get timestamps of trimmed data
+                double first_timestamp = Math.Round(generic_input_data_double_clone_catalog[catalog_index][0][0], 1);
+                double second_timestamp = Math.Round(generic_input_data_double_clone_catalog[catalog_index][0][generic_input_data_double_clone_catalog[catalog_index][0].Count - 1], 1);
+
+                //get dataset name
+                string dataset_name = get_filename_from_filepath(csv_input_filepaths_short[catalog_index]);
+                string dataset_name_trimmed = dataset_name + "[" + first_timestamp + "s - " + second_timestamp + "s]";
+                string dataset_name_trimmed_filtered = dataset_name_trimmed + "[" + low_cutoff_freq + "Hz - " + high_cutoff_freq + "Hz]";
+
+                //save the files at their filepath
+                save_list_of_list_string_as_csv(csv_data_master, save_results_folder + "Accel. Datasets " + dataset_name + " [Unedited].csv");
+                save_list_of_list_string_as_csv(csv_data_clone, save_results_folder + "Accel. Datasets " + dataset_name_trimmed + " [Trimmed].csv");
+                if (generic_input_data_double_clone_filtered_catalog[catalog_index].Count != 0)
+                {
+                    save_list_of_list_string_as_csv(csv_data_clone_filter, save_results_folder + "Accel. Datasets " + dataset_name_trimmed_filtered + " [Trimmed & Filtered].csv");
+                }
+
             }
 
         }
@@ -1455,6 +1503,14 @@ namespace Damping_Data_Processor
             check_checked_chart_series();
         }
 
-
+        private void displayResultsSummaryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string dataset_result_summary_text_concatenated = concat_dataset_results_summary();
+            if (!String.IsNullOrEmpty(dataset_result_summary_text_concatenated))
+            {
+                string title = "Results Summary";
+                MessageBox.Show(dataset_result_summary_text_concatenated, title);
+            }
+        }
     }
 }
