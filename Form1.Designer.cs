@@ -68,14 +68,22 @@ namespace Damping_Data_Processor
             this.saveSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.label12 = new System.Windows.Forms.Label();
+            this.select_data_set_tool_strip_combo_box = new System.Windows.Forms.ToolStripComboBox();
             this.exportResultsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportResultsSummaryEditedDatasetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.displayResultsSummaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportTrimmedDatasetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.label12 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.selected_data_set_textbox = new System.Windows.Forms.TextBox();
-            this.select_data_set_tool_strip_combo_box = new System.Windows.Forms.ToolStripComboBox();
-            this.displayResultsSummaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.activity_log_textbox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.data_chart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
@@ -259,7 +267,7 @@ namespace Damping_Data_Processor
             this.summary_results_textbox.Name = "summary_results_textbox";
             this.summary_results_textbox.ReadOnly = true;
             this.summary_results_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.summary_results_textbox.Size = new System.Drawing.Size(361, 490);
+            this.summary_results_textbox.Size = new System.Drawing.Size(361, 354);
             this.summary_results_textbox.TabIndex = 31;
             // 
             // freq_plot_cutoff_numupdown
@@ -280,10 +288,10 @@ namespace Damping_Data_Processor
             this.freq_plot_cutoff_numupdown.Size = new System.Drawing.Size(55, 26);
             this.freq_plot_cutoff_numupdown.TabIndex = 33;
             this.freq_plot_cutoff_numupdown.Value = new decimal(new int[] {
-            7,
+            55,
             0,
             0,
-            0});
+            65536});
             // 
             // label5
             // 
@@ -381,7 +389,8 @@ namespace Damping_Data_Processor
             this.menu_strip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.select_data_set_tool_strip_combo_box,
-            this.exportResultsToolStripMenuItem});
+            this.exportResultsToolStripMenuItem,
+            this.settingsToolStripMenuItem});
             this.menu_strip.Location = new System.Drawing.Point(0, 0);
             this.menu_strip.Name = "menu_strip";
             this.menu_strip.Size = new System.Drawing.Size(1763, 27);
@@ -402,28 +411,107 @@ namespace Damping_Data_Processor
             // selectInputFolderToolStripMenuItem
             // 
             this.selectInputFolderToolStripMenuItem.Name = "selectInputFolderToolStripMenuItem";
-            this.selectInputFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.selectInputFolderToolStripMenuItem.Text = "Select Input Folder";
+            this.selectInputFolderToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.selectInputFolderToolStripMenuItem.Text = "Select input folder";
             this.selectInputFolderToolStripMenuItem.Click += new System.EventHandler(this.selectInputFolderToolStripMenuItem_Click);
             // 
             // saveSessionToolStripMenuItem
             // 
             this.saveSessionToolStripMenuItem.Name = "saveSessionToolStripMenuItem";
-            this.saveSessionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.saveSessionToolStripMenuItem.Text = "Save Session";
+            this.saveSessionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.saveSessionToolStripMenuItem.Text = "Save session";
             // 
             // loadSessionToolStripMenuItem
             // 
             this.loadSessionToolStripMenuItem.Name = "loadSessionToolStripMenuItem";
-            this.loadSessionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.loadSessionToolStripMenuItem.Text = "Load Session";
+            this.loadSessionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.loadSessionToolStripMenuItem.Text = "Load session";
             // 
             // clearSessionToolStripMenuItem
             // 
             this.clearSessionToolStripMenuItem.Name = "clearSessionToolStripMenuItem";
-            this.clearSessionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.clearSessionToolStripMenuItem.Text = "Clear Session";
+            this.clearSessionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.clearSessionToolStripMenuItem.Text = "Clear session";
             this.clearSessionToolStripMenuItem.Click += new System.EventHandler(this.clearSessionToolStripMenuItem_Click);
+            // 
+            // select_data_set_tool_strip_combo_box
+            // 
+            this.select_data_set_tool_strip_combo_box.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.select_data_set_tool_strip_combo_box.MaxDropDownItems = 100;
+            this.select_data_set_tool_strip_combo_box.Name = "select_data_set_tool_strip_combo_box";
+            this.select_data_set_tool_strip_combo_box.Size = new System.Drawing.Size(600, 23);
+            this.select_data_set_tool_strip_combo_box.SelectedIndexChanged += new System.EventHandler(this.select_data_set_tool_strip_combo_box_SelectedIndexChanged_1);
+            // 
+            // exportResultsToolStripMenuItem
+            // 
+            this.exportResultsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem,
+            this.displayResultsSummaryToolStripMenuItem,
+            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem,
+            this.exportTrimmedDatasetsToolStripMenuItem,
+            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem});
+            this.exportResultsToolStripMenuItem.Name = "exportResultsToolStripMenuItem";
+            this.exportResultsToolStripMenuItem.Size = new System.Drawing.Size(93, 23);
+            this.exportResultsToolStripMenuItem.Text = "Export Results";
+            this.exportResultsToolStripMenuItem.Click += new System.EventHandler(this.exportResultsToolStripMenuItem_Click);
+            // 
+            // exportResultsSummaryEditedDatasetsToolStripMenuItem
+            // 
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Name = "exportResultsSummaryEditedDatasetsToolStripMenuItem";
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Size = new System.Drawing.Size(369, 22);
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Text = "Export results summary and all datasets to output folder";
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Click += new System.EventHandler(this.exportResultsSummaryEditedDatasetsToolStripMenuItem_Click);
+            // 
+            // displayResultsSummaryToolStripMenuItem
+            // 
+            this.displayResultsSummaryToolStripMenuItem.Name = "displayResultsSummaryToolStripMenuItem";
+            this.displayResultsSummaryToolStripMenuItem.Size = new System.Drawing.Size(369, 22);
+            this.displayResultsSummaryToolStripMenuItem.Text = "Display total results summary";
+            this.displayResultsSummaryToolStripMenuItem.Click += new System.EventHandler(this.displayResultsSummaryToolStripMenuItem_Click);
+            // 
+            // exportUneditedDatasetsToOutputFolderToolStripMenuItem
+            // 
+            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem.Name = "exportUneditedDatasetsToOutputFolderToolStripMenuItem";
+            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem.Size = new System.Drawing.Size(369, 22);
+            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem.Text = "Export unedited datasets to output folder";
+            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem.Click += new System.EventHandler(this.exportUneditedDatasetsToOutputFolderToolStripMenuItem_Click);
+            // 
+            // exportTrimmedDatasetsToolStripMenuItem
+            // 
+            this.exportTrimmedDatasetsToolStripMenuItem.Name = "exportTrimmedDatasetsToolStripMenuItem";
+            this.exportTrimmedDatasetsToolStripMenuItem.Size = new System.Drawing.Size(369, 22);
+            this.exportTrimmedDatasetsToolStripMenuItem.Text = "Export trimmed datasets to output folder";
+            this.exportTrimmedDatasetsToolStripMenuItem.Click += new System.EventHandler(this.exportTrimmedDatasetsToolStripMenuItem_Click);
+            // 
+            // exportFilteredAndTrimmedDatasetsToolStripMenuItem
+            // 
+            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem.Name = "exportFilteredAndTrimmedDatasetsToolStripMenuItem";
+            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem.Size = new System.Drawing.Size(369, 22);
+            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem.Text = "Export filtered and trimmed datasets to output folder";
+            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem.Click += new System.EventHandler(this.exportFilteredAndTrimmedDatasetsToolStripMenuItem_Click);
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem,
+            this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem});
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 23);
+            this.settingsToolStripMenuItem.Text = "Settings";
+            // 
+            // importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem
+            // 
+            this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Name = "importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem";
+            this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
+            this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Text = "Import .csv files from output folder when selecting input folder?";
+            this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Click += new System.EventHandler(this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem_Click);
+            // 
+            // recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem
+            // 
+            this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Name = "recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem";
+            this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
+            this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Text = "Recalculate Vector sum data after applying filter?";
+            this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Click += new System.EventHandler(this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem_Click);
             // 
             // label12
             // 
@@ -435,22 +523,6 @@ namespace Damping_Data_Processor
             this.label12.TabIndex = 32;
             this.label12.Text = "Results Summary";
             this.label12.Click += new System.EventHandler(this.label4_Click);
-            // 
-            // exportResultsToolStripMenuItem
-            // 
-            this.exportResultsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportResultsSummaryEditedDatasetsToolStripMenuItem,
-            this.displayResultsSummaryToolStripMenuItem});
-            this.exportResultsToolStripMenuItem.Name = "exportResultsToolStripMenuItem";
-            this.exportResultsToolStripMenuItem.Size = new System.Drawing.Size(93, 23);
-            this.exportResultsToolStripMenuItem.Text = "Export Results";
-            // 
-            // exportResultsSummaryEditedDatasetsToolStripMenuItem
-            // 
-            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Name = "exportResultsSummaryEditedDatasetsToolStripMenuItem";
-            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Size = new System.Drawing.Size(308, 22);
-            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Text = "Export Results Summary and Edited Datasets";
-            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Click += new System.EventHandler(this.exportResultsSummaryEditedDatasetsToolStripMenuItem_Click);
             // 
             // label4
             // 
@@ -481,26 +553,35 @@ namespace Damping_Data_Processor
             this.selected_data_set_textbox.Size = new System.Drawing.Size(268, 38);
             this.selected_data_set_textbox.TabIndex = 50;
             // 
-            // select_data_set_tool_strip_combo_box
+            // activity_log_textbox
             // 
-            this.select_data_set_tool_strip_combo_box.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.select_data_set_tool_strip_combo_box.MaxDropDownItems = 100;
-            this.select_data_set_tool_strip_combo_box.Name = "select_data_set_tool_strip_combo_box";
-            this.select_data_set_tool_strip_combo_box.Size = new System.Drawing.Size(400, 23);
-            this.select_data_set_tool_strip_combo_box.SelectedIndexChanged += new System.EventHandler(this.select_data_set_tool_strip_combo_box_SelectedIndexChanged_1);
+            this.activity_log_textbox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.activity_log_textbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.activity_log_textbox.Location = new System.Drawing.Point(2, 733);
+            this.activity_log_textbox.Multiline = true;
+            this.activity_log_textbox.Name = "activity_log_textbox";
+            this.activity_log_textbox.ReadOnly = true;
+            this.activity_log_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.activity_log_textbox.Size = new System.Drawing.Size(361, 103);
+            this.activity_log_textbox.TabIndex = 52;
             // 
-            // displayResultsSummaryToolStripMenuItem
+            // label1
             // 
-            this.displayResultsSummaryToolStripMenuItem.Name = "displayResultsSummaryToolStripMenuItem";
-            this.displayResultsSummaryToolStripMenuItem.Size = new System.Drawing.Size(308, 22);
-            this.displayResultsSummaryToolStripMenuItem.Text = "Display Results Summary";
-            this.displayResultsSummaryToolStripMenuItem.Click += new System.EventHandler(this.displayResultsSummaryToolStripMenuItem_Click);
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(145, 713);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(80, 17);
+            this.label1.TabIndex = 53;
+            this.label1.Text = "Activity Log";
             // 
             // form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1763, 861);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.activity_log_textbox);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.selected_data_set_textbox);
             this.Controls.Add(this.label4);
@@ -532,7 +613,7 @@ namespace Damping_Data_Processor
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menu_strip;
             this.Name = "form1";
-            this.Text = "Structrual Damping Data Processor";
+            this.Text = "Structrual Damping Reduction Processor";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.data_chart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).EndInit();
@@ -586,6 +667,14 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.TextBox selected_data_set_textbox;
         private System.Windows.Forms.ToolStripComboBox select_data_set_tool_strip_combo_box;
         private System.Windows.Forms.ToolStripMenuItem displayResultsSummaryToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportTrimmedDatasetsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportFilteredAndTrimmedDatasetsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportUneditedDatasetsToOutputFolderToolStripMenuItem;
+        private System.Windows.Forms.TextBox activity_log_textbox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem;
     }
 }
 
