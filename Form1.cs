@@ -16,6 +16,7 @@ using MathNet.Numerics;
 using DSPLib;
 
 
+
 namespace Damping_Data_Processor
 {
     public partial class form1 : Form
@@ -78,11 +79,16 @@ namespace Damping_Data_Processor
         List<Boolean> is_data_filtered = new List<Boolean>();
 
         //holds the values where the annotation will be placed
-        int x_index_trim_lower_index = 0;
-        int x_index_trim_upper_index = 0;
+        List<int> x_index_trim_lower_index_trimmed = new List<int>();
+        List<int> x_index_trim_upper_index_trimmed = new List<int>();
+
+        //holds the values where the annotation is placed relative to the original time dataset (not trimmed)
+        //useful when applying a filter to a dataset that has been trimmed twice
+        List<int> x_index_trim_lower_index_master = new List<int>();
+        List<int> x_index_trim_upper_index_master = new List<int>();
 
         //y label of data chart
-        string y_axis_label_data_chart = @"Acceleration [m/s^2]";
+        string y_axis_label_data_chart = "Acceleration (m/s^2)";
 
         List<string> dataset_result_summary_text_list = new List<string>();
 
@@ -105,13 +111,16 @@ namespace Damping_Data_Processor
             acceleration_dataset_csv_header.Add("XZ VS" + y_axis_label_data_chart);
             acceleration_dataset_csv_header.Add("YZ VS" + y_axis_label_data_chart);
 
+            //set default value in the combobox;
+            use_DFT_or_peaks_combobox.SelectedIndex = 0;
+
         }
 
         //generic program functions
 
         public void activity_log(string log)
         {
-            activity_log_textbox.AppendText(log + "\n\r");
+            activity_log_textbox.AppendText(log + "\n\r\n\r");
         }
 
         public void export_acceleration_datasets_csv(Boolean export_master = true, Boolean export_clone = true, Boolean export_filter = true)
@@ -695,7 +704,8 @@ namespace Damping_Data_Processor
 
                 for (int i = 0; i < data_sets[list_index].Count; i = i + sample_rate)
                 {
-                    sampled_data.Add(data_sets[list_index][i]);
+                    sampled_data.Add(Math.Abs(data_sets[list_index][i]));
+                    //sampled_data.Add((data_sets[list_index][i]));
 
                     //time_sampled.Add(data_sets[0][i]);
                     //X_sampled.Add(data_sets[1][i]);
@@ -975,11 +985,20 @@ namespace Damping_Data_Processor
 
         public void update_program_after_input_folder_select()
         {
+            //clear all visible UI elements
+            summary_results_textbox.Clear();
+            activity_log_textbox.Clear();
+            data_chart.Series.Clear();
+            freq_dft_chart.Series.Clear();
+            freq_peaks_chart.Series.Clear();
+
+            //clear catalogs of data
+            generic_input_data_double_master_catalog.Clear();
+            generic_input_data_double_clone_catalog.Clear();
+            generic_input_data_double_clone_filtered_catalog.Clear();
+
             //clear select data set combobox
             select_data_set_tool_strip_combo_box.Items.Clear();
-
-            //clear results textbox
-            summary_results_textbox.Clear();
 
             //clear all saved summaries
             dataset_result_summary_text_list.Clear();
@@ -1037,6 +1056,12 @@ namespace Damping_Data_Processor
 
                 //add entries to say all data is initally unfiltered
                 is_data_filtered.Add(false);
+
+                //add blank entries to allocate slots for all datasets
+                x_index_trim_lower_index_trimmed.Add(0);
+                x_index_trim_upper_index_trimmed.Add(0);
+                x_index_trim_lower_index_master.Add(0);
+                x_index_trim_upper_index_master.Add(0);
             }
 
             for (int i = 0; i < csv_input_filepaths.Count; i++)
@@ -1161,10 +1186,15 @@ namespace Damping_Data_Processor
                 x_index_trim_lower = upper_data_boundary_vertical_line.X;
             }
 
-            x_index_trim_lower_index = find_closest_value(x_index_trim_lower, generic_input_data_double_clone[0]);
-            x_index_trim_upper_index = find_closest_value(x_index_trim_upper, generic_input_data_double_clone[0]);
+            x_index_trim_lower_index_trimmed[select_data_set_tool_strip_combo_box.SelectedIndex] = find_closest_value(x_index_trim_lower, generic_input_data_double_clone[0]);
+            x_index_trim_upper_index_trimmed[select_data_set_tool_strip_combo_box.SelectedIndex] = find_closest_value(x_index_trim_upper, generic_input_data_double_clone[0]);
 
-            if (Math.Abs(x_index_trim_upper_index - x_index_trim_lower_index) < 15)
+            //get time value of of the horiz annotation and get the index of the time from the master time list
+            x_index_trim_lower_index_master[select_data_set_tool_strip_combo_box.SelectedIndex] = generic_input_data_double_master[0].IndexOf(generic_input_data_double_clone[0][find_closest_value(x_index_trim_lower, generic_input_data_double_clone[0])]);
+            x_index_trim_upper_index_master[select_data_set_tool_strip_combo_box.SelectedIndex] = generic_input_data_double_master[0].IndexOf(generic_input_data_double_clone[0][find_closest_value(x_index_trim_upper, generic_input_data_double_clone[0])]);
+
+
+            if (Math.Abs(x_index_trim_upper_index_trimmed[select_data_set_tool_strip_combo_box.SelectedIndex] - x_index_trim_lower_index_trimmed[select_data_set_tool_strip_combo_box.SelectedIndex]) < 15)
             {
                 string message = "Cannot trim data to less than 15 data points";
                 string title = "Error";
@@ -1172,7 +1202,7 @@ namespace Damping_Data_Processor
                 return;
             }
 
-            update_trimmed_input_data(x_index_trim_lower_index, x_index_trim_upper_index);
+            update_trimmed_input_data(x_index_trim_lower_index_trimmed[select_data_set_tool_strip_combo_box.SelectedIndex], x_index_trim_upper_index_trimmed[select_data_set_tool_strip_combo_box.SelectedIndex]);
 
             //add data to catalog
             generic_input_data_double_clone_catalog[select_data_set_tool_strip_combo_box.SelectedIndex] = generic_input_data_double_clone;
@@ -1402,15 +1432,19 @@ namespace Damping_Data_Processor
             double first_timestamp = Math.Round(generic_input_data_double_clone[0][0], 1);
             double second_timestamp = Math.Round(generic_input_data_double_clone[0][generic_input_data_double_clone[0].Count - 1], 1);
 
+            //get pixel length of
+            string header_border = "/////////////////////////////////////////////////////////////////////////////////////////////////////////\r\n";
+
             //set header for text file
-            results_summary_text = "/////////////////////////////////////////////////////////////////////////////\r\n";
+            results_summary_text = header_border;
             results_summary_text = results_summary_text + csv_input_filepaths_short[current_selected_csv_checkedlistbox_index] + "\r\n";
-            results_summary_text = results_summary_text + "/////////////////////////////////////////////////////////////////////////////\r\n";
+            results_summary_text = results_summary_text + header_border;
             results_summary_text = results_summary_text + "Trimmed from " + first_timestamp + " seconds to " + second_timestamp + " seconds.\r\n";
             if (is_data_filtered[select_data_set_tool_strip_combo_box.SelectedIndex] == true)
             {
                 results_summary_text = results_summary_text + "The data sets were bandpass filtered with cutoff frequencies of " + low_cutoff_freq + " Hz and " + high_cutoff_freq + " Hz.\r\n";
             }
+            results_summary_text = results_summary_text + "\r\n";
 
             //determine which data directions are currently selected add them to a list to be freq analyzed
             for (int data_direction_index = 0; data_direction_index < select_data_direction_check_list_box.Items.Count; data_direction_index++)
@@ -1478,7 +1512,18 @@ namespace Damping_Data_Processor
                 //y=p[0] e ^ (p[1] *x)
                 //returns the coeffcienets of the fitted curve
                 List<double> p_exp_coeff = exponential_curve_fit(time_maximas, selected_data_set_maximas);
-                double damp_ratio_exp = Math.Abs(p_exp_coeff[1] / (2 * Math.PI * natural_frequencies[data_direction_index]));
+
+                double damp_ratio_exp = 0;
+                //using DFT frequency
+                if (use_DFT_or_peaks_combobox.SelectedIndex == 0)
+                {
+                    damp_ratio_exp = Math.Abs(p_exp_coeff[1] / (2 * Math.PI * natural_frequencies[data_direction_index]));
+                }
+                //using peaks frequncy
+                else
+                {
+                    damp_ratio_exp = Math.Abs(p_exp_coeff[1] / (2 * Math.PI * average_natural_frequency_peaks));
+                }
 
                 List<double> exp_curve_fit_values = plot_fitted_exponential_curve(p_exp_coeff[0], p_exp_coeff[1], selected_data_set_names[data_direction_index]);
 
@@ -1486,11 +1531,20 @@ namespace Damping_Data_Processor
 
                 results_summary_text = results_summary_text + "The natural frequency of the " + selected_data_set_names[data_direction_index] + " direction data set was calculated using 2 methods:\r\n";
                 results_summary_text = results_summary_text + "DFT: " + Math.Round(natural_frequencies[data_direction_index], 6) + " Hz. \r\n";
-                results_summary_text = results_summary_text + "Peaks: " + Math.Round(average_natural_frequency_peaks, 6) + " Hz. \r\n";
+                results_summary_text = results_summary_text + "Peaks: " + Math.Round(average_natural_frequency_peaks, 6) + " Hz. \r\n\r\n";
                 results_summary_text = results_summary_text + "The damping ratio of the " + selected_data_set_names[data_direction_index] + " direction data set was calculated using 2 methods:\r\n";
                 results_summary_text = results_summary_text + "Log. Decrement: " + Math.Round(damp_ratio_average * 100, 3) + "%\r\n";
-                results_summary_text = results_summary_text + "Exp. Curve Fit: " + Math.Round(damp_ratio_exp * 100, 3) + "%\r\n";
-                results_summary_text = results_summary_text + "The R Sqaured value was found as: " + Math.Round(coffecient_of_determination, 3) + "\r\n\r\n";
+                //using DFT frequency
+                if (use_DFT_or_peaks_combobox.SelectedIndex == 0)
+                {
+                    results_summary_text = results_summary_text + "Exp. Curve Fit (using DFT freq.): " + Math.Round(damp_ratio_exp * 100, 3) + "%\r\n\r\n";
+                }
+                //using peaks frequncy
+                else
+                {
+                    results_summary_text = results_summary_text + "Exp. Curve Fit (using Peaks freq.): " + Math.Round(damp_ratio_exp * 100, 3) + "%\r\n\r\n";
+                }
+                results_summary_text = results_summary_text + "The R Squared value of the exp. curve fit is (" + selected_data_set_names[data_direction_index] + " direction): " + Math.Round(coffecient_of_determination, 3) + "\r\n\r\n";
 
                 //summary_results_textbox.Text = summary_results_textbox.Text + results_summary_text;
             }
@@ -1505,8 +1559,8 @@ namespace Damping_Data_Processor
             //reset data so filtered data isnt filtered
             is_data_filtered[select_data_set_tool_strip_combo_box.SelectedIndex] = false;
 
-            x_index_trim_lower_index = 0;
-            x_index_trim_upper_index = 0;
+            x_index_trim_lower_index_trimmed[select_data_set_tool_strip_combo_box.SelectedIndex] = 0;
+            x_index_trim_upper_index_trimmed[select_data_set_tool_strip_combo_box.SelectedIndex] = 0;
 
             load_data_of_selected_dataset_update_charts();
 
@@ -1536,16 +1590,16 @@ namespace Damping_Data_Processor
             {
                 if (i == 0)
                 {
-                    if (x_index_trim_upper_index > 0)
+                    if (x_index_trim_upper_index_trimmed[select_data_set_tool_strip_combo_box.SelectedIndex] > 0)
                     {
-                        generic_input_data_double_clone_filtered[0] = generic_input_data_double_master[i].GetRange(x_index_trim_lower_index, x_index_trim_upper_index - x_index_trim_lower_index);
+                        generic_input_data_double_clone_filtered[0] = generic_input_data_double_master[i].GetRange(x_index_trim_lower_index_master[select_data_set_tool_strip_combo_box.SelectedIndex], x_index_trim_upper_index_master[select_data_set_tool_strip_combo_box.SelectedIndex] - x_index_trim_lower_index_master[select_data_set_tool_strip_combo_box.SelectedIndex]);
                     }
                 }
                 else
                 {
-                    if (x_index_trim_upper_index > 0)
+                    if (x_index_trim_upper_index_trimmed[select_data_set_tool_strip_combo_box.SelectedIndex] > 0)
                     {
-                        generic_input_data_double_clone_filtered[i] = (bandpass.ProcessSamples(convert_double_list_to_array(generic_input_data_double_master[i])).ToList()).GetRange(x_index_trim_lower_index, x_index_trim_upper_index - x_index_trim_lower_index);
+                        generic_input_data_double_clone_filtered[i] = (bandpass.ProcessSamples(convert_double_list_to_array(generic_input_data_double_master[i])).ToList()).GetRange(x_index_trim_lower_index_master[select_data_set_tool_strip_combo_box.SelectedIndex], x_index_trim_upper_index_master[select_data_set_tool_strip_combo_box.SelectedIndex] - x_index_trim_lower_index_master[select_data_set_tool_strip_combo_box.SelectedIndex]);
                     }
                     else
                     {
@@ -1567,9 +1621,15 @@ namespace Damping_Data_Processor
                 generic_input_data_double_clone_filtered = vector_sum_xyz_datasets(generic_input_data_double_clone_filtered);
             }
 
+            List<string> data_direction_name_filter = new List<string>();
+            foreach (string name in data_direction_name)
+            {
+                data_direction_name_filter.Add(name + "(Filt.)");
+            }
+
 
             //replot data
-            plot_data_on_chart(data_chart, data_direction_name, generic_input_data_double_clone_filtered, "Time (Seconds)", y_axis_label_data_chart);
+            plot_data_on_chart(data_chart, data_direction_name_filter, generic_input_data_double_clone_filtered, "Time (Seconds)", y_axis_label_data_chart);
 
             check_checked_chart_series();
 
