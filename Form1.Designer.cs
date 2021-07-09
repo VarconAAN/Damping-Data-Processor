@@ -420,12 +420,14 @@ namespace Damping_Data_Processor
             this.saveSessionToolStripMenuItem.Name = "saveSessionToolStripMenuItem";
             this.saveSessionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveSessionToolStripMenuItem.Text = "Save session";
+            this.saveSessionToolStripMenuItem.Click += new System.EventHandler(this.saveSessionToolStripMenuItem_Click);
             // 
             // loadSessionToolStripMenuItem
             // 
             this.loadSessionToolStripMenuItem.Name = "loadSessionToolStripMenuItem";
             this.loadSessionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.loadSessionToolStripMenuItem.Text = "Load session";
+            this.loadSessionToolStripMenuItem.Click += new System.EventHandler(this.loadSessionToolStripMenuItem_Click);
             // 
             // select_data_set_tool_strip_combo_box
             // 

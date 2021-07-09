@@ -14,11 +14,20 @@ using MathNet.Filtering;
 using MathNet.Numerics.LinearRegression;
 using MathNet.Numerics;
 using DSPLib;
+using System.Xml;
+using System.Xml.Serialization;
+using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 
 
 namespace Damping_Data_Processor
 {
+
+
     public partial class form1 : Form
     {
 
@@ -50,6 +59,8 @@ namespace Damping_Data_Processor
         List<List<List<double>>> generic_input_data_double_master_catalog = new List<List<List<double>>>();
         List<List<List<double>>> generic_input_data_double_clone_catalog = new List<List<List<double>>>();
         List<List<List<double>>> generic_input_data_double_clone_filtered_catalog = new List<List<List<double>>>();
+        //single variable to hold all session data for binary serialization
+        //List<List<List<List<double>>>> generic_input_data_double_master_catalog_binary_serialization = new List<List<List<List<double>>>>();
 
         //keep track of what cutoff frequencies are used
         List<double> low_cutoff_freq_tracker = new List<double>();
@@ -98,6 +109,9 @@ namespace Damping_Data_Processor
 
         string output_folder_name = @"Damping Reduction Output\";
 
+        //the file extension (custom to this software) (damping reduction data sets)
+        string save_session_filetype = ".json";
+
 
         public form1()
         {
@@ -114,6 +128,119 @@ namespace Damping_Data_Processor
             //set default value in the combobox;
             use_DFT_or_peaks_combobox.SelectedIndex = 0;
 
+        }
+
+        public Boolean check_if_list_list_double_is_empty(List<List<List<double>>> list)
+        {
+            Boolean is_empty = true;
+            for (int i = 0; i < list.Count - 1; i++)
+            {
+                if (list[i].Count > 0)
+                {
+                    is_empty = false;
+                    break;
+                }
+            }
+            return is_empty;
+        }
+
+        /// <summary>
+        /// Writes the given object instance to a binary file.
+        /// <para>Object type (and all child types) must be decorated with the [Serializable] attribute.</para>
+        /// <para>To prevent a variable from being serialized, decorate it with the [NonSerialized] attribute; cannot be applied to properties.</para>
+        /// </summary>
+        /// <typeparam name="T">The type of object being written to the XML file.</typeparam>
+        /// <param name="filePath">The file path to write the object instance to.</param>
+        /// <param name="objectToWrite">The object instance to write to the XML file.</param>
+        /// <param name="append">If false the file will be overwritten if it already exists. If true the contents will be appended to the file.</param>
+        public static void WriteToBinaryFile<T>(string filePath, T objectToWrite, bool append = false)
+        {
+            using (Stream stream = File.Open(filePath, append ? FileMode.Append : FileMode.Create))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                binaryFormatter.Serialize(stream, objectToWrite);
+            }
+        }
+
+        /// <summary>
+        /// Reads an object instance from a binary file.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read from the XML.</typeparam>
+        /// <param name="filePath">The file path to read the object instance from.</param>
+        /// <returns>Returns a new instance of the object read from the binary file.</returns>
+        public static T ReadFromBinaryFile<T>(string filePath)
+        {
+            using (Stream stream = File.Open(filePath, FileMode.Open))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                return (T)binaryFormatter.Deserialize(stream);
+            }
+        }
+
+        /// <summary>
+        /// Serializes an object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="serializableObject"></param>
+        /// <param name="fileName"></param>
+        public void SerializeObject<T>(T serializableObject, string fileName)
+        {
+            if (serializableObject == null) { return; }
+
+            try
+            {
+                XmlDocument xmlDocument = new XmlDocument();
+                XmlSerializer serializer = new XmlSerializer(serializableObject.GetType());
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    serializer.Serialize(stream, serializableObject);
+                    stream.Position = 0;
+                    xmlDocument.Load(stream);
+                    xmlDocument.Save(fileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                //Log exception here
+            }
+        }
+
+
+        /// <summary>
+        /// Deserializes an xml file into an object list
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public T DeSerializeObject<T>(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName)) { return default(T); }
+
+            T objectOut = default(T);
+
+            try
+            {
+                XmlDocument xmlDocument = new XmlDocument();
+                xmlDocument.Load(fileName);
+                string xmlString = xmlDocument.OuterXml;
+
+                using (StringReader read = new StringReader(xmlString))
+                {
+                    Type outType = typeof(T);
+
+                    XmlSerializer serializer = new XmlSerializer(outType);
+                    using (XmlReader reader = new XmlTextReader(read))
+                    {
+                        objectOut = (T)serializer.Deserialize(reader);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //Log exception here
+            }
+
+            return objectOut;
         }
 
         //generic program functions
@@ -180,6 +307,9 @@ namespace Damping_Data_Processor
                 {
                     process_save_dataset_as_csv(generic_input_data_double_clone_filtered_catalog[catalog_index], save_results_folder + "Accel. Datasets " + dataset_name_trimmed_filtered + " [Filtered Trimmed].csv");
                 }
+
+                //play sound to allert user
+                System.Media.SystemSounds.Beep.Play();
 
                 ////CONVERT DATA SETS TO STRINGS
                 //if (export_master == true)
@@ -980,7 +1110,34 @@ namespace Damping_Data_Processor
 
             //plot the trimming annotations
             draw_vertical_annotations(data_chart, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, generic_input_data_double_clone[0]);
+        }
 
+        public void update_program_after_load_session()
+        {
+            //clear all visible UI elements
+            summary_results_textbox.Clear();
+            activity_log_textbox.Clear();
+            data_chart.Series.Clear();
+            freq_dft_chart.Series.Clear();
+            freq_peaks_chart.Series.Clear();
+
+            //clear select data set combobox
+            select_data_set_tool_strip_combo_box.Items.Clear();
+
+
+            //update the output folder
+            save_results_folder = input_folder + output_folder_name;
+
+            //set selected input folder textbox to user selected folder
+            input_folder_textbox.Text = input_folder;
+
+            select_data_set_tool_strip_combo_box.Items.Clear();
+            for (int i = 0; i < csv_input_filepaths.Count; i++)
+            {
+                select_data_set_tool_strip_combo_box.Items.Add(csv_input_filepaths_short[i]);
+            }
+
+            current_selected_csv_checkedlistbox_index = 0;
         }
 
         public void update_program_after_input_folder_select()
@@ -1676,13 +1833,6 @@ namespace Damping_Data_Processor
             update_program_after_input_folder_select();
         }
 
-        private void clearSessionToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.Controls.Clear();
-            this.InitializeComponent();
-            clear_all_global_variables();
-        }
-
         private void exportResultsSummaryEditedDatasetsToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -1694,33 +1844,10 @@ namespace Damping_Data_Processor
                 return;
             }
 
-            //string save_results_folder = current_selected_dataset_filepath + @"\Damping Reduction Output\";
-
-            ////open windows explorer to retrieve the save folder folder
-            //select_folder(out save_results_folder);
-
-            //if (save_results_folder == string.Empty)
-            //{
-            //    return;
-            //}
-            //save_results_folder = save_results_folder + @"\";
-
-
-
             //save the results text
             System.IO.File.WriteAllText(save_results_folder + "Damping Reduction Results Summary" + ".txt", dataset_result_summary_text_concatenated);
 
             //save all data sets master , trimmed, trimmed filtered using the catalog
-
-            ////create header for data exports
-            //List<string> acceleration_dataset_csv_header = new List<string>();
-            //acceleration_dataset_csv_header.Add("Time (Seconds)");
-            //acceleration_dataset_csv_header.Add("X " + y_axis_label_data_chart);
-            //acceleration_dataset_csv_header.Add("Y " + y_axis_label_data_chart);
-            //acceleration_dataset_csv_header.Add("Z " + y_axis_label_data_chart);
-            //acceleration_dataset_csv_header.Add("XY VS" + y_axis_label_data_chart);
-            //acceleration_dataset_csv_header.Add("XZ VS" + y_axis_label_data_chart);
-            //acceleration_dataset_csv_header.Add("YZ VS" + y_axis_label_data_chart);
 
             //select all data sets for export
             Boolean export_master = true;
@@ -1837,5 +1964,162 @@ namespace Damping_Data_Processor
                 recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Checked = true;
             }
         }
+
+        private void saveSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            if (check_if_list_list_double_is_empty(generic_input_data_double_master_catalog) && check_if_list_list_double_is_empty(generic_input_data_double_clone_catalog) && check_if_list_list_double_is_empty(generic_input_data_double_clone_filtered_catalog))
+            {
+                string message = "There is no data loaded into the current session";
+                string title = "Error";
+                MessageBox.Show(message, title);
+                return;
+            }
+
+            //create session object (drs = damping reduction session)
+            damping_reduction_session drs = new damping_reduction_session();
+            drs.generic_input_data_double_master_catalog_drs = generic_input_data_double_master_catalog;
+            drs.generic_input_data_double_clone_catalog_drs = generic_input_data_double_clone_catalog;
+            drs.generic_input_data_double_clone_filtered_catalog_drs = generic_input_data_double_clone_filtered_catalog;
+            drs.csv_input_filepaths_drs = csv_input_filepaths;
+            drs.csv_input_filepaths_short_drs = csv_input_filepaths_short;
+            drs.low_cutoff_freq_tracker_drs = low_cutoff_freq_tracker;
+            drs.high_cutoff_freq_tracker_drs = high_cutoff_freq_tracker;
+            drs.is_data_filtered_drs = is_data_filtered;
+            drs.dataset_result_summary_text_list_drs = dataset_result_summary_text_list;
+            drs.x_index_trim_lower_index_trimmed_drs = x_index_trim_lower_index_trimmed;
+            drs.x_index_trim_upper_index_trimmed_drs = x_index_trim_upper_index_trimmed;
+            drs.x_index_trim_lower_index_master_drs = x_index_trim_lower_index_master;
+            drs.x_index_trim_upper_index_master_drs = x_index_trim_upper_index_master;
+
+
+        //get default session file name (using the last folder in the input folder filepath and append the filetype extension
+        string input_folder_wo_filepath = input_folder;
+            if (input_folder_wo_filepath.LastIndexOf(@"\") == input_folder_wo_filepath.Length - 1)
+            {
+                input_folder_wo_filepath = input_folder.Remove(input_folder.Length - 1);
+            }
+            int index = input_folder_wo_filepath.LastIndexOf(@"\") + 1;
+            int lng = (input_folder_wo_filepath.Length) - index;
+            input_folder_wo_filepath = input_folder_wo_filepath.Substring(index, lng);
+            string default_file_name = input_folder_wo_filepath + "-Damping Reduction Session" + save_session_filetype;
+
+            //make user save file using file explorer
+            SaveFileDialog save_session_file_dialog = new SaveFileDialog();
+            save_session_file_dialog.Filter = "Damping Reduction Data Sets(" + save_session_filetype + ")| *" + save_session_filetype;
+            save_session_file_dialog.Title = "Save Damping Reduction Session";
+            save_session_file_dialog.InitialDirectory = input_folder + output_folder_name;
+            save_session_file_dialog.FileName = default_file_name;
+            save_session_file_dialog.ShowDialog();
+
+            // If the file name is not an empty string open it for saving.
+            if (!String.IsNullOrEmpty(save_session_file_dialog.FileName))
+            {
+                File.WriteAllText(save_session_file_dialog.FileName, JsonConvert.SerializeObject(drs));
+
+            }
+            else
+            {
+                string message = "The filepath/name was invalid and could not be saved";
+                string title = "Error";
+                MessageBox.Show(message, title);
+                return;
+            }
+        }
+
+        private void loadSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //make user open file using file explorer
+            OpenFileDialog load_session_file_dialog = new OpenFileDialog();
+            load_session_file_dialog.Filter = "Damping Reduction Data Sets(" + save_session_filetype + ")|*" + save_session_filetype;
+            load_session_file_dialog.Title = "Load Damping Reduction Session";
+            //load_session_file_dialog.InitialDirectory = input_folder + output_folder_name;
+            load_session_file_dialog.CheckFileExists = true;
+            load_session_file_dialog.ShowDialog();
+
+
+            //clear all lists
+            generic_input_data_double_master_catalog.Clear();
+            generic_input_data_double_clone_catalog.Clear();
+            generic_input_data_double_clone_filtered_catalog.Clear();
+
+            csv_input_filepaths.Clear();
+            csv_input_filepaths_short.Clear();
+
+            low_cutoff_freq_tracker.Clear();
+            high_cutoff_freq_tracker.Clear();
+
+
+
+            string session_load_filepath = load_session_file_dialog.FileName;
+
+            // If the file name is not an empty string open it for saving.
+            if (!String.IsNullOrEmpty(session_load_filepath))
+            {
+                damping_reduction_session drs = JsonConvert.DeserializeObject<damping_reduction_session>(File.ReadAllText(session_load_filepath));
+
+                //store datasets
+                generic_input_data_double_master_catalog = drs.generic_input_data_double_master_catalog_drs;
+                generic_input_data_double_clone_catalog = drs.generic_input_data_double_clone_catalog_drs;
+                generic_input_data_double_clone_filtered_catalog = drs.generic_input_data_double_clone_filtered_catalog_drs;
+
+                csv_input_filepaths = drs.csv_input_filepaths_drs;
+                csv_input_filepaths_short = drs.csv_input_filepaths_short_drs;
+
+                low_cutoff_freq_tracker = drs.low_cutoff_freq_tracker_drs;
+                high_cutoff_freq_tracker = drs.high_cutoff_freq_tracker_drs;
+
+                is_data_filtered =drs.is_data_filtered_drs ;
+                dataset_result_summary_text_list = drs.dataset_result_summary_text_list_drs;
+
+                x_index_trim_lower_index_trimmed = drs.x_index_trim_lower_index_trimmed_drs;
+                x_index_trim_upper_index_trimmed = drs.x_index_trim_upper_index_trimmed_drs;
+                x_index_trim_lower_index_master = drs.x_index_trim_lower_index_master_drs;
+                x_index_trim_upper_index_master = drs.x_index_trim_upper_index_master_drs;
+
+                update_program_after_load_session();
+            }
+            else
+            {
+                string message = "The filepath/name was invalid and could not be loaded";
+                string title = "Error";
+                MessageBox.Show(message, title);
+                return;
+            }
+        }
     }
+
+
+    [Serializable]
+    public class damping_reduction_session
+    {
+        //store datasets
+        public List<List<List<double>>> generic_input_data_double_master_catalog_drs = new List<List<List<double>>>();
+        public List<List<List<double>>> generic_input_data_double_clone_catalog_drs = new List<List<List<double>>>();
+        public List<List<List<double>>> generic_input_data_double_clone_filtered_catalog_drs = new List<List<List<double>>>();
+
+        //stores all csv filepath found in the slected input folder
+        public List<string> csv_input_filepaths_drs = new List<string>();
+        //stores all csv filepath found in the slected input folder (in short form for readability)
+        public List<string> csv_input_filepaths_short_drs = new List<string>();
+
+        //keep track of what cutoff frequencies are used
+        public List<double> low_cutoff_freq_tracker_drs = new List<double>();
+        public List<double> high_cutoff_freq_tracker_drs = new List<double>();
+
+        public List<Boolean> is_data_filtered_drs = new List<Boolean>();
+
+        public List<string> dataset_result_summary_text_list_drs = new List<string>();
+
+        //holds the values where the annotation will be placed
+         public List<int> x_index_trim_lower_index_trimmed_drs = new List<int>();
+        public List<int> x_index_trim_upper_index_trimmed_drs = new List<int>();
+
+        //holds the values where the annotation is placed relative to the original time dataset (not trimmed)
+        //useful when applying a filter to a dataset that has been trimmed twice
+        public List<int> x_index_trim_lower_index_master_drs = new List<int>();
+        public List<int> x_index_trim_upper_index_master_drs = new List<int>();
+    }
+
+
 }
