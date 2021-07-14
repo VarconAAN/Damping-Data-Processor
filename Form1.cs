@@ -125,7 +125,7 @@ namespace Damping_Data_Processor
             AutoUpdater.ShowSkipButton = false;
             AutoUpdater.Start("https://raw.githubusercontent.com/VarconAAN/Damping-Data-Processor/master/AutoUpdater.xml");
 
-            //test
+            
 
             InitializeComponent();
 
