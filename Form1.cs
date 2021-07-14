@@ -119,8 +119,10 @@ namespace Damping_Data_Processor
         public form1()
         {
             //check for update
-            AutoUpdater.Start("http://rbsoft.org/updates/AutoUpdaterTest.xml");
+            AutoUpdater.ReportErrors = true;
+            AutoUpdater.Start("https://raw.githubusercontent.com/VarconAAN/Damping-Data-Processor/master/AutoUpdater.xml");
 
+            //test
 
             InitializeComponent();
 
