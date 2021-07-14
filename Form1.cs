@@ -21,7 +21,7 @@ using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using AutoUpdaterDotNET;
+
 
 
 
@@ -118,14 +118,7 @@ namespace Damping_Data_Processor
 
         public form1()
         {
-            //string for current assembly version
-            //System.Net.NetworkCredential assembly = "1.0.0.2";
-            //check for update
-            AutoUpdater.ReportErrors = true;
-            AutoUpdater.ShowSkipButton = false;
-            AutoUpdater.Start("https://raw.githubusercontent.com/VarconAAN/Damping-Data-Processor/master/AutoUpdater.xml");
-
-            
+            //test
 
             InitializeComponent();
 

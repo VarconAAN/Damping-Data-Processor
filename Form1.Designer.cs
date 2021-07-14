@@ -353,7 +353,7 @@ namespace Damping_Data_Processor
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(256, 13);
             this.label9.TabIndex = 43;
-            this.label9.Text = "Created by Atlin Anderson for Varcon Inc (2021) ZZZ";
+            this.label9.Text = "Created by Atlin Anderson for Varcon Inc (2021) YYY";
             // 
             // freq_peaks_chart
             // 
