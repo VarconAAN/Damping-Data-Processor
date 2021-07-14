@@ -21,6 +21,7 @@ using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using AutoUpdaterDotNET;
 
 
 
@@ -117,6 +118,10 @@ namespace Damping_Data_Processor
 
         public form1()
         {
+            //check for update
+            AutoUpdater.Start("http://rbsoft.org/updates/AutoUpdaterTest.xml");
+
+
             InitializeComponent();
 
             acceleration_dataset_csv_header.Add("Time (Seconds)");
