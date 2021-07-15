@@ -23,9 +23,9 @@ namespace Damping_Data_Processor
         static void Main()
         {
             //check for update
-            AutoUpdater.ReportErrors = true;
-            AutoUpdater.ShowSkipButton = false;
-            AutoUpdater.Start("https://raw.githubusercontent.com/VarconAAN/Damping-Data-Processor/master/AutoUpdater.xml");
+            //AutoUpdater.ReportErrors = true;
+            //AutoUpdater.ShowSkipButton = false;
+            //AutoUpdater.Start("https://raw.githubusercontent.com/VarconAAN/Damping-Data-Processor/master/AutoUpdater.xml");
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

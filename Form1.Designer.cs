@@ -77,8 +77,6 @@ namespace Damping_Data_Processor
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.useDFTOrPeaksFrequencyToCalculateDampingRatioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.use_DFT_or_peaks_combobox = new System.Windows.Forms.ToolStripComboBox();
             this.freqResponseTransformPlotYAxisScaleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.linear_or_log_combobox = new System.Windows.Forms.ToolStripComboBox();
             this.label12 = new System.Windows.Forms.Label();
@@ -416,21 +414,21 @@ namespace Damping_Data_Processor
             // selectInputFolderToolStripMenuItem
             // 
             this.selectInputFolderToolStripMenuItem.Name = "selectInputFolderToolStripMenuItem";
-            this.selectInputFolderToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.selectInputFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.selectInputFolderToolStripMenuItem.Text = "Select input folder";
             this.selectInputFolderToolStripMenuItem.Click += new System.EventHandler(this.selectInputFolderToolStripMenuItem_Click);
             // 
             // saveSessionToolStripMenuItem
             // 
             this.saveSessionToolStripMenuItem.Name = "saveSessionToolStripMenuItem";
-            this.saveSessionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.saveSessionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveSessionToolStripMenuItem.Text = "Save session";
             this.saveSessionToolStripMenuItem.Click += new System.EventHandler(this.saveSessionToolStripMenuItem_Click);
             // 
             // loadSessionToolStripMenuItem
             // 
             this.loadSessionToolStripMenuItem.Name = "loadSessionToolStripMenuItem";
-            this.loadSessionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.loadSessionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.loadSessionToolStripMenuItem.Text = "Load session";
             this.loadSessionToolStripMenuItem.Click += new System.EventHandler(this.loadSessionToolStripMenuItem_Click);
             // 
@@ -495,7 +493,6 @@ namespace Damping_Data_Processor
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem,
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem,
-            this.useDFTOrPeaksFrequencyToCalculateDampingRatioToolStripMenuItem,
             this.freqResponseTransformPlotYAxisScaleToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 23);
@@ -504,39 +501,23 @@ namespace Damping_Data_Processor
             // importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem
             // 
             this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Name = "importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem";
-            this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Size = new System.Drawing.Size(451, 22);
+            this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
             this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Text = "Import .csv files from output folder when selecting input folder?";
             this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Click += new System.EventHandler(this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem_Click);
             // 
             // recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem
             // 
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Name = "recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem";
-            this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Size = new System.Drawing.Size(451, 22);
+            this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Text = "Recalculate Vector sum data after applying filter?";
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Click += new System.EventHandler(this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem_Click);
-            // 
-            // useDFTOrPeaksFrequencyToCalculateDampingRatioToolStripMenuItem
-            // 
-            this.useDFTOrPeaksFrequencyToCalculateDampingRatioToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.use_DFT_or_peaks_combobox});
-            this.useDFTOrPeaksFrequencyToCalculateDampingRatioToolStripMenuItem.Name = "useDFTOrPeaksFrequencyToCalculateDampingRatioToolStripMenuItem";
-            this.useDFTOrPeaksFrequencyToCalculateDampingRatioToolStripMenuItem.Size = new System.Drawing.Size(451, 22);
-            this.useDFTOrPeaksFrequencyToCalculateDampingRatioToolStripMenuItem.Text = "Use DFT method or Peaks method frequency to calculate damping ratio";
-            // 
-            // use_DFT_or_peaks_combobox
-            // 
-            this.use_DFT_or_peaks_combobox.Items.AddRange(new object[] {
-            "DFT",
-            "Peaks"});
-            this.use_DFT_or_peaks_combobox.Name = "use_DFT_or_peaks_combobox";
-            this.use_DFT_or_peaks_combobox.Size = new System.Drawing.Size(121, 23);
             // 
             // freqResponseTransformPlotYAxisScaleToolStripMenuItem
             // 
             this.freqResponseTransformPlotYAxisScaleToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.linear_or_log_combobox});
             this.freqResponseTransformPlotYAxisScaleToolStripMenuItem.Name = "freqResponseTransformPlotYAxisScaleToolStripMenuItem";
-            this.freqResponseTransformPlotYAxisScaleToolStripMenuItem.Size = new System.Drawing.Size(451, 22);
+            this.freqResponseTransformPlotYAxisScaleToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
             this.freqResponseTransformPlotYAxisScaleToolStripMenuItem.Text = "Freq Response Transform plot Y axis scale";
             // 
             // linear_or_log_combobox
@@ -703,8 +684,6 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem useDFTOrPeaksFrequencyToCalculateDampingRatioToolStripMenuItem;
-        private System.Windows.Forms.ToolStripComboBox use_DFT_or_peaks_combobox;
         private System.Windows.Forms.ToolStripMenuItem freqResponseTransformPlotYAxisScaleToolStripMenuItem;
         private System.Windows.Forms.ToolStripComboBox linear_or_log_combobox;
         private System.Windows.Forms.NumericUpDown lower_freq_plot_cutoff_numupdown;
