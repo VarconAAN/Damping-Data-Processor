@@ -258,7 +258,16 @@ namespace Damping_Data_Processor
             // If the file name is not an empty string open it for saving.
             if (!String.IsNullOrEmpty(save_filepath))
             {
-                File.WriteAllText(save_filepath, JsonConvert.SerializeObject(drs));
+                try
+                {
+                    File.WriteAllText(save_filepath, JsonConvert.SerializeObject(drs));
+                }
+                catch
+                {
+                    string message = "The autosave/session attempt has failed, try again.";
+                    string title = "Error";
+                    MessageBox.Show(message, title);
+                }
 
             }
             else
@@ -714,6 +723,9 @@ namespace Damping_Data_Processor
             List<List<double>> freq = new List<List<double>>();
             List<List<double>> mag = new List<List<double>>();
 
+            //data direction names (onl;y plotted names)
+            List<string> data_direction_names_plot = new List<string>();
+
             //get user input value
             double plot_lower_cuttoff_freq = 0;
             double plot_upper_cuttoff_freq = 0;
@@ -733,31 +745,37 @@ namespace Damping_Data_Processor
             //cycle through and grab trimmed value
             for (int list_index = 0; list_index < freq_span.Count; list_index++)
             {
-                //temp lists
-                List<double> freq_temp = new List<double>();
-                List<double> mag_temp = new List<double>();
-
-                for (int i = 0; i < freq_span[list_index].Count; i++)
+                if (data_direction_checkmark_tracker[select_data_set_tool_strip_combo_box.SelectedIndex][list_index] == true)
                 {
-                    if (freq_span[list_index][i] > plot_lower_cuttoff_freq)
+
+                    data_direction_names_plot.Add(data_direction_names[list_index]);
+
+                    //temp lists
+                    List<double> freq_temp = new List<double>();
+                    List<double> mag_temp = new List<double>();
+
+                    for (int i = 0; i < freq_span[list_index].Count; i++)
                     {
-                        freq_temp.Add(freq_span[list_index][i]);
-                        mag_temp.Add(real_spectrum[list_index][i]);
-                    }
-                    if (freq_span[list_index][i] > plot_upper_cuttoff_freq)
-                    {
-                        break;
+                        if (freq_span[list_index][i] > plot_lower_cuttoff_freq)
+                        {
+                            freq_temp.Add(freq_span[list_index][i]);
+                            mag_temp.Add(real_spectrum[list_index][i]);
+                        }
+                        if (freq_span[list_index][i] > plot_upper_cuttoff_freq)
+                        {
+                            break;
+                        }
+
                     }
 
+                    freq.Add(freq_temp);
+                    mag.Add(mag_temp);
                 }
-
-                freq.Add(freq_temp);
-                mag.Add(mag_temp);
             }
 
 
             //plot the data
-            plot_data_on_freq_chart(freq_dft_chart, data_direction_names, freq, mag, "Frequency (Hz)", "Amplitude");
+            plot_data_on_freq_chart(freq_dft_chart, data_direction_names_plot, freq, mag, "Frequency (Hz)", "Amplitude");
         }
 
         public List<double> fft_analysis(List<List<double>> signal_data, List<string> data_direction_name)
@@ -1098,7 +1116,7 @@ namespace Damping_Data_Processor
                     try
                     {
                         data_chart.Series[i].Enabled = true;
-                        data_direction_checkmark_tracker[select_data_direction_check_list_box.SelectedIndex][i] = true;
+                        data_direction_checkmark_tracker[select_data_set_tool_strip_combo_box.SelectedIndex][i] = true;
                     }
                     catch { }
                 }
@@ -1107,7 +1125,7 @@ namespace Damping_Data_Processor
                     try
                     {
                         data_chart.Series[i].Enabled = false;
-                        data_direction_checkmark_tracker[select_data_direction_check_list_box.SelectedIndex][i] = false;
+                        data_direction_checkmark_tracker[select_data_set_tool_strip_combo_box.SelectedIndex][i] = false;
                     }
                     catch { }
                 }
@@ -1734,6 +1752,9 @@ namespace Damping_Data_Processor
 
         private void calculate_damp_ratio_and_freq_button_Click(object sender, EventArgs e)
         {
+            //autosave all data sets at the default location in the background
+            save_session(false, false, true);
+
             //clear plotting values
             real_spectrum = new List<List<double>>();
             freq_span = new List<List<double>>();
@@ -1794,11 +1815,14 @@ namespace Damping_Data_Processor
             natural_frequencies[4] = (natural_frequencies[0] + natural_frequencies[2]) / 2;
             natural_frequencies[5] = (natural_frequencies[1] + natural_frequencies[2]) / 2;
 
+
             //after the natural frequencies have been analyzed run loop to get results
             for (int data_direction_index = 0; data_direction_index < selected_data_sets.Count; data_direction_index++)
             {
+                peak_freqs.Add(0);
+
                 //checked to see if the data direction is checked if not skip the calculation
-                if (select_data_direction_check_list_box.GetItemCheckState(data_direction_index) == CheckState.Checked)
+                if (data_direction_checkmark_tracker[select_data_set_tool_strip_combo_box.SelectedIndex][data_direction_index] == true)
                 {
                     //create an absoluted data set for the analysis
                     List<double> selected_data_set_abs = new List<double>();
@@ -1815,7 +1839,6 @@ namespace Damping_Data_Processor
                     if (local_maximas_indexs.Count <=3)
                     {
                         results_summary_text = results_summary_text + "The poor quality of the "+ data_direction_name[data_direction_index] +" direction data resulted in no meaningful peaks extracted and the calculations were skipped.\r\n\r\n";
-                        peak_freqs.Add(0);
                         continue;
                     }
                     //plot the peak values and return the amplitudes
@@ -1824,7 +1847,7 @@ namespace Damping_Data_Processor
                     List<double> natural_frequncy_peaks = calculate_natural_frequency_peaks(local_maximas_indexs, input_data_sample_rate, data_direction_name[data_direction_index]); 
                     //average all calculated freqs
                     double average_natural_frequency_peaks = natural_frequncy_peaks.Average();
-                    peak_freqs.Add(average_natural_frequency_peaks);
+                    peak_freqs[data_direction_index] =average_natural_frequency_peaks;
 
                     //gather the data points of the local maximas
                     List<double> time_maximas = new List<double>();
@@ -2115,7 +2138,7 @@ namespace Damping_Data_Processor
             check_checked_chart_series();
 
             //add data to catalog
-            generic_input_data_double_clone_filtered_catalog[select_data_set_tool_strip_combo_box.SelectedIndex] = generic_input_data_double_clone_filtered;
+            generic_input_data_double_clone_filtered_catalog[select_data_set_tool_strip_combo_box.SelectedIndex] = new List<List<double>>(generic_input_data_double_clone_filtered);
 
         }
 
@@ -2451,6 +2474,11 @@ namespace Damping_Data_Processor
             {
 
             }
+        }
+
+        private void label9_Click(object sender, EventArgs e)
+        {
+
         }
     }
 
