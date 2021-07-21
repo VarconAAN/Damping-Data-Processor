@@ -415,21 +415,21 @@ namespace Damping_Data_Processor
             // selectInputFolderToolStripMenuItem
             // 
             this.selectInputFolderToolStripMenuItem.Name = "selectInputFolderToolStripMenuItem";
-            this.selectInputFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.selectInputFolderToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.selectInputFolderToolStripMenuItem.Text = "Select input folder";
             this.selectInputFolderToolStripMenuItem.Click += new System.EventHandler(this.selectInputFolderToolStripMenuItem_Click);
             // 
             // saveSessionToolStripMenuItem
             // 
             this.saveSessionToolStripMenuItem.Name = "saveSessionToolStripMenuItem";
-            this.saveSessionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveSessionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.saveSessionToolStripMenuItem.Text = "Save session";
             this.saveSessionToolStripMenuItem.Click += new System.EventHandler(this.saveSessionToolStripMenuItem_Click);
             // 
             // loadSessionToolStripMenuItem
             // 
             this.loadSessionToolStripMenuItem.Name = "loadSessionToolStripMenuItem";
-            this.loadSessionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.loadSessionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.loadSessionToolStripMenuItem.Text = "Load session";
             this.loadSessionToolStripMenuItem.Click += new System.EventHandler(this.loadSessionToolStripMenuItem_Click);
             // 
@@ -589,8 +589,6 @@ namespace Damping_Data_Processor
             // 
             // form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1763, 861);
             this.Controls.Add(this.lower_freq_plot_cutoff_numupdown);
             this.Controls.Add(this.label1);
@@ -621,8 +619,10 @@ namespace Damping_Data_Processor
             this.Controls.Add(this.trim_data_button);
             this.Controls.Add(this.data_chart);
             this.Controls.Add(this.menu_strip);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menu_strip;
+            this.MaximizeBox = false;
             this.Name = "form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Structrual Damping Reduction Processor";

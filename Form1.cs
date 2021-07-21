@@ -124,6 +124,9 @@ namespace Damping_Data_Processor
             //test
 
             InitializeComponent();
+            //scaling the app view
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 
             acceleration_dataset_csv_header.Add("Time (Seconds)");
             acceleration_dataset_csv_header.Add("X " + y_axis_label_data_chart);
