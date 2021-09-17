@@ -9,19 +9,11 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Numerics;
-using MathNet.Filtering.FIR;
-using MathNet.Filtering;
 using MathNet.Numerics.LinearRegression;
 using MathNet.Numerics;
 using DSPLib;
-using System.Xml;
-using System.Xml.Serialization;
 using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-
+using MathNet.Filtering;
 
 
 
@@ -659,9 +651,6 @@ namespace Damping_Data_Processor
             return new[] { Math.Exp(p_hat[0]), p_hat[1] };
         }
 
-
-
-
         public List<double> calculate_natural_frequency_peaks(List<int> peak_int_indexs, double sample_rate, string series_name)
         {
             //get the freqs by using the integer indecies of the maximas and the sample rate
@@ -921,7 +910,22 @@ namespace Damping_Data_Processor
 
             if (data_sets[0].Count <= max_samples)
             {
-                return data_sets;
+                //absolute the data without sampling if the data  points are less then the max samples
+                sampled_data_sets.Add(data_sets[0]);
+
+                for (int list_index = 1; list_index < data_sets.Count; list_index++)
+                {
+
+                    List<double> sampled_data = new List<double>();
+
+                    for (int i = 0; i < data_sets[list_index].Count; i ++)
+                    {
+                        sampled_data.Add(Math.Abs(data_sets[list_index][i]));
+                    }
+                    sampled_data_sets.Add(sampled_data);
+                }
+
+                return sampled_data_sets;
             }
 
             int sample_rate = data_sets[0].Count / max_samples;
@@ -988,8 +992,7 @@ namespace Damping_Data_Processor
 
             return y_data_integrated;
         }
-
-
+ 
         public static List<int> find_local_maximas(List<double> values, int range_of_peaks)
         {
             List<int> peaks = new List<int>();
@@ -1630,6 +1633,16 @@ namespace Damping_Data_Processor
             //create series and plot
             chart_name.Series.Clear();
 
+            //set color scheme
+            List<Color> color_scheme = new List<Color>();
+            color_scheme.Add(System.Drawing.ColorTranslator.FromHtml("#6495ed"));
+            color_scheme.Add(System.Drawing.ColorTranslator.FromHtml("#556b2f"));
+            color_scheme.Add(System.Drawing.ColorTranslator.FromHtml("#b22222"));
+
+            color_scheme.Add(Color.Cyan);
+            color_scheme.Add(Color.Violet);
+            color_scheme.Add(Color.SaddleBrown);
+
             for (int i = 1; i < sampled_data_sets.Count; i++)
             {
                 System.Windows.Forms.DataVisualization.Charting.Series series = chart_name.Series.Add(data_sets_names[i - 1]);
@@ -1637,6 +1650,12 @@ namespace Damping_Data_Processor
                 series.Points.DataBindXY(sampled_data_sets[0], sampled_data_sets[i]);
                 series.BorderWidth = 1;
                 series.ToolTip = "#SERIESNAME\nX: #VALX\nY: #VAL";
+
+                if (i <= color_scheme.Count)
+                {
+                    series.Color = color_scheme[i-1];
+                }
+
             }
 
             chart_name.ChartAreas[0].AxisX.Title = x_axis_label;
@@ -2075,6 +2094,9 @@ namespace Damping_Data_Processor
 
         private void apply_filter_button_Click(object sender, EventArgs e)
         {
+
+
+
             is_data_filtered[select_data_set_tool_strip_combo_box.SelectedIndex] = true;
 
             generic_input_data_double_clone_filtered = new List<List<double>>(generic_input_data_double_master);
@@ -2087,9 +2109,42 @@ namespace Damping_Data_Processor
             low_cutoff_freq_tracker[select_data_set_tool_strip_combo_box.SelectedIndex] = low_cutoff_freq;
             high_cutoff_freq_tracker[select_data_set_tool_strip_combo_box.SelectedIndex] = high_cutoff_freq;
 
+            //IIR_Butterworth_CS_Library.IIR_Butterworth_Interface IBI = new IIR_Butterworth_CS_Library.IIR_Butterworth_C_Sharp.IIR_Butterworth_Implementation();
+
+            //coeff_numb = 2 * order_filt + 1;
+
+
+            //for (int i = 0; i < 2; i++)
+            //{
+
+            //    coeff_final[i] = new double[coeff_numb];
+
+            //}
+
+
+            //coeff_final = IBI.Lp2bp(f1 / Nyquist_F, f2 / Nyquist_F, order_filt);
+
+            //stability_check = IBI.Check_stability_iir(coeff_final);
+
+            //output_filt_signal = IBI.Filter_Data(coeff_final, test_signal);
+
+            ////determines how powerful the filter is at removing filtered frequencies.
+            ///
+            int half_order = Convert.ToInt32(half_order_bandpass_filter_numupdown.Value);
+            //if (half_order > 100 || half_order < 0)
+            //{
+            //    half_order = 0;
+            //}
+
+
+
             //create filter object
-            var bandpass = OnlineFirFilter.CreateBandpass(ImpulseResponse.Finite, input_data_sample_rate, low_cutoff_freq, high_cutoff_freq);
+            var bandpass = MathNet.Filtering.IIR.OnlineIirFilter.CreateBandpass(ImpulseResponse.Finite, input_data_sample_rate, low_cutoff_freq, high_cutoff_freq, half_order);
             //var bandpass = OnlineFirFilter.CreateLowpass(ImpulseResponse.Finite, input_data_sample_rate, high_cutoff_freq);
+
+            //var butterworth_filter_coefficients = MathNet.Filtering.Butterworth.IirCoefficients.BandPass(0.1, 0.3, 0.7, 1, 0.2, 33);
+            //bandpass
+
 
             //filter all datasets using the filter object
             for (int i = 0; i < generic_input_data_double_clone_filtered.Count; i++)
@@ -2480,6 +2535,11 @@ namespace Damping_Data_Processor
         }
 
         private void label9_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void data_chart_Click(object sender, EventArgs e)
         {
 
         }
