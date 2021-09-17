@@ -697,9 +697,9 @@ namespace Damping_Data_Processor
 
             for (int i = 0; i < datasets_xyz[0].Count; i++)
             {
-                xy.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) * Math.Pow(datasets_xyz[2][i], 2)));
-                xz.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) * Math.Pow(datasets_xyz[3][i], 2)));
-                yz.Add(Math.Sqrt(Math.Pow(datasets_xyz[2][i], 2) * Math.Pow(datasets_xyz[3][i], 2)));
+                xy.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) + Math.Pow(datasets_xyz[2][i], 2)));
+                xz.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) + Math.Pow(datasets_xyz[3][i], 2)));
+                yz.Add(Math.Sqrt(Math.Pow(datasets_xyz[2][i], 2) + Math.Pow(datasets_xyz[3][i], 2)));
             }
 
             datasets_xyz.Add(xy);
@@ -1651,12 +1651,16 @@ namespace Damping_Data_Processor
                 series.BorderWidth = 1;
                 series.ToolTip = "#SERIESNAME\nX: #VALX\nY: #VAL";
 
+
+
                 if (i <= color_scheme.Count)
                 {
                     series.Color = color_scheme[i-1];
                 }
 
             }
+            //set the x-axis min to the first time data
+            chart_name.ChartAreas[0].AxisX.Minimum = sampled_data_sets[0][0];
 
             chart_name.ChartAreas[0].AxisX.Title = x_axis_label;
             chart_name.ChartAreas[0].AxisY.Title = y_axis_label;
@@ -1731,7 +1735,7 @@ namespace Damping_Data_Processor
             //line2.Name = "line 2";
             line2.LineColor = Color.Purple;
             line2.LineWidth = 3;         // use your numbers!
-            line2.X = time_data_list[time_data_list.Count - 10];
+            line2.X = time_data_list[time_data_list.Count - 2];
             //add to the chart
             chart_name.Annotations.Add(line2);
         }
@@ -1856,6 +1860,13 @@ namespace Damping_Data_Processor
                     //window size to is the range to search for the local maximas
                     //windows size is determined by the freq/2 since the data is absolutred
                     int window_size = Convert.ToInt32(Math.Round(((1 / natural_frequencies[data_direction_index]) * input_data_sample_rate * 0.95) / 2));
+
+                    //check if user wants to use their manual frequency for window size of peak picker
+                    if(manual_freq_est_checkbox.Checked == true)
+                    {
+                        window_size = Convert.ToInt32(Math.Round(((1 / Convert.ToDouble(manual_freq_est_numupdown.Value)) * input_data_sample_rate * 0.95) / 2));
+                    }
+
                     //calaculte the local maximas of dataset
                     List<int> local_maximas_indexs = find_local_maximas(selected_data_set_abs, window_size);
                     if (local_maximas_indexs.Count <=3)
@@ -1951,115 +1962,9 @@ namespace Damping_Data_Processor
                 }
             }
 
-            //List<int> selected_data_direction_indexs = new List<int>();
+            //add annotation trim lines to freq peaks estimation
+            //draw_annotation_trim_lines_freq_plot(freq_peaks_chart, VerticalLineAnnotation line1, VerticalLineAnnotation line2, List<double> time_data_list)
 
-            ////determine which data directions are currently selected add them to a list to be freq analyzed
-            //for (int data_direction_index = 0; data_direction_index < select_data_direction_check_list_box.Items.Count; data_direction_index++)
-            //{
-            //    if (select_data_direction_check_list_box.GetItemCheckState(data_direction_index) == CheckState.Checked)
-            //    {
-            //        selected_data_set_names.Add(data_direction_name[data_direction_index]);
-
-            //        selected_data_direction_indexs.Add(data_direction_index);
-
-            //        if (is_data_filtered[select_data_set_tool_strip_combo_box.SelectedIndex] == true)
-            //        {
-            //            selected_data_sets.Add(generic_input_data_double_clone_filtered[data_direction_index + 1]);
-            //        }
-            //        else
-            //        {
-            //            selected_data_sets.Add(generic_input_data_double_clone[data_direction_index + 1]);
-            //        }
-            //    }
-            //}
-
-            //List<double> natural_frequencies = dft_analysis(selected_data_sets, selected_data_set_names);
-
-            ////after the natural frequencies have been analyzed run loop again to get results
-            //for (int data_direction_index = 0; data_direction_index < natural_frequencies.Count; data_direction_index++)
-            //{
-
-            //    List<double> selected_data_set_abs = new List<double>();
-            //    for (int i = 0; i < selected_data_sets[data_direction_index].Count; i++)
-            //    {
-            //        selected_data_set_abs.Add(Math.Abs(selected_data_sets[data_direction_index][i]));
-            //    }
-
-            //    int window_size = Convert.ToInt32(Math.Round(((1 / natural_frequencies[data_direction_index]) * input_data_sample_rate * 0.95) / 2));
-            //    List<int> local_maximas = find_local_maximas(selected_data_set_abs, window_size);
-
-
-            //    List<double> peak_amplitudes = plot_peaks_chart(local_maximas, selected_data_set_abs, selected_data_set_names[data_direction_index] + " Peaks");
-
-
-            //    List<double> natural_frequncy_peaks = calculate_natural_frequency_peaks(local_maximas, input_data_sample_rate, selected_data_set_names[data_direction_index]);
-            //    double average_natural_frequency_peaks = natural_frequncy_peaks.Average();
-            //    peak_freqs.Add(average_natural_frequency_peaks);
-
-            //    //gather the data points of the local maximas
-            //    List<double> time_maximas = new List<double>();
-            //    List<double> selected_data_set_maximas = new List<double>();
-
-            //    for (int i = 0; i < local_maximas.Count; i++)
-            //    {
-            //        time_maximas.Add(generic_input_data_double_clone[0][local_maximas[i]]);
-            //        selected_data_set_maximas.Add(selected_data_set_abs[local_maximas[i]]);
-            //    }
-
-            //    //calculate simplified damping ratio based on loagrithmic decrement
-            //    List<double> damp_ratios = new List<double>();
-            //    for (int i = 1; i < selected_data_set_maximas.Count; i++)
-            //    {
-            //        double damp_ratio_temp = 1 / Math.Sqrt(1 + Math.Pow(2 * Math.PI / (Math.Log(selected_data_set_maximas[i - 1] / selected_data_set_maximas[i])), 2));
-            //        if (Double.IsNaN(damp_ratio_temp) != true)
-            //        {
-            //            damp_ratios.Add(damp_ratio_temp);
-            //        }
-            //    }
-
-            //    double damp_ratio_average = damp_ratios.Average();
-
-            //    //y=p[0] e ^ (p[1] *x)
-            //    //returns the coeffcienets of the fitted curve
-            //    List<double> p_exp_coeff = exponential_curve_fit(time_maximas, selected_data_set_maximas);
-
-            //    double damp_ratio_exp = 0;
-            //    //using DFT frequency
-            //    if (use_DFT_or_peaks_combobox.SelectedIndex == 0)
-            //    {
-            //        damp_ratio_exp = Math.Abs(p_exp_coeff[1] / (2 * Math.PI * natural_frequencies[data_direction_index]));
-            //    }
-            //    //using peaks frequncy
-            //    else
-            //    {
-            //        damp_ratio_exp = Math.Abs(p_exp_coeff[1] / (2 * Math.PI * average_natural_frequency_peaks));
-            //    }
-
-            //    List<double> exp_curve_fit_values = plot_fitted_exponential_curve(p_exp_coeff[0], p_exp_coeff[1], selected_data_set_names[data_direction_index]);
-
-            //    double coffecient_of_determination = calculate_coffecient_of_determination(peak_amplitudes, exp_curve_fit_values, local_maximas);
-
-            //    results_summary_text = results_summary_text + "The natural frequency of the " + selected_data_set_names[data_direction_index] + " direction data set was calculated using 2 methods:\r\n";
-            //    results_summary_text = results_summary_text + "DFT: " + Math.Round(natural_frequencies[data_direction_index], 6) + " Hz. \r\n";
-            //    results_summary_text = results_summary_text + "Peaks: " + Math.Round(peak_freqs[data_direction_index], 6) + " Hz. \r\n\r\n";
-            //    if (selected_data_direction_indexs[data_direction_index] > 2)
-            //    {
-            //        results_summary_text = results_summary_text + "Note that the vector sum freqs. were calculated using the average of the 2 component freqs.\r\n\r\n";
-            //    }
-            //    results_summary_text = results_summary_text + "The damping ratio of the " + selected_data_set_names[data_direction_index] + " direction data set was calculated using 2 methods:\r\n";
-            //    results_summary_text = results_summary_text + "Log. Decrement: " + Math.Round(damp_ratio_average * 100, 3) + "%\r\n";
-            //    //using DFT frequency
-            //    if (use_DFT_or_peaks_combobox.SelectedIndex == 0)
-            //    {
-            //        results_summary_text = results_summary_text + "Exp. Curve Fit (using DFT freq.): " + Math.Round(damp_ratio_exp * 100, 3) + "%\r\n\r\n";
-            //    }
-            //    //using peaks frequncy
-            //    else
-            //    {
-            //        results_summary_text = results_summary_text + "Exp. Curve Fit (using Peaks freq.): " + Math.Round(damp_ratio_exp * 100, 3) + "%\r\n\r\n";
-            //    }
-            //    results_summary_text = results_summary_text + "The R Squared value of the exp. curve fit is (" + selected_data_set_names[data_direction_index] + " direction): " + Math.Round(coffecient_of_determination, 3) + "\r\n\r\n";
-            //}
 
             summary_results_textbox.Text = results_summary_text;
 
@@ -2109,42 +2014,8 @@ namespace Damping_Data_Processor
             low_cutoff_freq_tracker[select_data_set_tool_strip_combo_box.SelectedIndex] = low_cutoff_freq;
             high_cutoff_freq_tracker[select_data_set_tool_strip_combo_box.SelectedIndex] = high_cutoff_freq;
 
-            //IIR_Butterworth_CS_Library.IIR_Butterworth_Interface IBI = new IIR_Butterworth_CS_Library.IIR_Butterworth_C_Sharp.IIR_Butterworth_Implementation();
-
-            //coeff_numb = 2 * order_filt + 1;
-
-
-            //for (int i = 0; i < 2; i++)
-            //{
-
-            //    coeff_final[i] = new double[coeff_numb];
-
-            //}
-
-
-            //coeff_final = IBI.Lp2bp(f1 / Nyquist_F, f2 / Nyquist_F, order_filt);
-
-            //stability_check = IBI.Check_stability_iir(coeff_final);
-
-            //output_filt_signal = IBI.Filter_Data(coeff_final, test_signal);
-
-            ////determines how powerful the filter is at removing filtered frequencies.
-            ///
-            int half_order = Convert.ToInt32(half_order_bandpass_filter_numupdown.Value);
-            //if (half_order > 100 || half_order < 0)
-            //{
-            //    half_order = 0;
-            //}
-
-
-
             //create filter object
-            var bandpass = MathNet.Filtering.IIR.OnlineIirFilter.CreateBandpass(ImpulseResponse.Finite, input_data_sample_rate, low_cutoff_freq, high_cutoff_freq, half_order);
-            //var bandpass = OnlineFirFilter.CreateLowpass(ImpulseResponse.Finite, input_data_sample_rate, high_cutoff_freq);
-
-            //var butterworth_filter_coefficients = MathNet.Filtering.Butterworth.IirCoefficients.BandPass(0.1, 0.3, 0.7, 1, 0.2, 33);
-            //bandpass
-
+            var bandpass = MathNet.Filtering.IIR.OnlineIirFilter.CreateBandpass(ImpulseResponse.Finite, input_data_sample_rate, low_cutoff_freq, high_cutoff_freq, 0);
 
             //filter all datasets using the filter object
             for (int i = 0; i < generic_input_data_double_clone_filtered.Count; i++)

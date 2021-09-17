@@ -85,9 +85,9 @@ namespace Damping_Data_Processor
             this.activity_log_textbox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.lower_freq_plot_cutoff_numupdown = new System.Windows.Forms.NumericUpDown();
-            this.half_order_bandpass_filter_numupdown = new System.Windows.Forms.NumericUpDown();
-            this.label13 = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.manual_freq_est_numupdown = new System.Windows.Forms.NumericUpDown();
+            this.manual_freq_est_checkbox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.data_chart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
@@ -96,7 +96,7 @@ namespace Damping_Data_Processor
             ((System.ComponentModel.ISupportInitialize)(this.freq_peaks_chart)).BeginInit();
             this.menu_strip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.lower_freq_plot_cutoff_numupdown)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.half_order_bandpass_filter_numupdown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.manual_freq_est_numupdown)).BeginInit();
             this.SuspendLayout();
             // 
             // data_chart
@@ -282,7 +282,7 @@ namespace Damping_Data_Processor
             // 
             this.upper_freq_plot_cutoff_numupdown.DecimalPlaces = 1;
             this.upper_freq_plot_cutoff_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.upper_freq_plot_cutoff_numupdown.Location = new System.Drawing.Point(300, 275);
+            this.upper_freq_plot_cutoff_numupdown.Location = new System.Drawing.Point(300, 271);
             this.upper_freq_plot_cutoff_numupdown.Maximum = new decimal(new int[] {
             99999999,
             0,
@@ -593,36 +593,47 @@ namespace Damping_Data_Processor
             this.lower_freq_plot_cutoff_numupdown.TabIndex = 54;
             this.lower_freq_plot_cutoff_numupdown.ValueChanged += new System.EventHandler(this.lower_freq_plot_cutoff_numupdown_ValueChanged);
             // 
-            // half_order_bandpass_filter_numupdown
+            // manual_freq_est_numupdown
             // 
-            this.half_order_bandpass_filter_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.half_order_bandpass_filter_numupdown.Location = new System.Drawing.Point(300, 307);
-            this.half_order_bandpass_filter_numupdown.Maximum = new decimal(new int[] {
-            100000,
+            this.manual_freq_est_numupdown.DecimalPlaces = 3;
+            this.manual_freq_est_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.manual_freq_est_numupdown.Location = new System.Drawing.Point(276, 307);
+            this.manual_freq_est_numupdown.Maximum = new decimal(new int[] {
+            99999999,
             0,
             0,
             0});
-            this.half_order_bandpass_filter_numupdown.Name = "half_order_bandpass_filter_numupdown";
-            this.half_order_bandpass_filter_numupdown.Size = new System.Drawing.Size(55, 26);
-            this.half_order_bandpass_filter_numupdown.TabIndex = 55;
+            this.manual_freq_est_numupdown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            196608});
+            this.manual_freq_est_numupdown.Name = "manual_freq_est_numupdown";
+            this.manual_freq_est_numupdown.Size = new System.Drawing.Size(79, 26);
+            this.manual_freq_est_numupdown.TabIndex = 55;
+            this.manual_freq_est_numupdown.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
-            // label13
+            // manual_freq_est_checkbox
             // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(149, 307);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(142, 13);
-            this.label13.TabIndex = 56;
-            this.label13.Text = "Half-Order of Bandpass Filter";
-            this.toolTip1.SetToolTip(this.label13, "Half Order determines the order of the bandpass filter\r\nBandpass Order = (2)*(Hal" +
-        "f Order)+1");
+            this.manual_freq_est_checkbox.AutoSize = true;
+            this.manual_freq_est_checkbox.Location = new System.Drawing.Point(12, 313);
+            this.manual_freq_est_checkbox.Name = "manual_freq_est_checkbox";
+            this.manual_freq_est_checkbox.Size = new System.Drawing.Size(262, 17);
+            this.manual_freq_est_checkbox.TabIndex = 56;
+            this.manual_freq_est_checkbox.Text = "Manual Freq. Estimation for Peak-Picking Window";
+            this.toolTip1.SetToolTip(this.manual_freq_est_checkbox, "If not selected the fft peak frequency will be used in the peak-picking");
+            this.manual_freq_est_checkbox.UseVisualStyleBackColor = true;
             // 
             // form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1763, 861);
-            this.Controls.Add(this.label13);
-            this.Controls.Add(this.half_order_bandpass_filter_numupdown);
+            this.Controls.Add(this.manual_freq_est_checkbox);
+            this.Controls.Add(this.manual_freq_est_numupdown);
             this.Controls.Add(this.lower_freq_plot_cutoff_numupdown);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.activity_log_textbox);
@@ -669,7 +680,7 @@ namespace Damping_Data_Processor
             this.menu_strip.ResumeLayout(false);
             this.menu_strip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.lower_freq_plot_cutoff_numupdown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.half_order_bandpass_filter_numupdown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.manual_freq_est_numupdown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -722,9 +733,9 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.ToolStripMenuItem freqResponseTransformPlotYAxisScaleToolStripMenuItem;
         private System.Windows.Forms.ToolStripComboBox linear_or_log_combobox;
         private System.Windows.Forms.NumericUpDown lower_freq_plot_cutoff_numupdown;
-        private System.Windows.Forms.NumericUpDown half_order_bandpass_filter_numupdown;
-        private System.Windows.Forms.Label label13;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.NumericUpDown manual_freq_est_numupdown;
+        private System.Windows.Forms.CheckBox manual_freq_est_checkbox;
     }
 }
 
