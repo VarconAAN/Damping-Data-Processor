@@ -87,6 +87,9 @@ namespace Damping_Data_Processor
             this.manual_freq_est_checkbox = new System.Windows.Forms.CheckBox();
             this.manual_freq_est_numupdown = new System.Windows.Forms.NumericUpDown();
             this.recalc_damp_ratio_freq_peak_button = new System.Windows.Forms.Button();
+            this.peak_picking_method_combobox = new System.Windows.Forms.ComboBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.signal_data_chart_main)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
@@ -129,9 +132,9 @@ namespace Damping_Data_Processor
             // calculate_damp_ratio_and_freq_button
             // 
             this.calculate_damp_ratio_and_freq_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.calculate_damp_ratio_and_freq_button.Location = new System.Drawing.Point(2, 242);
+            this.calculate_damp_ratio_and_freq_button.Location = new System.Drawing.Point(2, 319);
             this.calculate_damp_ratio_and_freq_button.Name = "calculate_damp_ratio_and_freq_button";
-            this.calculate_damp_ratio_and_freq_button.Size = new System.Drawing.Size(356, 49);
+            this.calculate_damp_ratio_and_freq_button.Size = new System.Drawing.Size(361, 49);
             this.calculate_damp_ratio_and_freq_button.TabIndex = 2;
             this.calculate_damp_ratio_and_freq_button.Text = "Calculate Damping Ratio and Frequency";
             this.calculate_damp_ratio_and_freq_button.UseVisualStyleBackColor = true;
@@ -270,12 +273,12 @@ namespace Damping_Data_Processor
             // 
             this.summary_results_textbox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.summary_results_textbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.summary_results_textbox.Location = new System.Drawing.Point(2, 360);
+            this.summary_results_textbox.Location = new System.Drawing.Point(2, 391);
             this.summary_results_textbox.Multiline = true;
             this.summary_results_textbox.Name = "summary_results_textbox";
             this.summary_results_textbox.ReadOnly = true;
             this.summary_results_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.summary_results_textbox.Size = new System.Drawing.Size(361, 339);
+            this.summary_results_textbox.Size = new System.Drawing.Size(361, 319);
             this.summary_results_textbox.TabIndex = 31;
             // 
             // upper_freq_plot_cutoff_numupdown
@@ -525,7 +528,7 @@ namespace Damping_Data_Processor
             // 
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(125, 340);
+            this.label12.Location = new System.Drawing.Point(125, 371);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(118, 17);
             this.label12.TabIndex = 32;
@@ -581,20 +584,20 @@ namespace Damping_Data_Processor
             // manual_freq_est_checkbox
             // 
             this.manual_freq_est_checkbox.AutoSize = true;
-            this.manual_freq_est_checkbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.manual_freq_est_checkbox.Location = new System.Drawing.Point(12, 301);
+            this.manual_freq_est_checkbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.manual_freq_est_checkbox.Location = new System.Drawing.Point(0, 282);
             this.manual_freq_est_checkbox.Name = "manual_freq_est_checkbox";
-            this.manual_freq_est_checkbox.Size = new System.Drawing.Size(239, 14);
+            this.manual_freq_est_checkbox.Size = new System.Drawing.Size(287, 17);
             this.manual_freq_est_checkbox.TabIndex = 56;
-            this.manual_freq_est_checkbox.Text = "Manual Freq. Estimation for Peak-Picking Window (Hz) (not in use)";
+            this.manual_freq_est_checkbox.Text = "Manual Freq. Estimation for Peak-Picking Window (Hz) ";
             this.toolTip1.SetToolTip(this.manual_freq_est_checkbox, "If not selected the fft peak frequency will be used in the peak-picking");
             this.manual_freq_est_checkbox.UseVisualStyleBackColor = true;
             // 
             // manual_freq_est_numupdown
             // 
             this.manual_freq_est_numupdown.DecimalPlaces = 3;
-            this.manual_freq_est_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.manual_freq_est_numupdown.Location = new System.Drawing.Point(276, 295);
+            this.manual_freq_est_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.manual_freq_est_numupdown.Location = new System.Drawing.Point(295, 281);
             this.manual_freq_est_numupdown.Maximum = new decimal(new int[] {
             99999999,
             0,
@@ -606,13 +609,14 @@ namespace Damping_Data_Processor
             0,
             196608});
             this.manual_freq_est_numupdown.Name = "manual_freq_est_numupdown";
-            this.manual_freq_est_numupdown.Size = new System.Drawing.Size(79, 26);
+            this.manual_freq_est_numupdown.Size = new System.Drawing.Size(63, 20);
             this.manual_freq_est_numupdown.TabIndex = 55;
             this.manual_freq_est_numupdown.Value = new decimal(new int[] {
             1,
             0,
             0,
             0});
+            this.manual_freq_est_numupdown.ValueChanged += new System.EventHandler(this.manual_freq_est_numupdown_ValueChanged);
             // 
             // recalc_damp_ratio_freq_peak_button
             // 
@@ -624,10 +628,39 @@ namespace Damping_Data_Processor
             this.recalc_damp_ratio_freq_peak_button.UseVisualStyleBackColor = true;
             this.recalc_damp_ratio_freq_peak_button.Click += new System.EventHandler(this.recalc_damp_ratio_freq_peak_button_Click);
             // 
+            // peak_picking_method_combobox
+            // 
+            this.peak_picking_method_combobox.FormattingEnabled = true;
+            this.peak_picking_method_combobox.Location = new System.Drawing.Point(0, 257);
+            this.peak_picking_method_combobox.Name = "peak_picking_method_combobox";
+            this.peak_picking_method_combobox.Size = new System.Drawing.Size(358, 21);
+            this.peak_picking_method_combobox.TabIndex = 58;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(0, 241);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(109, 13);
+            this.label5.TabIndex = 59;
+            this.label5.Text = "Peak Picking Method";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(17, 300);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(176, 13);
+            this.label7.TabIndex = 60;
+            this.label7.Text = "Works with classic peak picker only";
+            // 
             // form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1763, 861);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.peak_picking_method_combobox);
             this.Controls.Add(this.recalc_damp_ratio_freq_peak_button);
             this.Controls.Add(this.manual_freq_est_checkbox);
             this.Controls.Add(this.manual_freq_est_numupdown);
@@ -730,6 +763,9 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.NumericUpDown manual_freq_est_numupdown;
         private System.Windows.Forms.CheckBox manual_freq_est_checkbox;
         private System.Windows.Forms.Button recalc_damp_ratio_freq_peak_button;
+        private System.Windows.Forms.ComboBox peak_picking_method_combobox;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label7;
     }
 }
 

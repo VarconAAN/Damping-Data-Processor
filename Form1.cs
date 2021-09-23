@@ -144,6 +144,10 @@ namespace Damping_Data_Processor
             acceleration_dataset_csv_header.Add("XZ VS" + y_axis_label_data_chart);
             acceleration_dataset_csv_header.Add("YZ VS" + y_axis_label_data_chart);
 
+            peak_picking_method_combobox.Items.Add("1. Fast Peak Picker (works best on filtered data)");
+            peak_picking_method_combobox.Items.Add("2. Classic Peak Picker (Slow)");
+            peak_picking_method_combobox.SelectedIndex = 0;
+
             //set default value in the comboboxs;
             linear_or_log_combobox.SelectedIndex = 0;
 
@@ -2036,22 +2040,17 @@ namespace Damping_Data_Processor
                         Console.WriteLine($"Timestamp before maximas calculation: {watch.ElapsedMilliseconds} ms");
 
                         //calaculte the local maximas of dataset
-                        //local_maximas_indexs = find_local_maximas1(selected_data_set_abs, window_size);
+                        if (peak_picking_method_combobox.SelectedIndex == 1)
+                        {
+                            local_maximas_indexs = find_local_maximas1(selected_data_set_abs, window_size);
+                        }
+                        else
+                        {
+                            local_maximas_indexs = (Accord.Audio.Tools.FindPeaks(selected_data_set_abs.ToArray())).ToList();
+                        }
 
-                        local_maximas_indexs = (Accord.Audio.Tools.FindPeaks(selected_data_set_abs.ToArray())).ToList();
-                        //for (double threshold = 1; threshold < 2; threshold = threshold + 0.05)
-                        //{
-                        //var output = ZScore.StartAlgo(selected_data_set_abs, window_size, 1.225, 0);
+                            
 
-                        //for (int i = 0; i < output.signals.Count; i++)
-                        //{
-                        //    if (output.signals[i] > 0)
-                        //    {
-                        //        local_maximas_indexs.Add(i);
-                        //    }
-                        //}
-                        ////local_maximas_indexs.Clear();
-                        //// }
                         Console.WriteLine($"Local Maximas Execution Time: {watch.ElapsedMilliseconds} ms");
 
                         if (local_maximas_indexs.Count <= 3)
@@ -2757,6 +2756,10 @@ namespace Damping_Data_Processor
             //freq_peaks_storage
         }
 
+        private void manual_freq_est_numupdown_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 
 
