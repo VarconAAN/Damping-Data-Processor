@@ -14,6 +14,7 @@ using MathNet.Numerics;
 using DSPLib;
 using Newtonsoft.Json;
 using MathNet.Filtering;
+using System.Threading;
 
 
 
@@ -148,6 +149,12 @@ namespace Damping_Data_Processor
             peak_picking_method_combobox.Items.Add("2. Classic Peak Picker (Slow)");
             peak_picking_method_combobox.SelectedIndex = 0;
 
+            //disable manual freq estimation
+            manual_freq_est_checkbox.Enabled = false;
+            manual_freq_est_numupdown.Enabled = false;
+            label7.Enabled = false;
+
+
             //set default value in the comboboxs;
             linear_or_log_combobox.SelectedIndex = 0;
 
@@ -173,6 +180,8 @@ namespace Damping_Data_Processor
             signal_colors.Add(Color.Violet);
             signal_colors.Add(Color.SaddleBrown);
 
+            process_icon.Visible = false;
+            process_icon.BackColor = Color.Transparent;
 
 
         }
@@ -338,6 +347,25 @@ namespace Damping_Data_Processor
 
         //generic program functions
 
+        public void update_process_icons(Boolean processing)
+        {
+            //updating the processing icons based on the input
+            //true now preocessing
+            //false stop processing
+            if (processing)
+            {
+                //process_icon.Visible = true;
+                //process_icon.Refresh();
+                System.Windows.Forms.Cursor.Current = Cursors.AppStarting;
+            }
+            else
+            {
+                //process_icon.Visible = false;
+                //process_icon.Refresh();
+                System.Windows.Forms.Cursor.Current = Cursors.Default;
+            }
+        }
+
         public void activity_log(string log)
         {
             activity_log_textbox.AppendText(log + "\n\r\n\r");
@@ -390,15 +418,15 @@ namespace Damping_Data_Processor
 
                 if (export_master == true)
                 {
-                    process_save_dataset_as_csv(generic_input_data_double_master_catalog[catalog_index], save_results_folder + "Acc. Data " + dataset_name + " [Unedited].csv");
+                    process_save_dataset_as_csv(generic_input_data_double_master_catalog[catalog_index], save_results_folder  + dataset_name + " Acc. Data[Unedited].csv");
                 }
                 if (export_clone == true)
                 {
-                    process_save_dataset_as_csv(generic_input_data_double_clone_catalog[catalog_index], save_results_folder + "Acc. Data " + dataset_name_trimmed + " [Trim].csv");
+                    process_save_dataset_as_csv(generic_input_data_double_clone_catalog[catalog_index], save_results_folder + dataset_name_trimmed + " Acc.Data[Trim].csv");
                 }
                 if (export_filter == true)
                 {
-                    process_save_dataset_as_csv(generic_input_data_double_clone_filtered_catalog[catalog_index], save_results_folder + "Acc. Data " + dataset_name_trimmed_filtered + " [Filt Trim].csv");
+                    process_save_dataset_as_csv(generic_input_data_double_clone_filtered_catalog[catalog_index], save_results_folder + dataset_name_trimmed_filtered + " Acc. Data[Filt Trim].csv");
                 }
 
                 //play sound to allert user
@@ -1976,8 +2004,6 @@ namespace Damping_Data_Processor
             }
             results_summary_text = results_summary_text + "\r\n";
 
-
-
             //get the data set to perfom analysis on (filter or unfiltered)
             List<List<double>> selected_data_sets = new List<List<double>>();
             if (is_data_filtered[select_data_set_tool_strip_combo_box.SelectedIndex] == true)
@@ -2049,7 +2075,8 @@ namespace Damping_Data_Processor
                             local_maximas_indexs = (Accord.Audio.Tools.FindPeaks(selected_data_set_abs.ToArray())).ToList();
                         }
 
-                            
+
+
 
                         Console.WriteLine($"Local Maximas Execution Time: {watch.ElapsedMilliseconds} ms");
 
@@ -2183,6 +2210,9 @@ namespace Damping_Data_Processor
                     results_summary_text = results_summary_text + "The R Squared value of the exp. curve fit is (" + data_direction_name[data_direction_index] + " direction): " + Math.Round(coffecient_of_determination, 3) + "\r\n\r\n";
                     results_summary_text = results_summary_text + header_border + "\r\n\r\n";
                 }
+
+
+
             }
 
             //draw the annoation trim lines on the peaks freqs plot
@@ -2194,6 +2224,17 @@ namespace Damping_Data_Processor
             dataset_result_summary_text_list[select_data_set_tool_strip_combo_box.SelectedIndex] = results_summary_text;
 
             Console.WriteLine($"Finished Execution Time: {watch.ElapsedMilliseconds} ms");
+
+
+            string dataset_name = get_filename_from_filepath(csv_input_filepaths_short[select_data_set_tool_strip_combo_box.SelectedIndex]);
+            string plots_sufolder_filepath = save_results_folder + @"\Plots " + dataset_name+@"\";
+            Directory.CreateDirectory(plots_sufolder_filepath);
+
+            //save the charts
+            signal_data_chart_main.SaveImage(plots_sufolder_filepath + "Signal Data Plot "+ dataset_name + ".png", ChartImageFormat.Png);
+            freq_dft_chart.SaveImage(plots_sufolder_filepath + "DFT Plot " + dataset_name + ".png", ChartImageFormat.Png);
+            freq_peaks_chart.SaveImage(plots_sufolder_filepath + "Frequency Estimation Plot " + dataset_name + ".png", ChartImageFormat.Png);
+
         }
 
         public void remove_non_signal_series_plot()
@@ -2238,11 +2279,18 @@ namespace Damping_Data_Processor
 
         private void calculate_damp_ratio_and_freq_button_Click(object sender, EventArgs e)
         {
+            update_process_icons(true);
             calculate_damp_ratio_and_freq();
+            //backgroundWorker1.RunWorkerAsync();
+
+
+
+            update_process_icons(false);
         }
 
         private void reset_data_trimming_button_Click(object sender, EventArgs e)
         {
+            update_process_icons(true);
 
             //reset data so filtered data isnt filtered
             is_data_filtered[select_data_set_tool_strip_combo_box.SelectedIndex] = false;
@@ -2265,11 +2313,13 @@ namespace Damping_Data_Processor
             draw_vertical_annotations(signal_data_chart_main, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, generic_input_data_double_clone[0]);
 
             check_checked_chart_series();
+
+            update_process_icons(false);
         }
 
         private void apply_filter_button_Click(object sender, EventArgs e)
         {
-
+            update_process_icons(true);
 
 
             is_data_filtered[select_data_set_tool_strip_combo_box.SelectedIndex] = true;
@@ -2339,6 +2389,10 @@ namespace Damping_Data_Processor
             //add data to catalog
             generic_input_data_double_clone_filtered_catalog[select_data_set_tool_strip_combo_box.SelectedIndex] = new List<List<double>>(generic_input_data_double_clone_filtered);
 
+
+
+
+            update_process_icons(false);
         }
 
         private void remove_filter_button_Click(object sender, EventArgs e)
@@ -2393,6 +2447,11 @@ namespace Damping_Data_Processor
             //save the results text
             System.IO.File.WriteAllText(save_results_folder + "Damping Reduction Results Summary" + ".txt", dataset_result_summary_text_concatenated);
 
+            ////save the charts
+            //signal_data_chart_main.SaveImage(save_results_folder + "Signal Data Plot.png", ChartImageFormat.Png);
+            //freq_dft_chart.SaveImage(save_results_folder + "DFT Plot.png", ChartImageFormat.Png);
+            //freq_peaks_chart.SaveImage(save_results_folder + "Frequency Estimation Plot.png", ChartImageFormat.Png);
+
             //save all data sets master , trimmed, trimmed filtered using the catalog
 
             //select all data sets for export
@@ -2407,6 +2466,8 @@ namespace Damping_Data_Processor
 
         private void select_data_set_tool_strip_combo_box_SelectedIndexChanged_1(object sender, EventArgs e)
         {
+            update_process_icons(true);
+
             populate_select_data_direction_checked_list();
 
             //reset data so filtered data isnt filtered
@@ -2440,6 +2501,8 @@ namespace Damping_Data_Processor
 
             //autosave all data sets at the default location in the background
             save_session(false, false, true);
+
+            update_process_icons(false);
         }
 
         private void displayResultsSummaryToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2697,6 +2760,8 @@ namespace Damping_Data_Processor
 
         private void recalc_damp_ratio_freq_peak_button_Click(object sender, EventArgs e)
         {
+            update_process_icons(true);
+
             //get index/values of annotation trim lines and do some boundry checking
 
             int xmax = 0;
@@ -2754,11 +2819,37 @@ namespace Damping_Data_Processor
 
             calculate_damp_ratio_and_freq(true);
             //freq_peaks_storage
+
+            update_process_icons(false);
         }
 
         private void manual_freq_est_numupdown_ValueChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void peak_picking_method_combobox_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+            //using fast peak picker?
+            if (peak_picking_method_combobox.SelectedIndex == 1)
+            {
+                //enable manual freq estimation
+                manual_freq_est_checkbox.Enabled = true;
+                manual_freq_est_numupdown.Enabled = true;
+                label7.Enabled = true;
+            }
+            else
+            {
+                //disable manual freq estimation
+                manual_freq_est_checkbox.Enabled = false;
+                manual_freq_est_numupdown.Enabled = false;
+                label7.Enabled = false;
+            }
+        }
+
+        private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            calculate_damp_ratio_and_freq();
         }
     }
 
