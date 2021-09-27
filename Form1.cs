@@ -1117,13 +1117,23 @@ namespace Damping_Data_Processor
             }
         }
 
-        public List<List<double>> convert_list_of_list_string_to_double(List<List<string>> list_of_lists_data)
+        public List<List<double>> convert_list_of_list_string_to_double(List<List<string>> list_of_lists_data, Boolean return_zeros_if_invalid =false)
         {
             List<List<double>> double_data = new List<List<double>>();
 
             foreach (List<string> list_of_data in list_of_lists_data)
             {
-                double_data.Add(list_of_data.Select(x => double.Parse(x)).ToList());
+                try // will throw error if data is not in double format
+                {
+                    double_data.Add(list_of_data.Select(x => double.Parse(x)).ToList());
+                }
+                catch //in that case fill with zeros if enabled
+                {
+                    if (return_zeros_if_invalid)
+                    {
+                        double_data.Add(Enumerable.Repeat(0.00, list_of_data.Count).ToList());
+                   }
+                }
             }
             return double_data;
         }
@@ -1290,7 +1300,7 @@ namespace Damping_Data_Processor
                 data.RemoveAt(0);
             }
             //convert from string list to double list
-            generic_input_data_double_master = convert_list_of_list_string_to_double(generic_input_data_string);
+            generic_input_data_double_master = convert_list_of_list_string_to_double(generic_input_data_string, true);
 
             //converts the time data from ticks to seconds (1 tick = 1/1024 seconds)
             convert_ticks_to_seconds();
