@@ -15,6 +15,7 @@ using DSPLib;
 using Newtonsoft.Json;
 using MathNet.Filtering;
 using System.Threading;
+using JR.Utils.GUI.Forms;
 
 
 
@@ -241,7 +242,7 @@ namespace Damping_Data_Processor
                 {
                     string message = "There is no data loaded into the current session";
                     string title = "Error";
-                    MessageBox.Show(message, title);
+                    FlexibleMessageBox.Show(message, title);
                 }
                 return;
             }
@@ -313,7 +314,7 @@ namespace Damping_Data_Processor
                 {
                     string message = "The autosave/session attempt has failed, try again.";
                     string title = "Error";
-                    MessageBox.Show(message, title);
+                    FlexibleMessageBox.Show(message, title);
                 }
 
             }
@@ -323,7 +324,7 @@ namespace Damping_Data_Processor
                 {
                     string message = "The filepath/name was invalid and could not be saved";
                     string title = "Error";
-                    MessageBox.Show(message, title);
+                    FlexibleMessageBox.Show(message, title);
                 }
                 return;
             }
@@ -344,6 +345,25 @@ namespace Damping_Data_Processor
         }
 
         //generic program functions
+
+        public void automatically_update_freq_repsonse_plot()
+        {
+            //get the data set to perfom analysis on (filter or unfiltered)
+            List<List<double>> selected_data_sets = new List<List<double>>();
+            if (is_data_filtered[select_data_set_tool_strip_combo_box.SelectedIndex] == true)
+            {
+                selected_data_sets = new List<List<double>>(generic_input_data_double_clone_filtered);
+            }
+            else
+            {
+                selected_data_sets = new List<List<double>>(generic_input_data_double_clone);
+            }
+            //remove the time list from data to be porocessed
+            selected_data_sets.RemoveAt(0);
+
+            //preform fft freq response analysis on all data sets
+            List<double> natural_frequencies = fft_analysis(selected_data_sets, data_direction_name);
+        }
 
         public void update_process_icons(Boolean processing)
         {
@@ -375,7 +395,7 @@ namespace Damping_Data_Processor
             {
                 string message = "There is no dataset to export";
                 string title = "Error";
-                MessageBox.Show(message, title);
+                FlexibleMessageBox.Show(message, title);
                 return;
             }
 
@@ -416,7 +436,7 @@ namespace Damping_Data_Processor
 
                 if (export_master == true)
                 {
-                    process_save_dataset_as_csv(generic_input_data_double_master_catalog[catalog_index], save_results_folder  + dataset_name + " Acc. Data[Unedited].csv");
+                    process_save_dataset_as_csv(generic_input_data_double_master_catalog[catalog_index], save_results_folder + dataset_name + " Acc. Data[Unedited].csv");
                 }
                 if (export_clone == true)
                 {
@@ -493,7 +513,7 @@ namespace Damping_Data_Processor
             {
                 //string message = "There is no dataset to export";
                 //string title = "Error";
-                //MessageBox.Show(message, title);
+                //FlexibleMessageBox.Show(message, title);
                 return false;
             }
 
@@ -529,7 +549,7 @@ namespace Damping_Data_Processor
             {
                 string message = "There are no results to export. The results are generated after clicking -" + calculate_damp_ratio_and_freq_button.Text + "- Button";
                 string title = "Error";
-                MessageBox.Show(message, title);
+                FlexibleMessageBox.Show(message, title);
                 return string.Empty;
             }
 
@@ -677,10 +697,34 @@ namespace Damping_Data_Processor
             {
                 if (data[i] < data.Average() + std_deviation * 3 && data[i] > data.Average() - std_deviation * 3)
                 {
-                    data_trimmed.Add(data[i]);
+                    if (freq_estimation_reject_freq_checkbox.Checked == true)
+                    {
+                        if (data[i] <= Convert.ToDouble(freq_estimation_high_cutoff_freq_numupdown.Value) )
+                        {
+                            data_trimmed.Add(data[i]);
+                        }
+                    }
+                    else
+                    {
+                        data_trimmed.Add(data[i]);
+                    }
+
+
                 }
             }
-            return data_trimmed;
+            if (data_trimmed.Count > 0)
+            {
+                return data_trimmed;
+            
+            }
+            else
+            {
+                string message = "Could not reject all frequencies above "+ freq_estimation_high_cutoff_freq_numupdown.Value+ " Hz, as all data points were rejected. Rejection parameters ignored.";
+                string title = "Error";
+                FlexibleMessageBox.Show(message, title);
+                return data;
+            }
+
 
         }
 
@@ -755,7 +799,7 @@ namespace Damping_Data_Processor
             //remove last data point to match lengths for plotting (list not used anymnore)
             peak_int_indexs.RemoveAt(peak_int_indexs.Count - 1);
 
-            plot_freq_peaks_response( frequency_peaks, series_name);
+            plot_freq_peaks_response(frequency_peaks, series_name);
 
             return frequency_peaks;
         }
@@ -1117,7 +1161,7 @@ namespace Damping_Data_Processor
             }
         }
 
-        public List<List<double>> convert_list_of_list_string_to_double(List<List<string>> list_of_lists_data, Boolean return_zeros_if_invalid =false)
+        public List<List<double>> convert_list_of_list_string_to_double(List<List<string>> list_of_lists_data, Boolean return_zeros_if_invalid = false)
         {
             List<List<double>> double_data = new List<List<double>>();
 
@@ -1132,7 +1176,7 @@ namespace Damping_Data_Processor
                     if (return_zeros_if_invalid)
                     {
                         double_data.Add(Enumerable.Repeat(0.00, list_of_data.Count).ToList());
-                   }
+                    }
                 }
             }
             return double_data;
@@ -1457,7 +1501,7 @@ namespace Damping_Data_Processor
             }
         }
 
-        public void enable_all_user_controls (Boolean enable)
+        public void enable_all_user_controls(Boolean enable)
         {
             if (enable)
             {
@@ -1580,12 +1624,12 @@ namespace Damping_Data_Processor
 
         //manipulate chart functions
 
-        public void plot_freq_peaks_response( List<double> frequency_peaks, string series_name)
+        public void plot_freq_peaks_response(List<double> frequency_peaks, string series_name)
         {
             System.Windows.Forms.DataVisualization.Charting.Series series = freq_peaks_chart.Series.Add(series_name + " Freq. Resp.");
             series.ChartType = SeriesChartType.Point;
             //series.Points.DataBindXY(time_peaks, frequency_peaks);
-            series.Points.DataBindY( frequency_peaks);
+            series.Points.DataBindY(frequency_peaks);
             series.BorderWidth = 1;
             series.Color = signal_colors[data_direction_name.IndexOf(series_name)];
             series.ToolTip = "#SERIESNAME\nX: #VALX\nY: #VAL";
@@ -1639,7 +1683,7 @@ namespace Damping_Data_Processor
             {
                 string message = "Cannot trim data to less than 15 data points";
                 string title = "Error";
-                MessageBox.Show(message, title);
+                FlexibleMessageBox.Show(message, title);
                 return;
             }
 
@@ -2134,7 +2178,7 @@ namespace Damping_Data_Processor
                         if (natural_frequncy_peaks.Count == 0 || local_maximas_indexs.Count == 0 || peak_amplitudes.Count == 0)
                         {
                             string title = "Error";
-                            MessageBox.Show("Not enough trimmed points in the selected frequency estimation plot window", title);
+                            FlexibleMessageBox.Show("Not enough trimmed points in the selected frequency estimation plot window", title);
                             return;
                         }
 
@@ -2243,11 +2287,11 @@ namespace Damping_Data_Processor
 
 
             string dataset_name = get_filename_from_filepath(csv_input_filepaths_short[select_data_set_tool_strip_combo_box.SelectedIndex]);
-            string plots_sufolder_filepath = save_results_folder + @"\Plots " + dataset_name+@"\";
+            string plots_sufolder_filepath = save_results_folder + @"\Plots " + dataset_name + @"\";
             Directory.CreateDirectory(plots_sufolder_filepath);
 
             //save the charts
-            signal_data_chart_main.SaveImage(plots_sufolder_filepath + "Signal Data Plot "+ dataset_name + ".png", ChartImageFormat.Png);
+            signal_data_chart_main.SaveImage(plots_sufolder_filepath + "Signal Data Plot " + dataset_name + ".png", ChartImageFormat.Png);
             freq_dft_chart.SaveImage(plots_sufolder_filepath + "DFT Plot " + dataset_name + ".png", ChartImageFormat.Png);
             freq_peaks_chart.SaveImage(plots_sufolder_filepath + "Frequency Estimation Plot " + dataset_name + ".png", ChartImageFormat.Png);
 
@@ -2428,6 +2472,7 @@ namespace Damping_Data_Processor
         private void select_data_direction_check_list_box_SelectedIndexChanged(object sender, EventArgs e)
         {
             check_checked_chart_series();
+
         }
 
         private void label4_Click(object sender, EventArgs e)
@@ -2515,6 +2560,9 @@ namespace Damping_Data_Processor
 
             check_checked_chart_series();
 
+            //preform fft freq response analysis on all data sets
+            automatically_update_freq_repsonse_plot();
+
             //autosave all data sets at the default location in the background
             save_session(false, false, true);
 
@@ -2527,7 +2575,8 @@ namespace Damping_Data_Processor
             if (!String.IsNullOrEmpty(dataset_result_summary_text_concatenated))
             {
                 string title = "Results Summary";
-                MessageBox.Show(dataset_result_summary_text_concatenated, title);
+                FlexibleMessageBox.Show(dataset_result_summary_text_concatenated, title);
+                //FlexibleMessageBox.
             }
         }
 
@@ -2598,7 +2647,7 @@ namespace Damping_Data_Processor
             //    {
             //        string message = "There is no data loaded into the current session";
             //        string title = "Error";
-            //        MessageBox.Show(message, title);
+            //        FlexibleMessageBox.Show(message, title);
             //        return;
             //    }
 
@@ -2648,7 +2697,7 @@ namespace Damping_Data_Processor
             //    {
             //        string message = "The filepath/name was invalid and could not be saved";
             //        string title = "Error";
-            //        MessageBox.Show(message, title);
+            //        FlexibleMessageBox.Show(message, title);
             //        return;
             //    }
         }
@@ -2713,7 +2762,7 @@ namespace Damping_Data_Processor
             {
                 string message = "The filepath/name was invalid and could not be loaded";
                 string title = "Error";
-                MessageBox.Show(message, title);
+                FlexibleMessageBox.Show(message, title);
                 return;
             }
         }
@@ -2777,6 +2826,16 @@ namespace Damping_Data_Processor
         private void recalc_damp_ratio_freq_peak_button_Click(object sender, EventArgs e)
         {
             update_process_icons(true);
+
+            //check if there is data loaded into the freq estimation (distance between peaks window)
+            if (freq_peaks_chart.Series.Count <= 0)
+            {
+                string message = "The ' " + calculate_damp_ratio_and_freq_button.Text + " ' button must be clicked first for the current dataset first before trimming frequency dataset(s)";
+                string title = "Error";
+                FlexibleMessageBox.Show(message, title);
+                return;
+            }
+
 
             //get index/values of annotation trim lines and do some boundry checking
 
@@ -2875,6 +2934,23 @@ namespace Damping_Data_Processor
         {
             //draw the annoation trim lines on the peaks freqs plot
             draw_annotation_trim_lines_freq_plot(freq_peaks_chart, freq_peaks_trim_vertical_line_1, freq_peaks_trim_vertical_line_2, freq_peaks_trim_horizontal_line_1, freq_peaks_trim_horizontal_line_2);
+        }
+
+        private void freq_peaks_chart_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void aboutStructuralDampingReductionProcessorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string message = "Structural Damping Reduction Processor was developed by Atlin Anderson (2021). Copyright of Atlin Anderson. Special thanks to Matt Mills, Kevin Scherbatiuk, Yashar Ghari, Saptarshi Datta ";
+            string title = "About";
+            FlexibleMessageBox.Show(message, title);
+        }
+
+        private void select_data_set_tool_strip_combo_box_Click(object sender, EventArgs e)
+        {
+
         }
     }
 

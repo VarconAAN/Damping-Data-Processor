@@ -78,6 +78,9 @@ namespace Damping_Data_Processor
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.freqResponseTransformPlotYAxisScaleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.linear_or_log_combobox = new System.Windows.Forms.ToolStripComboBox();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutStructuralDampingReductionProcessorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label12 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.activity_log_textbox = new System.Windows.Forms.TextBox();
@@ -85,12 +88,14 @@ namespace Damping_Data_Processor
             this.lower_freq_plot_cutoff_numupdown = new System.Windows.Forms.NumericUpDown();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.manual_freq_est_checkbox = new System.Windows.Forms.CheckBox();
+            this.freq_estimation_reject_freq_checkbox = new System.Windows.Forms.CheckBox();
             this.manual_freq_est_numupdown = new System.Windows.Forms.NumericUpDown();
             this.recalc_damp_ratio_freq_peak_button = new System.Windows.Forms.Button();
             this.peak_picking_method_combobox = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.reset_trim_lines_button = new System.Windows.Forms.Button();
+            this.freq_estimation_high_cutoff_freq_numupdown = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.signal_data_chart_main)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
@@ -100,6 +105,7 @@ namespace Damping_Data_Processor
             this.menu_strip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.lower_freq_plot_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.manual_freq_est_numupdown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.freq_estimation_high_cutoff_freq_numupdown)).BeginInit();
             this.SuspendLayout();
             // 
             // signal_data_chart_main
@@ -258,7 +264,7 @@ namespace Damping_Data_Processor
             this.freq_dft_chart.ChartAreas.Add(chartArea2);
             legend2.Name = "Legend1";
             this.freq_dft_chart.Legends.Add(legend2);
-            this.freq_dft_chart.Location = new System.Drawing.Point(369, 609);
+            this.freq_dft_chart.Location = new System.Drawing.Point(367, 629);
             this.freq_dft_chart.Name = "freq_dft_chart";
             series2.ChartArea = "ChartArea1";
             series2.Legend = "Legend1";
@@ -340,7 +346,7 @@ namespace Damping_Data_Processor
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(11, 839);
+            this.label9.Location = new System.Drawing.Point(9, 850);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(232, 13);
             this.label9.TabIndex = 43;
@@ -353,7 +359,7 @@ namespace Damping_Data_Processor
             this.freq_peaks_chart.ChartAreas.Add(chartArea3);
             legend3.Name = "Legend1";
             this.freq_peaks_chart.Legends.Add(legend3);
-            this.freq_peaks_chart.Location = new System.Drawing.Point(1098, 609);
+            this.freq_peaks_chart.Location = new System.Drawing.Point(1103, 629);
             this.freq_peaks_chart.Name = "freq_peaks_chart";
             series3.ChartArea = "ChartArea1";
             series3.Legend = "Legend1";
@@ -362,6 +368,7 @@ namespace Damping_Data_Processor
             this.freq_peaks_chart.Size = new System.Drawing.Size(656, 243);
             this.freq_peaks_chart.TabIndex = 44;
             this.freq_peaks_chart.Text = "chart1";
+            this.freq_peaks_chart.Click += new System.EventHandler(this.freq_peaks_chart_Click);
             // 
             // label10
             // 
@@ -390,7 +397,8 @@ namespace Damping_Data_Processor
             this.fileToolStripMenuItem,
             this.select_data_set_tool_strip_combo_box,
             this.exportResultsToolStripMenuItem,
-            this.settingsToolStripMenuItem});
+            this.settingsToolStripMenuItem,
+            this.aboutToolStripMenuItem});
             this.menu_strip.Location = new System.Drawing.Point(0, 0);
             this.menu_strip.Name = "menu_strip";
             this.menu_strip.Size = new System.Drawing.Size(1763, 27);
@@ -435,6 +443,7 @@ namespace Damping_Data_Processor
             this.select_data_set_tool_strip_combo_box.Name = "select_data_set_tool_strip_combo_box";
             this.select_data_set_tool_strip_combo_box.Size = new System.Drawing.Size(600, 23);
             this.select_data_set_tool_strip_combo_box.SelectedIndexChanged += new System.EventHandler(this.select_data_set_tool_strip_combo_box_SelectedIndexChanged_1);
+            this.select_data_set_tool_strip_combo_box.Click += new System.EventHandler(this.select_data_set_tool_strip_combo_box_Click);
             // 
             // exportResultsToolStripMenuItem
             // 
@@ -525,6 +534,28 @@ namespace Damping_Data_Processor
             this.linear_or_log_combobox.Size = new System.Drawing.Size(121, 23);
             this.linear_or_log_combobox.DropDownClosed += new System.EventHandler(this.linear_or_log_combobox_DropDownClosed);
             // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.documentationToolStripMenuItem,
+            this.aboutStructuralDampingReductionProcessorToolStripMenuItem});
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 23);
+            this.aboutToolStripMenuItem.Text = "About";
+            // 
+            // documentationToolStripMenuItem
+            // 
+            this.documentationToolStripMenuItem.Name = "documentationToolStripMenuItem";
+            this.documentationToolStripMenuItem.Size = new System.Drawing.Size(324, 22);
+            this.documentationToolStripMenuItem.Text = "Documentation";
+            // 
+            // aboutStructuralDampingReductionProcessorToolStripMenuItem
+            // 
+            this.aboutStructuralDampingReductionProcessorToolStripMenuItem.Name = "aboutStructuralDampingReductionProcessorToolStripMenuItem";
+            this.aboutStructuralDampingReductionProcessorToolStripMenuItem.Size = new System.Drawing.Size(324, 22);
+            this.aboutStructuralDampingReductionProcessorToolStripMenuItem.Text = "About Structural Damping Reduction Processor";
+            this.aboutStructuralDampingReductionProcessorToolStripMenuItem.Click += new System.EventHandler(this.aboutStructuralDampingReductionProcessorToolStripMenuItem_Click);
+            // 
             // label12
             // 
             this.label12.AutoSize = true;
@@ -594,6 +625,21 @@ namespace Damping_Data_Processor
             this.toolTip1.SetToolTip(this.manual_freq_est_checkbox, "If not selected the fft peak frequency will be used in the peak-picking");
             this.manual_freq_est_checkbox.UseVisualStyleBackColor = true;
             // 
+            // freq_estimation_reject_freq_checkbox
+            // 
+            this.freq_estimation_reject_freq_checkbox.AutoSize = true;
+            this.freq_estimation_reject_freq_checkbox.Checked = true;
+            this.freq_estimation_reject_freq_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.freq_estimation_reject_freq_checkbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.freq_estimation_reject_freq_checkbox.Location = new System.Drawing.Point(1520, 609);
+            this.freq_estimation_reject_freq_checkbox.Name = "freq_estimation_reject_freq_checkbox";
+            this.freq_estimation_reject_freq_checkbox.Size = new System.Drawing.Size(177, 17);
+            this.freq_estimation_reject_freq_checkbox.TabIndex = 65;
+            this.freq_estimation_reject_freq_checkbox.Text = "Reject Frequencies Above: (Hz)";
+            this.toolTip1.SetToolTip(this.freq_estimation_reject_freq_checkbox, "Only rejects frequencies when \"calculate damping ratio and frequency\" is clicked." +
+        "");
+            this.freq_estimation_reject_freq_checkbox.UseVisualStyleBackColor = true;
+            // 
             // manual_freq_est_numupdown
             // 
             this.manual_freq_est_numupdown.DecimalPlaces = 3;
@@ -621,7 +667,7 @@ namespace Damping_Data_Processor
             // 
             // recalc_damp_ratio_freq_peak_button
             // 
-            this.recalc_damp_ratio_freq_peak_button.Location = new System.Drawing.Point(1388, 587);
+            this.recalc_damp_ratio_freq_peak_button.Location = new System.Drawing.Point(1409, 587);
             this.recalc_damp_ratio_freq_peak_button.Name = "recalc_damp_ratio_freq_peak_button";
             this.recalc_damp_ratio_freq_peak_button.Size = new System.Drawing.Size(238, 20);
             this.recalc_damp_ratio_freq_peak_button.TabIndex = 57;
@@ -658,7 +704,7 @@ namespace Damping_Data_Processor
             // 
             // reset_trim_lines_button
             // 
-            this.reset_trim_lines_button.Location = new System.Drawing.Point(1632, 586);
+            this.reset_trim_lines_button.Location = new System.Drawing.Point(1653, 586);
             this.reset_trim_lines_button.Name = "reset_trim_lines_button";
             this.reset_trim_lines_button.Size = new System.Drawing.Size(104, 20);
             this.reset_trim_lines_button.TabIndex = 62;
@@ -666,11 +712,42 @@ namespace Damping_Data_Processor
             this.reset_trim_lines_button.UseVisualStyleBackColor = true;
             this.reset_trim_lines_button.Click += new System.EventHandler(this.reset_trim_lines_button_Click);
             // 
+            // freq_estimation_high_cutoff_freq_numupdown
+            // 
+            this.freq_estimation_high_cutoff_freq_numupdown.DecimalPlaces = 1;
+            this.freq_estimation_high_cutoff_freq_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.freq_estimation_high_cutoff_freq_numupdown.Increment = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.freq_estimation_high_cutoff_freq_numupdown.Location = new System.Drawing.Point(1703, 606);
+            this.freq_estimation_high_cutoff_freq_numupdown.Maximum = new decimal(new int[] {
+            99999999,
+            0,
+            0,
+            0});
+            this.freq_estimation_high_cutoff_freq_numupdown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.freq_estimation_high_cutoff_freq_numupdown.Name = "freq_estimation_high_cutoff_freq_numupdown";
+            this.freq_estimation_high_cutoff_freq_numupdown.Size = new System.Drawing.Size(55, 21);
+            this.freq_estimation_high_cutoff_freq_numupdown.TabIndex = 63;
+            this.freq_estimation_high_cutoff_freq_numupdown.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            // 
             // form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.ClientSize = new System.Drawing.Size(1763, 861);
+            this.ClientSize = new System.Drawing.Size(1763, 875);
+            this.Controls.Add(this.freq_estimation_reject_freq_checkbox);
+            this.Controls.Add(this.freq_estimation_high_cutoff_freq_numupdown);
             this.Controls.Add(this.reset_trim_lines_button);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label5);
@@ -705,7 +782,7 @@ namespace Damping_Data_Processor
             this.Controls.Add(this.trim_data_button);
             this.Controls.Add(this.signal_data_chart_main);
             this.Controls.Add(this.menu_strip);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menu_strip;
             this.MaximizeBox = false;
@@ -723,6 +800,7 @@ namespace Damping_Data_Processor
             this.menu_strip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.lower_freq_plot_cutoff_numupdown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.manual_freq_est_numupdown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.freq_estimation_high_cutoff_freq_numupdown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -781,6 +859,11 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button reset_trim_lines_button;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem documentationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutStructuralDampingReductionProcessorToolStripMenuItem;
+        private System.Windows.Forms.NumericUpDown freq_estimation_high_cutoff_freq_numupdown;
+        private System.Windows.Forms.CheckBox freq_estimation_reject_freq_checkbox;
     }
 }
 
