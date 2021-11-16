@@ -96,6 +96,8 @@ namespace Damping_Data_Processor
             this.label7 = new System.Windows.Forms.Label();
             this.reset_trim_lines_button = new System.Windows.Forms.Button();
             this.freq_estimation_high_cutoff_freq_numupdown = new System.Windows.Forms.NumericUpDown();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.signal_data_chart_main)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
@@ -112,6 +114,9 @@ namespace Damping_Data_Processor
             // 
             this.signal_data_chart_main.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.signal_data_chart_main.BackColor = System.Drawing.Color.Gainsboro;
+            this.signal_data_chart_main.BorderlineColor = System.Drawing.Color.Black;
+            this.signal_data_chart_main.BorderlineWidth = 2;
             chartArea1.Name = "ChartArea1";
             this.signal_data_chart_main.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
@@ -122,7 +127,7 @@ namespace Damping_Data_Processor
             series1.Legend = "Legend1";
             series1.Name = "Series1";
             this.signal_data_chart_main.Series.Add(series1);
-            this.signal_data_chart_main.Size = new System.Drawing.Size(1384, 550);
+            this.signal_data_chart_main.Size = new System.Drawing.Size(1076, 501);
             this.signal_data_chart_main.TabIndex = 0;
             this.signal_data_chart_main.Text = "chart1";
             this.signal_data_chart_main.AnnotationPositionChanged += new System.EventHandler(this.signal_data_chart_main_AnnotationPositionChanged);
@@ -263,19 +268,21 @@ namespace Damping_Data_Processor
             // 
             // freq_dft_chart
             // 
-            this.freq_dft_chart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+            this.freq_dft_chart.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.freq_dft_chart.BackColor = System.Drawing.Color.Gainsboro;
             chartArea2.Name = "ChartArea1";
             this.freq_dft_chart.ChartAreas.Add(chartArea2);
             legend2.Name = "Legend1";
             this.freq_dft_chart.Legends.Add(legend2);
-            this.freq_dft_chart.Location = new System.Drawing.Point(367, 629);
+            this.freq_dft_chart.Location = new System.Drawing.Point(367, 576);
             this.freq_dft_chart.Name = "freq_dft_chart";
             series2.ChartArea = "ChartArea1";
             series2.Legend = "Legend1";
             series2.Name = "Series1";
             this.freq_dft_chart.Series.Add(series2);
-            this.freq_dft_chart.Size = new System.Drawing.Size(723, 243);
+            this.freq_dft_chart.Size = new System.Drawing.Size(557, 184);
             this.freq_dft_chart.TabIndex = 30;
             this.freq_dft_chart.Text = "chart1";
             this.freq_dft_chart.AxisViewChanged += new System.EventHandler<System.Windows.Forms.DataVisualization.Charting.ViewEventArgs>(this.freq_dft_chart_AxisViewChanged_1);
@@ -287,19 +294,22 @@ namespace Damping_Data_Processor
             | System.Windows.Forms.AnchorStyles.Left)));
             this.summary_results_textbox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.summary_results_textbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.summary_results_textbox.Location = new System.Drawing.Point(0, 390);
+            this.summary_results_textbox.Location = new System.Drawing.Point(2, 390);
             this.summary_results_textbox.Multiline = true;
             this.summary_results_textbox.Name = "summary_results_textbox";
             this.summary_results_textbox.ReadOnly = true;
             this.summary_results_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.summary_results_textbox.Size = new System.Drawing.Size(361, 282);
+            this.summary_results_textbox.Size = new System.Drawing.Size(358, 234);
             this.summary_results_textbox.TabIndex = 31;
+            this.summary_results_textbox.DoubleClick += new System.EventHandler(this.summary_results_textbox_DoubleClick);
             // 
             // upper_freq_plot_cutoff_numupdown
             // 
+            this.upper_freq_plot_cutoff_numupdown.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.upper_freq_plot_cutoff_numupdown.DecimalPlaces = 3;
             this.upper_freq_plot_cutoff_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.upper_freq_plot_cutoff_numupdown.Location = new System.Drawing.Point(1012, 586);
+            this.upper_freq_plot_cutoff_numupdown.Location = new System.Drawing.Point(846, 547);
             this.upper_freq_plot_cutoff_numupdown.Maximum = new decimal(new int[] {
             99999999,
             0,
@@ -322,8 +332,10 @@ namespace Damping_Data_Processor
             // 
             // label6
             // 
+            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(773, 590);
+            this.label6.Location = new System.Drawing.Point(607, 551);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(147, 13);
             this.label6.TabIndex = 35;
@@ -354,7 +366,7 @@ namespace Damping_Data_Processor
             // 
             this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(9, 850);
+            this.label9.Location = new System.Drawing.Point(2, 747);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(232, 13);
             this.label9.TabIndex = 43;
@@ -363,20 +375,20 @@ namespace Damping_Data_Processor
             // 
             // freq_peaks_chart
             // 
-            this.freq_peaks_chart.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.freq_peaks_chart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.freq_peaks_chart.BackColor = System.Drawing.Color.Gainsboro;
             chartArea3.Name = "ChartArea1";
             this.freq_peaks_chart.ChartAreas.Add(chartArea3);
             legend3.Name = "Legend1";
             this.freq_peaks_chart.Legends.Add(legend3);
-            this.freq_peaks_chart.Location = new System.Drawing.Point(1103, 629);
+            this.freq_peaks_chart.Location = new System.Drawing.Point(932, 576);
             this.freq_peaks_chart.Name = "freq_peaks_chart";
             series3.ChartArea = "ChartArea1";
             series3.Legend = "Legend1";
             series3.Name = "Series1";
             this.freq_peaks_chart.Series.Add(series3);
-            this.freq_peaks_chart.Size = new System.Drawing.Size(656, 243);
+            this.freq_peaks_chart.Size = new System.Drawing.Size(511, 184);
             this.freq_peaks_chart.TabIndex = 44;
             this.freq_peaks_chart.Text = "chart1";
             this.freq_peaks_chart.AnnotationPositionChanged += new System.EventHandler(this.freq_peaks_chart_AnnotationPositionChanged);
@@ -384,23 +396,26 @@ namespace Damping_Data_Processor
             // 
             // label10
             // 
+            this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(371, 590);
+            this.label10.Location = new System.Drawing.Point(366, 535);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(308, 13);
+            this.label10.Size = new System.Drawing.Size(126, 13);
             this.label10.TabIndex = 45;
-            this.label10.Text = "Frequency Response (Discrete Frequency Transform)";
+            this.label10.Text = "Frequency Response";
             // 
             // label11
             // 
+            this.label11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label11.AutoSize = true;
             this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label11.Location = new System.Drawing.Point(1100, 593);
+            this.label11.Location = new System.Drawing.Point(929, 535);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(282, 13);
+            this.label11.Size = new System.Drawing.Size(128, 13);
             this.label11.TabIndex = 46;
-            this.label11.Text = "Frequency Estimation (Distance Between Peaks)";
+            this.label11.Text = "Frequency Estimation";
             // 
             // menu_strip
             // 
@@ -413,7 +428,7 @@ namespace Damping_Data_Processor
             this.aboutToolStripMenuItem});
             this.menu_strip.Location = new System.Drawing.Point(0, 0);
             this.menu_strip.Name = "menu_strip";
-            this.menu_strip.Size = new System.Drawing.Size(1763, 27);
+            this.menu_strip.Size = new System.Drawing.Size(1447, 27);
             this.menu_strip.TabIndex = 48;
             this.menu_strip.Text = "menuStrip1";
             // 
@@ -595,12 +610,12 @@ namespace Damping_Data_Processor
             this.activity_log_textbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.activity_log_textbox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.activity_log_textbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.activity_log_textbox.Location = new System.Drawing.Point(0, 695);
+            this.activity_log_textbox.Location = new System.Drawing.Point(2, 647);
             this.activity_log_textbox.Multiline = true;
             this.activity_log_textbox.Name = "activity_log_textbox";
             this.activity_log_textbox.ReadOnly = true;
             this.activity_log_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.activity_log_textbox.Size = new System.Drawing.Size(361, 145);
+            this.activity_log_textbox.Size = new System.Drawing.Size(358, 97);
             this.activity_log_textbox.TabIndex = 52;
             // 
             // label1
@@ -608,7 +623,7 @@ namespace Damping_Data_Processor
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(143, 675);
+            this.label1.Location = new System.Drawing.Point(140, 627);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(80, 17);
             this.label1.TabIndex = 53;
@@ -616,9 +631,11 @@ namespace Damping_Data_Processor
             // 
             // lower_freq_plot_cutoff_numupdown
             // 
+            this.lower_freq_plot_cutoff_numupdown.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lower_freq_plot_cutoff_numupdown.DecimalPlaces = 3;
             this.lower_freq_plot_cutoff_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lower_freq_plot_cutoff_numupdown.Location = new System.Drawing.Point(926, 586);
+            this.lower_freq_plot_cutoff_numupdown.Location = new System.Drawing.Point(760, 547);
             this.lower_freq_plot_cutoff_numupdown.Maximum = new decimal(new int[] {
             99999999,
             0,
@@ -648,7 +665,7 @@ namespace Damping_Data_Processor
             this.freq_estimation_reject_freq_checkbox.Checked = true;
             this.freq_estimation_reject_freq_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.freq_estimation_reject_freq_checkbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.freq_estimation_reject_freq_checkbox.Location = new System.Drawing.Point(1520, 609);
+            this.freq_estimation_reject_freq_checkbox.Location = new System.Drawing.Point(1203, 553);
             this.freq_estimation_reject_freq_checkbox.Name = "freq_estimation_reject_freq_checkbox";
             this.freq_estimation_reject_freq_checkbox.Size = new System.Drawing.Size(177, 17);
             this.freq_estimation_reject_freq_checkbox.TabIndex = 65;
@@ -685,7 +702,7 @@ namespace Damping_Data_Processor
             // recalc_damp_ratio_freq_peak_button
             // 
             this.recalc_damp_ratio_freq_peak_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.recalc_damp_ratio_freq_peak_button.Location = new System.Drawing.Point(1409, 587);
+            this.recalc_damp_ratio_freq_peak_button.Location = new System.Drawing.Point(1092, 531);
             this.recalc_damp_ratio_freq_peak_button.Name = "recalc_damp_ratio_freq_peak_button";
             this.recalc_damp_ratio_freq_peak_button.Size = new System.Drawing.Size(238, 20);
             this.recalc_damp_ratio_freq_peak_button.TabIndex = 57;
@@ -723,7 +740,7 @@ namespace Damping_Data_Processor
             // reset_trim_lines_button
             // 
             this.reset_trim_lines_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.reset_trim_lines_button.Location = new System.Drawing.Point(1653, 586);
+            this.reset_trim_lines_button.Location = new System.Drawing.Point(1336, 530);
             this.reset_trim_lines_button.Name = "reset_trim_lines_button";
             this.reset_trim_lines_button.Size = new System.Drawing.Size(104, 20);
             this.reset_trim_lines_button.TabIndex = 62;
@@ -741,7 +758,7 @@ namespace Damping_Data_Processor
             0,
             0,
             0});
-            this.freq_estimation_high_cutoff_freq_numupdown.Location = new System.Drawing.Point(1703, 606);
+            this.freq_estimation_high_cutoff_freq_numupdown.Location = new System.Drawing.Point(1386, 550);
             this.freq_estimation_high_cutoff_freq_numupdown.Maximum = new decimal(new int[] {
             99999999,
             0,
@@ -761,11 +778,36 @@ namespace Damping_Data_Processor
             0,
             0});
             // 
+            // label13
+            // 
+            this.label13.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label13.AutoSize = true;
+            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label13.Location = new System.Drawing.Point(929, 550);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(157, 13);
+            this.label13.TabIndex = 67;
+            this.label13.Text = "(Distance Between Peaks)";
+            // 
+            // label14
+            // 
+            this.label14.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.label14.AutoSize = true;
+            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label14.Location = new System.Drawing.Point(366, 550);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(185, 13);
+            this.label14.TabIndex = 66;
+            this.label14.Text = "(Discrete Frequency Transform)";
+            // 
             // form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.ClientSize = new System.Drawing.Size(1763, 875);
+            this.ClientSize = new System.Drawing.Size(1447, 766);
+            this.Controls.Add(this.label13);
+            this.Controls.Add(this.label14);
             this.Controls.Add(this.freq_estimation_reject_freq_checkbox);
             this.Controls.Add(this.freq_estimation_high_cutoff_freq_numupdown);
             this.Controls.Add(this.reset_trim_lines_button);
@@ -802,10 +844,11 @@ namespace Damping_Data_Processor
             this.Controls.Add(this.trim_data_button);
             this.Controls.Add(this.signal_data_chart_main);
             this.Controls.Add(this.menu_strip);
+            this.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menu_strip;
-            this.MinimumSize = new System.Drawing.Size(1779, 914);
+            this.MinimumSize = new System.Drawing.Size(1463, 805);
             this.Name = "form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Structural Damping Reduction Processor";
@@ -884,6 +927,8 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.ToolStripMenuItem aboutStructuralDampingReductionProcessorToolStripMenuItem;
         private System.Windows.Forms.NumericUpDown freq_estimation_high_cutoff_freq_numupdown;
         private System.Windows.Forms.CheckBox freq_estimation_reject_freq_checkbox;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label14;
     }
 }
 

@@ -121,6 +121,8 @@ namespace Damping_Data_Processor
         List<List<double>> peak_amplitudes_storage = new List<List<double>>();
         List<List<double>> freq_peaks_storage = new List<List<double>>();
         List<List<int>> local_maximas_indexs_storage = new List<List<int>>();
+        List<List<double>> local_maximas_time_values_storage = new List<List<double>>();
+        
 
         //colors for plotting
         List<Color> peak_point_colors = new List<Color>();
@@ -680,49 +682,51 @@ namespace Damping_Data_Processor
             }
         }
 
-        public List<double> average_remove_outliers(List<double> data)
+        public void average_remove_outliers(ref List<double> data_x, ref List<double> data_y)
         {
             //remove outliers that are higher than 90% of average and less than 10 % of averag
-            List<double> data_trimmed = new List<double>();
+            List<double> data_y_trimmed = new List<double>();
+            List<double> data_x_trimmed = new List<double>();
 
             double x = 0;
 
-            for (int i = 0; i < data.Count; i++)
+            for (int i = 0; i < data_y.Count; i++)
             {
-                x = x + Math.Pow(data[i] - data.Average(), 2);
+                x = x + Math.Pow(data_y[i] - data_y.Average(), 2);
             }
-            double std_deviation = Math.Sqrt(x / data.Count);
+            double std_deviation = Math.Sqrt(x / data_y.Count);
 
-            for (int i = 0; i < data.Count; i++)
+            for (int i = 0; i < data_y.Count; i++)
             {
-                if (data[i] < data.Average() + std_deviation * 3 && data[i] > data.Average() - std_deviation * 3)
+                if (data_y[i] < data_y.Average() + std_deviation * 3 && data_y[i] > data_y.Average() - std_deviation * 3)
                 {
                     if (freq_estimation_reject_freq_checkbox.Checked == true)
                     {
-                        if (data[i] <= Convert.ToDouble(freq_estimation_high_cutoff_freq_numupdown.Value) )
+                        if (data_y[i] <= Convert.ToDouble(freq_estimation_high_cutoff_freq_numupdown.Value) )
                         {
-                            data_trimmed.Add(data[i]);
+                            data_y_trimmed.Add(data_y[i]);
+                            data_x_trimmed.Add(data_x[i]);
                         }
                     }
                     else
                     {
-                        data_trimmed.Add(data[i]);
+                        data_y_trimmed.Add(data_y[i]);
+                        data_x_trimmed.Add(data_x[i]);
                     }
 
 
                 }
             }
-            if (data_trimmed.Count > 0)
+            if (data_y_trimmed.Count > 0)
             {
-                return data_trimmed;
-            
+                return;
             }
             else
             {
                 string message = "Could not reject all frequencies above "+ freq_estimation_high_cutoff_freq_numupdown.Value+ " Hz, as all data points were rejected. Rejection parameters ignored.";
                 string title = "Error";
                 FlexibleMessageBox.Show(message, title);
-                return data;
+                return;
             }
 
 
@@ -766,7 +770,7 @@ namespace Damping_Data_Processor
             return new[] { Math.Exp(p_hat[0]), p_hat[1] };
         }
 
-        public List<double> calculate_natural_frequency_peaks(List<int> peak_int_indexs, double sample_rate, string series_name)
+        public List<double> calculate_natural_frequency_peaks(List<double> time_values_peak, List<int> peak_int_indexs, double sample_rate, string series_name)
         {
             //get the freqs by using the integer indecies of the maximas and the sample rate
             List<double> frequency_peaks = new List<double>();
@@ -777,7 +781,7 @@ namespace Damping_Data_Processor
                 frequency_peaks.Add((1 / (samples_between_peaks / 1024)) / 2);
             }
 
-            frequency_peaks = average_remove_outliers(frequency_peaks);
+            average_remove_outliers( ref time_values_peak, ref frequency_peaks);
 
             if (frequency_peaks.Count == 0)
             {
@@ -786,7 +790,7 @@ namespace Damping_Data_Processor
 
 
             //remove last data point as signal is not usually trimmed perfectly
-            frequency_peaks.RemoveAt(frequency_peaks.Count - 1);
+            //frequency_peaks.RemoveAt(frequency_peaks.Count - 1);
 
             //abitrary list to display clauclated frequencies
             List<int> count_list = new List<int>();
@@ -796,10 +800,12 @@ namespace Damping_Data_Processor
             }
 
 
-            //remove last data point to match lengths for plotting (list not used anymnore)
-            peak_int_indexs.RemoveAt(peak_int_indexs.Count - 1);
 
-            plot_freq_peaks_response(frequency_peaks, series_name);
+
+            ////remove last data point to match lengths for plotting (list not used anymnore)
+            //peak_int_indexs.RemoveAt(peak_int_indexs.Count - 1);
+
+            plot_freq_peaks_response(time_values_peak, frequency_peaks, series_name);
 
             return frequency_peaks;
         }
@@ -1659,22 +1665,30 @@ namespace Damping_Data_Processor
 
         //manipulate chart functions
 
-        public void plot_freq_peaks_response(List<double> frequency_peaks, string series_name)
+        public void plot_freq_peaks_response(List<double> time_value, List<double> frequency_peaks, string series_name)
         {
+            if (time_value.Count> frequency_peaks.Count)
+            {
+                time_value.RemoveAt(time_value.Count - 1);
+            }
+
+
             System.Windows.Forms.DataVisualization.Charting.Series series = freq_peaks_chart.Series.Add(series_name + " Freq. Resp.");
             series.ChartType = SeriesChartType.Point;
             //series.Points.DataBindXY(time_peaks, frequency_peaks);
-            series.Points.DataBindY(frequency_peaks);
+            series.Points.DataBindXY(time_value, frequency_peaks);
             series.BorderWidth = 1;
             series.Color = signal_colors[data_direction_name.IndexOf(series_name)];
             series.ToolTip = "#SERIESNAME\nX: #VALX\nY: #VAL";
 
 
-            freq_peaks_chart.ChartAreas[0].AxisX.Title = "Freq. Calc. #";
+            freq_peaks_chart.ChartAreas[0].AxisX.Title = "Time Value of Peak (Seconds)";
             freq_peaks_chart.ChartAreas[0].AxisY.Title = "Frequency (Hz)";
 
             //rescale y axis
             freq_peaks_chart.ChartAreas[0].AxisY.IsStartedFromZero = false;
+
+            freq_peaks_chart.ChartAreas[0].AxisX.LabelStyle.Format = "0.00";
 
         }
 
@@ -1801,7 +1815,7 @@ namespace Damping_Data_Processor
             List<double> peak_amplitudes = new List<double>();
 
             //dont include last point it can be a bad data point
-            for (int i = 0; i < peak_indexs.Count - 1; i++)
+            for (int i = 0; i <= peak_indexs.Count - 1; i++)
             {
                 peak_times.Add(generic_input_data_double_clone[0][peak_indexs[i]]);
                 peak_amplitudes.Add(abs_data[peak_indexs[i]]);
@@ -2027,6 +2041,18 @@ namespace Damping_Data_Processor
         }
 
         //event control functions
+
+        public void display_results_message_box()
+        {
+            string dataset_result_summary_text_concatenated = concat_dataset_results_summary();
+            if (!String.IsNullOrEmpty(dataset_result_summary_text_concatenated))
+            {
+                string title = "Results Summary";
+                FlexibleMessageBox.Show(dataset_result_summary_text_concatenated, title);
+                //FlexibleMessageBox.
+            }
+        }
+
         private void x_data_chart_Click(object sender, MouseEventArgs e)
         {
             //clicked_x_pos_chart = x_data_chart.ChartAreas[0].AxisX.PixelPositionToValue(e.X);
@@ -2070,6 +2096,7 @@ namespace Damping_Data_Processor
                 freq_peaks_storage.Clear();
                 peak_amplitudes_storage.Clear();
                 local_maximas_indexs_storage.Clear();
+                local_maximas_time_values_storage.Clear();
             }
 
             remove_non_signal_series_plot();
@@ -2097,15 +2124,21 @@ namespace Damping_Data_Processor
             }
             results_summary_text = results_summary_text + "\r\n";
 
+            //create a list to store time values for plotting in the freq estimation window (peaks)
+            List<double> time_dataset = new List<double>();
+            //List<double> local_maximas_time_values = new List<double>();
+
             //get the data set to perfom analysis on (filter or unfiltered)
             List<List<double>> selected_data_sets = new List<List<double>>();
             if (is_data_filtered[select_data_set_tool_strip_combo_box.SelectedIndex] == true)
             {
                 selected_data_sets = new List<List<double>>(generic_input_data_double_clone_filtered);
+                time_dataset = selected_data_sets[0];
             }
             else
             {
                 selected_data_sets = new List<List<double>>(generic_input_data_double_clone);
+                time_dataset = selected_data_sets[0];
             }
             //remove the time list from data to be porocessed
             selected_data_sets.RemoveAt(0);
@@ -2119,6 +2152,8 @@ namespace Damping_Data_Processor
             natural_frequencies[3] = (natural_frequencies[0] + natural_frequencies[1]) / 2;
             natural_frequencies[4] = (natural_frequencies[0] + natural_frequencies[2]) / 2;
             natural_frequencies[5] = (natural_frequencies[1] + natural_frequencies[2]) / 2;
+
+
 
 
             //after the natural frequencies have been analyzed run loop to get results
@@ -2141,6 +2176,7 @@ namespace Damping_Data_Processor
                     List<int> local_maximas_indexs = new List<int>();
                     List<double> peak_amplitudes = new List<double>();
                     List<double> natural_frequncy_peaks = new List<double>();
+                    List<double> local_maximas_time_values = new List<double>();
 
                     //if the trimmed freq est. window has been trimmed then dont recalculate the peaks freqs
                     if (recalculate_damp_ratio_trimmed_freq_values == false)
@@ -2168,6 +2204,12 @@ namespace Damping_Data_Processor
                             local_maximas_indexs = (Accord.Audio.Tools.FindPeaks(selected_data_set_abs.ToArray())).ToList();
                         }
 
+                        local_maximas_time_values.Clear();
+                        for (int i =0; i< local_maximas_indexs.Count; i++)
+                        {
+                            local_maximas_time_values.Add(time_dataset[local_maximas_indexs[i]]);
+                        }
+
 
 
 
@@ -2182,13 +2224,14 @@ namespace Damping_Data_Processor
                         peak_amplitudes = plot_peaks_chart(local_maximas_indexs, selected_data_set_abs, data_direction_name[data_direction_index] + " Peaks", data_direction_index);
                         //peak_amplitudes.RemoveAt(peak_amplitudes.Count - 1);
                         //calaculate the freqs based upon the distance between the located local peaks (also removes outlier data)
-                        natural_frequncy_peaks = calculate_natural_frequency_peaks(local_maximas_indexs, input_data_sample_rate, data_direction_name[data_direction_index]);
+                        natural_frequncy_peaks = calculate_natural_frequency_peaks(local_maximas_time_values, local_maximas_indexs, input_data_sample_rate, data_direction_name[data_direction_index]);
 
                         Console.WriteLine($"Plot found peaks and their freqs Execution Time: {watch.ElapsedMilliseconds} ms");
 
                         freq_peaks_storage.Add(natural_frequncy_peaks);
                         local_maximas_indexs_storage.Add(local_maximas_indexs);
                         peak_amplitudes_storage.Add(peak_amplitudes);
+                        local_maximas_time_values_storage.Add(local_maximas_time_values);
 
                         //freq_peaks_storage.RemoveAt(freq_peaks_storage.Count - 1);
                         //local_maximas_indexs_storage.RemoveAt(local_maximas_indexs_storage.Count - 1);
@@ -2200,10 +2243,11 @@ namespace Damping_Data_Processor
                         natural_frequncy_peaks = new List<double>(freq_peaks_storage[data_direction_index]);
                         local_maximas_indexs = new List<int>(local_maximas_indexs_storage[data_direction_index]);
                         peak_amplitudes = new List<double>(peak_amplitudes_storage[data_direction_index]);
+                        local_maximas_time_values = new List<double>(local_maximas_time_values_storage[data_direction_index]);
 
                         plot_peaks_chart(local_maximas_indexs, selected_data_set_abs, data_direction_name[data_direction_index] + " Peaks", data_direction_index);
 
-                        plot_freq_peaks_response(natural_frequncy_peaks, data_direction_name[data_direction_index]);
+                        plot_freq_peaks_response(local_maximas_time_values, natural_frequncy_peaks, data_direction_name[data_direction_index]);
                         //calculate_natural_frequency_peaks(local_maximas_indexs, input_data_sample_rate, data_direction_name[data_direction_index]);
 
                         //natural_frequncy_peaks = new List<double>(freq_peaks_storage[data_direction_index]);
@@ -2334,7 +2378,7 @@ namespace Damping_Data_Processor
 
         public void remove_non_signal_series_plot()
         {
-            /////clear_all_global_variables the unused exp plots +peak_amplitudes_storage points
+            ///////clear_all_global_variables the unused exp plots +peak_amplitudes_storage points
             ////figure out how many signal data sets are plotted and then remove all other plotted data sets
             ////get the data set to perfom analysis on (filter or unfiltered)
             //int plotted_signal_count = 0;
@@ -2384,6 +2428,12 @@ namespace Damping_Data_Processor
         private void reset_data_trimming_button_Click(object sender, EventArgs e)
         {
             update_process_icons(true);
+
+            //clear all visible UI elements
+            summary_results_textbox.Clear();
+            freq_dft_chart.Series.Clear();
+            freq_peaks_chart.Series.Clear();
+
 
             //reset data so filtered data isnt filtered
             is_data_filtered[select_data_set_tool_strip_combo_box.SelectedIndex] = false;
@@ -2606,13 +2656,7 @@ namespace Damping_Data_Processor
 
         private void displayResultsSummaryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string dataset_result_summary_text_concatenated = concat_dataset_results_summary();
-            if (!String.IsNullOrEmpty(dataset_result_summary_text_concatenated))
-            {
-                string title = "Results Summary";
-                FlexibleMessageBox.Show(dataset_result_summary_text_concatenated, title);
-                //FlexibleMessageBox.
-            }
+            display_results_message_box();
         }
 
         private void exportResultsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2909,11 +2953,13 @@ namespace Damping_Data_Processor
             {
                 for (int j = freq_peaks_storage[i].Count - 1; j >= 0; j--)
                 {
-                    if (j > xmax || j < xmin)
+                    if (local_maximas_time_values_storage[i][j] > xmax || local_maximas_time_values_storage[i][j] < xmin)
                     {
                         local_maximas_indexs_storage[i].RemoveAt(j);
                         freq_peaks_storage[i].RemoveAt(j);
                         peak_amplitudes_storage[i].RemoveAt(j);
+                        local_maximas_time_values_storage[i].RemoveAt(j);
+
                         continue;
                     }
                     if (freq_peaks_storage[i][j] > ymax || freq_peaks_storage[i][j] < ymin)
@@ -2921,9 +2967,9 @@ namespace Damping_Data_Processor
                         local_maximas_indexs_storage[i].RemoveAt(j);
                         freq_peaks_storage[i].RemoveAt(j);
                         peak_amplitudes_storage[i].RemoveAt(j);
+                        local_maximas_time_values_storage[i].RemoveAt(j);
                         continue;
                     }
-
                 }
             }
 
@@ -2996,6 +3042,11 @@ namespace Damping_Data_Processor
         private void freq_peaks_chart_AnnotationPositionChanged(object sender, EventArgs e)
         {
             check_if_annotations_in_chartview(freq_peaks_chart);
+        }
+
+        private void summary_results_textbox_DoubleClick(object sender, EventArgs e)
+        {
+            display_results_message_box();
         }
     }
 
