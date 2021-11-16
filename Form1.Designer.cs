@@ -110,19 +110,22 @@ namespace Damping_Data_Processor
             // 
             // signal_data_chart_main
             // 
+            this.signal_data_chart_main.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             chartArea1.Name = "ChartArea1";
             this.signal_data_chart_main.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
             this.signal_data_chart_main.Legends.Add(legend1);
-            this.signal_data_chart_main.Location = new System.Drawing.Point(369, 32);
+            this.signal_data_chart_main.Location = new System.Drawing.Point(367, 31);
             this.signal_data_chart_main.Name = "signal_data_chart_main";
             series1.ChartArea = "ChartArea1";
             series1.Legend = "Legend1";
             series1.Name = "Series1";
             this.signal_data_chart_main.Series.Add(series1);
-            this.signal_data_chart_main.Size = new System.Drawing.Size(1382, 550);
+            this.signal_data_chart_main.Size = new System.Drawing.Size(1384, 550);
             this.signal_data_chart_main.TabIndex = 0;
             this.signal_data_chart_main.Text = "chart1";
+            this.signal_data_chart_main.AnnotationPositionChanged += new System.EventHandler(this.signal_data_chart_main_AnnotationPositionChanged);
             this.signal_data_chart_main.Click += new System.EventHandler(this.data_chart_Click);
             this.signal_data_chart_main.MouseClick += new System.Windows.Forms.MouseEventHandler(this.x_data_chart_Click);
             // 
@@ -260,6 +263,8 @@ namespace Damping_Data_Processor
             // 
             // freq_dft_chart
             // 
+            this.freq_dft_chart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             chartArea2.Name = "ChartArea1";
             this.freq_dft_chart.ChartAreas.Add(chartArea2);
             legend2.Name = "Legend1";
@@ -278,6 +283,8 @@ namespace Damping_Data_Processor
             // 
             // summary_results_textbox
             // 
+            this.summary_results_textbox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.summary_results_textbox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.summary_results_textbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.summary_results_textbox.Location = new System.Drawing.Point(0, 390);
@@ -290,9 +297,9 @@ namespace Damping_Data_Processor
             // 
             // upper_freq_plot_cutoff_numupdown
             // 
-            this.upper_freq_plot_cutoff_numupdown.DecimalPlaces = 1;
+            this.upper_freq_plot_cutoff_numupdown.DecimalPlaces = 3;
             this.upper_freq_plot_cutoff_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.upper_freq_plot_cutoff_numupdown.Location = new System.Drawing.Point(1035, 586);
+            this.upper_freq_plot_cutoff_numupdown.Location = new System.Drawing.Point(1012, 586);
             this.upper_freq_plot_cutoff_numupdown.Maximum = new decimal(new int[] {
             99999999,
             0,
@@ -304,7 +311,7 @@ namespace Damping_Data_Processor
             0,
             0});
             this.upper_freq_plot_cutoff_numupdown.Name = "upper_freq_plot_cutoff_numupdown";
-            this.upper_freq_plot_cutoff_numupdown.Size = new System.Drawing.Size(55, 21);
+            this.upper_freq_plot_cutoff_numupdown.Size = new System.Drawing.Size(78, 21);
             this.upper_freq_plot_cutoff_numupdown.TabIndex = 33;
             this.upper_freq_plot_cutoff_numupdown.Value = new decimal(new int[] {
             7,
@@ -316,7 +323,7 @@ namespace Damping_Data_Processor
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(830, 590);
+            this.label6.Location = new System.Drawing.Point(773, 590);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(147, 13);
             this.label6.TabIndex = 35;
@@ -345,6 +352,7 @@ namespace Damping_Data_Processor
             // 
             // label9
             // 
+            this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(9, 850);
             this.label9.Name = "label9";
@@ -355,6 +363,9 @@ namespace Damping_Data_Processor
             // 
             // freq_peaks_chart
             // 
+            this.freq_peaks_chart.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             chartArea3.Name = "ChartArea1";
             this.freq_peaks_chart.ChartAreas.Add(chartArea3);
             legend3.Name = "Legend1";
@@ -368,6 +379,7 @@ namespace Damping_Data_Processor
             this.freq_peaks_chart.Size = new System.Drawing.Size(656, 243);
             this.freq_peaks_chart.TabIndex = 44;
             this.freq_peaks_chart.Text = "chart1";
+            this.freq_peaks_chart.AnnotationPositionChanged += new System.EventHandler(this.freq_peaks_chart_AnnotationPositionChanged);
             this.freq_peaks_chart.Click += new System.EventHandler(this.freq_peaks_chart_Click);
             // 
             // label10
@@ -512,6 +524,8 @@ namespace Damping_Data_Processor
             // 
             // recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem
             // 
+            this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Checked = true;
+            this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Name = "recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem";
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Text = "Recalculate Vector sum data after applying filter?";
@@ -578,6 +592,7 @@ namespace Damping_Data_Processor
             // 
             // activity_log_textbox
             // 
+            this.activity_log_textbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.activity_log_textbox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.activity_log_textbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.activity_log_textbox.Location = new System.Drawing.Point(0, 695);
@@ -585,11 +600,12 @@ namespace Damping_Data_Processor
             this.activity_log_textbox.Name = "activity_log_textbox";
             this.activity_log_textbox.ReadOnly = true;
             this.activity_log_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.activity_log_textbox.Size = new System.Drawing.Size(361, 103);
+            this.activity_log_textbox.Size = new System.Drawing.Size(361, 145);
             this.activity_log_textbox.TabIndex = 52;
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(143, 675);
@@ -600,16 +616,16 @@ namespace Damping_Data_Processor
             // 
             // lower_freq_plot_cutoff_numupdown
             // 
-            this.lower_freq_plot_cutoff_numupdown.DecimalPlaces = 1;
+            this.lower_freq_plot_cutoff_numupdown.DecimalPlaces = 3;
             this.lower_freq_plot_cutoff_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lower_freq_plot_cutoff_numupdown.Location = new System.Drawing.Point(978, 586);
+            this.lower_freq_plot_cutoff_numupdown.Location = new System.Drawing.Point(926, 586);
             this.lower_freq_plot_cutoff_numupdown.Maximum = new decimal(new int[] {
             99999999,
             0,
             0,
             0});
             this.lower_freq_plot_cutoff_numupdown.Name = "lower_freq_plot_cutoff_numupdown";
-            this.lower_freq_plot_cutoff_numupdown.Size = new System.Drawing.Size(55, 21);
+            this.lower_freq_plot_cutoff_numupdown.Size = new System.Drawing.Size(80, 21);
             this.lower_freq_plot_cutoff_numupdown.TabIndex = 54;
             this.lower_freq_plot_cutoff_numupdown.ValueChanged += new System.EventHandler(this.lower_freq_plot_cutoff_numupdown_ValueChanged);
             // 
@@ -627,6 +643,7 @@ namespace Damping_Data_Processor
             // 
             // freq_estimation_reject_freq_checkbox
             // 
+            this.freq_estimation_reject_freq_checkbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.freq_estimation_reject_freq_checkbox.AutoSize = true;
             this.freq_estimation_reject_freq_checkbox.Checked = true;
             this.freq_estimation_reject_freq_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -667,6 +684,7 @@ namespace Damping_Data_Processor
             // 
             // recalc_damp_ratio_freq_peak_button
             // 
+            this.recalc_damp_ratio_freq_peak_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.recalc_damp_ratio_freq_peak_button.Location = new System.Drawing.Point(1409, 587);
             this.recalc_damp_ratio_freq_peak_button.Name = "recalc_damp_ratio_freq_peak_button";
             this.recalc_damp_ratio_freq_peak_button.Size = new System.Drawing.Size(238, 20);
@@ -704,6 +722,7 @@ namespace Damping_Data_Processor
             // 
             // reset_trim_lines_button
             // 
+            this.reset_trim_lines_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.reset_trim_lines_button.Location = new System.Drawing.Point(1653, 586);
             this.reset_trim_lines_button.Name = "reset_trim_lines_button";
             this.reset_trim_lines_button.Size = new System.Drawing.Size(104, 20);
@@ -714,6 +733,7 @@ namespace Damping_Data_Processor
             // 
             // freq_estimation_high_cutoff_freq_numupdown
             // 
+            this.freq_estimation_high_cutoff_freq_numupdown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.freq_estimation_high_cutoff_freq_numupdown.DecimalPlaces = 1;
             this.freq_estimation_high_cutoff_freq_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.freq_estimation_high_cutoff_freq_numupdown.Increment = new decimal(new int[] {
@@ -782,10 +802,10 @@ namespace Damping_Data_Processor
             this.Controls.Add(this.trim_data_button);
             this.Controls.Add(this.signal_data_chart_main);
             this.Controls.Add(this.menu_strip);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menu_strip;
-            this.MaximizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(1779, 914);
             this.Name = "form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Structural Damping Reduction Processor";

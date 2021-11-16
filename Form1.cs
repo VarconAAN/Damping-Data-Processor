@@ -1255,6 +1255,41 @@ namespace Damping_Data_Processor
 
         //program control functions
 
+        public void check_if_annotations_in_chartview (Chart chart_to_be_checked)
+        {
+            //get chart boundries
+            double xmin = chart_to_be_checked.ChartAreas[0].AxisX.Minimum;
+            double xmax = chart_to_be_checked.ChartAreas[0].AxisX.Maximum;
+            double ymin = chart_to_be_checked.ChartAreas[0].AxisY.Minimum;
+            double ymax = chart_to_be_checked.ChartAreas[0].AxisY.Maximum;
+
+            for (int i=0; i<= chart_to_be_checked.Annotations.Count-1; i++)
+            {
+                if(chart_to_be_checked.Annotations[i].AnnotationType == "VerticalLine")
+                {
+                    if(chart_to_be_checked.Annotations[i].X < xmin)
+                    {
+                        chart_to_be_checked.Annotations[i].X = xmin;
+                    }
+                    if (chart_to_be_checked.Annotations[i].X > xmax)
+                    {
+                        chart_to_be_checked.Annotations[i].X = xmax;
+                    }
+                }
+                if (chart_to_be_checked.Annotations[i].AnnotationType == "HorizontalLine")
+                {
+                    if (chart_to_be_checked.Annotations[i].Y <ymin)
+                    {
+                        chart_to_be_checked.Annotations[i].Y = ymin;
+                    }
+                    if (chart_to_be_checked.Annotations[i].Y > ymax)
+                    {
+                        chart_to_be_checked.Annotations[i].Y = ymax;
+                    }
+                }
+            }
+        }
+
         public void check_checked_chart_series()
         {
             for (int i = 0; i < select_data_direction_check_list_box.Items.Count; i++)
@@ -2951,6 +2986,16 @@ namespace Damping_Data_Processor
         private void select_data_set_tool_strip_combo_box_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void signal_data_chart_main_AnnotationPositionChanged(object sender, EventArgs e)
+        {
+            check_if_annotations_in_chartview(signal_data_chart_main);
+        }
+
+        private void freq_peaks_chart_AnnotationPositionChanged(object sender, EventArgs e)
+        {
+            check_if_annotations_in_chartview(freq_peaks_chart);
         }
     }
 
