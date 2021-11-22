@@ -751,14 +751,14 @@ namespace Damping_Data_Processor
             // freq_estimation_high_cutoff_freq_numupdown
             // 
             this.freq_estimation_high_cutoff_freq_numupdown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.freq_estimation_high_cutoff_freq_numupdown.DecimalPlaces = 1;
+            this.freq_estimation_high_cutoff_freq_numupdown.DecimalPlaces = 3;
             this.freq_estimation_high_cutoff_freq_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.freq_estimation_high_cutoff_freq_numupdown.Increment = new decimal(new int[] {
             2,
             0,
             0,
             0});
-            this.freq_estimation_high_cutoff_freq_numupdown.Location = new System.Drawing.Point(1386, 550);
+            this.freq_estimation_high_cutoff_freq_numupdown.Location = new System.Drawing.Point(1376, 550);
             this.freq_estimation_high_cutoff_freq_numupdown.Maximum = new decimal(new int[] {
             99999999,
             0,
@@ -768,9 +768,9 @@ namespace Damping_Data_Processor
             1,
             0,
             0,
-            0});
+            196608});
             this.freq_estimation_high_cutoff_freq_numupdown.Name = "freq_estimation_high_cutoff_freq_numupdown";
-            this.freq_estimation_high_cutoff_freq_numupdown.Size = new System.Drawing.Size(55, 21);
+            this.freq_estimation_high_cutoff_freq_numupdown.Size = new System.Drawing.Size(65, 21);
             this.freq_estimation_high_cutoff_freq_numupdown.TabIndex = 63;
             this.freq_estimation_high_cutoff_freq_numupdown.Value = new decimal(new int[] {
             10,
@@ -852,6 +852,7 @@ namespace Damping_Data_Processor
             this.Name = "form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Structural Damping Reduction Processor";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.signal_data_chart_main)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).EndInit();

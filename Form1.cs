@@ -717,6 +717,11 @@ namespace Damping_Data_Processor
 
                 }
             }
+
+            data_x = data_x_trimmed;
+            data_y = data_y_trimmed;
+
+
             if (data_y_trimmed.Count > 0)
             {
                 return;
@@ -770,7 +775,7 @@ namespace Damping_Data_Processor
             return new[] { Math.Exp(p_hat[0]), p_hat[1] };
         }
 
-        public List<double> calculate_natural_frequency_peaks(List<double> time_values_peak, List<int> peak_int_indexs, double sample_rate, string series_name)
+        public List<double> calculate_natural_frequency_peaks(ref List<double> time_values_peak, List<int> peak_int_indexs, double sample_rate, string series_name)
         {
             //get the freqs by using the integer indecies of the maximas and the sample rate
             List<double> frequency_peaks = new List<double>();
@@ -1300,6 +1305,11 @@ namespace Damping_Data_Processor
         {
             for (int i = 0; i < select_data_direction_check_list_box.Items.Count; i++)
             {
+                //calculate indexes for N_peaks and N_EXP Fit (N = data direction)
+                int i_peaks_index = i + (2 * i);
+                int i_exp_fit_index = i_peaks_index - 1;
+
+                //check each data direction if it checked
                 if (select_data_direction_check_list_box.GetItemCheckState(i) == CheckState.Checked)
                 {
                     //try catch added because user could click on control before and chart data was loaded casuing error
@@ -1307,6 +1317,14 @@ namespace Damping_Data_Processor
                     {
                         signal_data_chart_main.Series[i].Enabled = true;
                         data_direction_checkmark_tracker[select_data_set_tool_strip_combo_box.SelectedIndex][i] = true;
+
+                        freq_dft_chart.Series[i].Enabled = true;
+                        freq_peaks_chart.Series[i].Enabled = true;
+
+                        //enable the peaks/exp fit curves
+                        signal_data_chart_main.Series[i_peaks_index].Enabled = true;
+                        signal_data_chart_main.Series[i_exp_fit_index].Enabled = true;
+
                     }
                     catch { }
                 }
@@ -1316,6 +1334,13 @@ namespace Damping_Data_Processor
                     {
                         signal_data_chart_main.Series[i].Enabled = false;
                         data_direction_checkmark_tracker[select_data_set_tool_strip_combo_box.SelectedIndex][i] = false;
+
+                        freq_dft_chart.Series[i].Enabled = false;
+                        freq_peaks_chart.Series[i].Enabled = false;
+
+                        //enable the peaks/exp fit curves
+                        signal_data_chart_main.Series[i_peaks_index].Enabled = false;
+                        signal_data_chart_main.Series[i_exp_fit_index].Enabled = false;
                     }
                     catch { }
                 }
@@ -1667,11 +1692,18 @@ namespace Damping_Data_Processor
 
         public void plot_freq_peaks_response(List<double> time_value, List<double> frequency_peaks, string series_name)
         {
-            if (time_value.Count> frequency_peaks.Count)
+            if (time_value.Count > frequency_peaks.Count)
             {
                 time_value.RemoveAt(time_value.Count - 1);
             }
 
+            if (time_value.Count() != frequency_peaks.Count())
+            {
+                string message = "freq peeaks plot data is not same length";
+                string title = "Error";
+                FlexibleMessageBox.Show(message, title);
+                return;
+            }
 
             System.Windows.Forms.DataVisualization.Charting.Series series = freq_peaks_chart.Series.Add(series_name + " Freq. Resp.");
             series.ChartType = SeriesChartType.Point;
@@ -2224,7 +2256,7 @@ namespace Damping_Data_Processor
                         peak_amplitudes = plot_peaks_chart(local_maximas_indexs, selected_data_set_abs, data_direction_name[data_direction_index] + " Peaks", data_direction_index);
                         //peak_amplitudes.RemoveAt(peak_amplitudes.Count - 1);
                         //calaculate the freqs based upon the distance between the located local peaks (also removes outlier data)
-                        natural_frequncy_peaks = calculate_natural_frequency_peaks(local_maximas_time_values, local_maximas_indexs, input_data_sample_rate, data_direction_name[data_direction_index]);
+                        natural_frequncy_peaks = calculate_natural_frequency_peaks(ref local_maximas_time_values, local_maximas_indexs, input_data_sample_rate, data_direction_name[data_direction_index]);
 
                         Console.WriteLine($"Plot found peaks and their freqs Execution Time: {watch.ElapsedMilliseconds} ms");
 
@@ -2263,6 +2295,13 @@ namespace Damping_Data_Processor
 
                     }
 
+                    if (natural_frequncy_peaks.Count == 0)
+                    {
+                        string message = "There was an error with the quality of the frequency estimation data "+data_direction_name[data_direction_index] +"(distance between peaks).";
+                        string title = "Error";
+                        FlexibleMessageBox.Show(message, title);
+                        return;
+                    }
 
                     //average all calculated freqs
                     double average_natural_frequency_peaks = natural_frequncy_peaks.Average();
