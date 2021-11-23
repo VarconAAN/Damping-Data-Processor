@@ -122,12 +122,15 @@ namespace Damping_Data_Processor
         List<List<double>> freq_peaks_storage = new List<List<double>>();
         List<List<int>> local_maximas_indexs_storage = new List<List<int>>();
         List<List<double>> local_maximas_time_values_storage = new List<List<double>>();
-        
+
 
         //colors for plotting
         List<Color> peak_point_colors = new List<Color>();
         List<Color> exp_curve_colors = new List<Color>();
         List<Color> signal_colors = new List<Color>();
+
+        ////list to dtetrmine which series are enebaled/disaabled when data directiosn are selected/unslected
+        //List<List<string>> data_direction_series_tracker = new List<List<string>>();
 
 
 
@@ -144,9 +147,9 @@ namespace Damping_Data_Processor
             acceleration_dataset_csv_header.Add("X " + y_axis_label_data_chart);
             acceleration_dataset_csv_header.Add("Y " + y_axis_label_data_chart);
             acceleration_dataset_csv_header.Add("Z " + y_axis_label_data_chart);
-            acceleration_dataset_csv_header.Add("XY VS" + y_axis_label_data_chart);
-            acceleration_dataset_csv_header.Add("XZ VS" + y_axis_label_data_chart);
-            acceleration_dataset_csv_header.Add("YZ VS" + y_axis_label_data_chart);
+            acceleration_dataset_csv_header.Add("XY_VS" + y_axis_label_data_chart);
+            acceleration_dataset_csv_header.Add("XZ_VS" + y_axis_label_data_chart);
+            acceleration_dataset_csv_header.Add("YZ_VS" + y_axis_label_data_chart);
 
             peak_picking_method_combobox.Items.Add("1. Fast Peak Picker (works best on filtered data)");
             peak_picking_method_combobox.Items.Add("2. Classic Peak Picker (Slow)");
@@ -182,6 +185,7 @@ namespace Damping_Data_Processor
             signal_colors.Add(Color.DarkCyan);
             signal_colors.Add(Color.Violet);
             signal_colors.Add(Color.SaddleBrown);
+
 
 
             enable_all_user_controls(false);
@@ -436,18 +440,29 @@ namespace Damping_Data_Processor
                 //create the folder
                 Directory.CreateDirectory(save_results_folder);
 
+                string save_results_folder_subfolder = save_results_folder + "/" + dataset_name + "/";
+                Directory.CreateDirectory(save_results_folder_subfolder);
+
                 if (export_master == true)
                 {
-                    process_save_dataset_as_csv(generic_input_data_double_master_catalog[catalog_index], save_results_folder + dataset_name + " Acc. Data[Unedited].csv");
+                    process_save_dataset_as_csv(generic_input_data_double_master_catalog[catalog_index], save_results_folder_subfolder + dataset_name + " Acc. Data[Unedited].csv");
                 }
                 if (export_clone == true)
                 {
-                    process_save_dataset_as_csv(generic_input_data_double_clone_catalog[catalog_index], save_results_folder + dataset_name_trimmed + " Acc.Data[Trim].csv");
+                    process_save_dataset_as_csv(generic_input_data_double_clone_catalog[catalog_index], save_results_folder_subfolder + dataset_name_trimmed + " Acc.Data[Trim].csv");
                 }
                 if (export_filter == true)
                 {
-                    process_save_dataset_as_csv(generic_input_data_double_clone_filtered_catalog[catalog_index], save_results_folder + dataset_name_trimmed_filtered + " Acc. Data[Filt Trim].csv");
+                    process_save_dataset_as_csv(generic_input_data_double_clone_filtered_catalog[catalog_index], save_results_folder_subfolder + dataset_name_trimmed_filtered + " Acc. Data[Filt Trim].csv");
                 }
+
+                //save plots
+                //string plots_sufolder_filepath = save_results_folder + @"\Plots " + dataset_name + @"\";
+                //Directory.CreateDirectory(plots_sufolder_filepath);
+
+                signal_data_chart_main.SaveImage(save_results_folder_subfolder + "Signal Data Plot " + dataset_name + ".png", ChartImageFormat.Png);
+                freq_dft_chart.SaveImage(save_results_folder_subfolder + "DFT Plot " + dataset_name + ".png", ChartImageFormat.Png);
+                freq_peaks_chart.SaveImage(save_results_folder_subfolder + "Frequency Estimation Plot " + dataset_name + ".png", ChartImageFormat.Png);
 
                 //play sound to allert user
                 System.Media.SystemSounds.Beep.Play();
@@ -664,9 +679,9 @@ namespace Damping_Data_Processor
             data_direction_name.Add("X");
             data_direction_name.Add("Y");
             data_direction_name.Add("Z");
-            data_direction_name.Add("XY VS");
-            data_direction_name.Add("XZ VS");
-            data_direction_name.Add("YZ VS");
+            data_direction_name.Add("XY_VS");
+            data_direction_name.Add("XZ_VS");
+            data_direction_name.Add("YZ_VS");
 
             //check which items are previuously checked and check them
             for (int i = 0; i < data_direction_name.Count; i++)
@@ -702,7 +717,7 @@ namespace Damping_Data_Processor
                 {
                     if (freq_estimation_reject_freq_checkbox.Checked == true)
                     {
-                        if (data_y[i] <= Convert.ToDouble(freq_estimation_high_cutoff_freq_numupdown.Value) )
+                        if (data_y[i] <= Convert.ToDouble(freq_estimation_high_cutoff_freq_numupdown.Value))
                         {
                             data_y_trimmed.Add(data_y[i]);
                             data_x_trimmed.Add(data_x[i]);
@@ -728,7 +743,7 @@ namespace Damping_Data_Processor
             }
             else
             {
-                string message = "Could not reject all frequencies above "+ freq_estimation_high_cutoff_freq_numupdown.Value+ " Hz, as all data points were rejected. Rejection parameters ignored.";
+                string message = "Could not reject all frequencies above " + freq_estimation_high_cutoff_freq_numupdown.Value + " Hz, as all data points were rejected. Rejection parameters ignored.";
                 string title = "Error";
                 FlexibleMessageBox.Show(message, title);
                 return;
@@ -786,7 +801,7 @@ namespace Damping_Data_Processor
                 frequency_peaks.Add((1 / (samples_between_peaks / 1024)) / 2);
             }
 
-            average_remove_outliers( ref time_values_peak, ref frequency_peaks);
+            average_remove_outliers(ref time_values_peak, ref frequency_peaks);
 
             if (frequency_peaks.Count == 0)
             {
@@ -1266,7 +1281,7 @@ namespace Damping_Data_Processor
 
         //program control functions
 
-        public void check_if_annotations_in_chartview (Chart chart_to_be_checked)
+        public void check_if_annotations_in_chartview(Chart chart_to_be_checked)
         {
             //get chart boundries
             double xmin = chart_to_be_checked.ChartAreas[0].AxisX.Minimum;
@@ -1274,11 +1289,11 @@ namespace Damping_Data_Processor
             double ymin = chart_to_be_checked.ChartAreas[0].AxisY.Minimum;
             double ymax = chart_to_be_checked.ChartAreas[0].AxisY.Maximum;
 
-            for (int i=0; i<= chart_to_be_checked.Annotations.Count-1; i++)
+            for (int i = 0; i <= chart_to_be_checked.Annotations.Count - 1; i++)
             {
-                if(chart_to_be_checked.Annotations[i].AnnotationType == "VerticalLine")
+                if (chart_to_be_checked.Annotations[i].AnnotationType == "VerticalLine")
                 {
-                    if(chart_to_be_checked.Annotations[i].X < xmin)
+                    if (chart_to_be_checked.Annotations[i].X < xmin)
                     {
                         chart_to_be_checked.Annotations[i].X = xmin;
                     }
@@ -1289,7 +1304,7 @@ namespace Damping_Data_Processor
                 }
                 if (chart_to_be_checked.Annotations[i].AnnotationType == "HorizontalLine")
                 {
-                    if (chart_to_be_checked.Annotations[i].Y <ymin)
+                    if (chart_to_be_checked.Annotations[i].Y < ymin)
                     {
                         chart_to_be_checked.Annotations[i].Y = ymin;
                     }
@@ -1305,44 +1320,125 @@ namespace Damping_Data_Processor
         {
             for (int i = 0; i < select_data_direction_check_list_box.Items.Count; i++)
             {
-                //calculate indexes for N_peaks and N_EXP Fit (N = data direction)
-                int i_peaks_index = i + (2 * i);
-                int i_exp_fit_index = i_peaks_index - 1;
-
                 //check each data direction if it checked
                 if (select_data_direction_check_list_box.GetItemCheckState(i) == CheckState.Checked)
                 {
-                    //try catch added because user could click on control before and chart data was loaded casuing error
-                    try
-                    {
-                        signal_data_chart_main.Series[i].Enabled = true;
-                        data_direction_checkmark_tracker[select_data_set_tool_strip_combo_box.SelectedIndex][i] = true;
+                    check_charted_series_subfunction(true, i);
+                    ////try catch added because user could click on control before and chart data was loaded casuing error
+                    ////try
+                    ////{
+                    //signal_data_chart_main.Series[i].Enabled = true;
+                    //data_direction_checkmark_tracker[select_data_set_tool_strip_combo_box.SelectedIndex][i] = true;
 
-                        freq_dft_chart.Series[i].Enabled = true;
-                        freq_peaks_chart.Series[i].Enabled = true;
+                    //if (freq_dft_chart.Series.Count < 0)
+                    //{
+                    //    freq_dft_chart.Series[i].Enabled = true;
+                    //}
 
-                        //enable the peaks/exp fit curves
-                        signal_data_chart_main.Series[i_peaks_index].Enabled = true;
-                        signal_data_chart_main.Series[i_exp_fit_index].Enabled = true;
+                    //if (freq_peaks_chart.Series.Count < 0)
+                    //{
+                    //    freq_peaks_chart.Series[i].Enabled = true;
+                    //}
 
-                    }
-                    catch { }
+                    //for (int j = 0; j < signal_data_chart_main.Series.Count; j++)
+                    //{
+                    //    string checked_direction = select_data_direction_check_list_box.Items[i].ToString();
+                    //    string current_series_name = signal_data_chart_main.Series[j].Name;
+
+                    //    int trim_index = (current_series_name.IndexOf(" "));
+
+                    //    if (trim_index != -1)
+                    //    {
+                    //        //isolate direction name
+                    //        current_series_name = current_series_name.Substring(0, trim_index);
+
+                    //        if (checked_direction == current_series_name)
+                    //        {
+                    //            signal_data_chart_main.Series[j].Enabled = true;
+                    //        }
+                    //    }
+                    //}
+
+                    //////enable the peaks/exp fit curves
+                    ////signal_data_chart_main.Series[].Enabled = true;
+                    ////signal_data_chart_main.Series[].Enabled = true;
+
+                    ////}
+                    ////catch { }
                 }
                 else
                 {
-                    try
+                    check_charted_series_subfunction(false, i);
+                    ////try
+                    ////{
+                    //signal_data_chart_main.Series[i].Enabled = false;
+                    //data_direction_checkmark_tracker[select_data_set_tool_strip_combo_box.SelectedIndex][i] = false;
+
+                    //if (i < freq_dft_chart.Series.Count )
+                    //{
+                    //    freq_dft_chart.Series[i].Enabled = false;
+                    //}
+
+                    //if (i < freq_peaks_chart.Series.Count )
+                    //{
+                    //    freq_peaks_chart.Series[i].Enabled = false;
+                    //}
+
+
+                    //for (int j = 0; j < signal_data_chart_main.Series.Count; j++)
+                    //{
+                    //    string checked_direction = select_data_direction_check_list_box.Items[i].ToString();
+                    //    string current_series_name = signal_data_chart_main.Series[j].Name;
+
+                    //    int trim_index = (current_series_name.IndexOf(" "));
+                    //    if (trim_index != -1)
+                    //    {
+                    //        //isolate direction name
+                    //        current_series_name = current_series_name.Substring(0, trim_index);
+
+                    //        if (checked_direction == current_series_name)
+                    //        {
+                    //            signal_data_chart_main.Series[j].Enabled = false;
+                    //        }
+                    //    }
+                    //}
+                    ////}
+                    ////catch { }
+                }
+            }
+        }
+
+        public void check_charted_series_subfunction(Boolean enable, int i)
+        {
+            signal_data_chart_main.Series[i].Enabled = enable;
+            data_direction_checkmark_tracker[select_data_set_tool_strip_combo_box.SelectedIndex][i] = enable;
+
+            if (i < freq_dft_chart.Series.Count)
+            {
+                freq_dft_chart.Series[i].Enabled = enable;
+            }
+
+            if (i < freq_peaks_chart.Series.Count)
+            {
+                freq_peaks_chart.Series[i].Enabled = enable;
+            }
+
+            for (int j = 0; j < signal_data_chart_main.Series.Count; j++)
+            {
+                string checked_direction = select_data_direction_check_list_box.Items[i].ToString();
+                string current_series_name = signal_data_chart_main.Series[j].Name;
+
+                int trim_index = (current_series_name.IndexOf(" "));
+
+                if (trim_index != -1)
+                {
+                    //isolate direction name
+                    current_series_name = current_series_name.Substring(0, trim_index);
+
+                    if (checked_direction == current_series_name)
                     {
-                        signal_data_chart_main.Series[i].Enabled = false;
-                        data_direction_checkmark_tracker[select_data_set_tool_strip_combo_box.SelectedIndex][i] = false;
-
-                        freq_dft_chart.Series[i].Enabled = false;
-                        freq_peaks_chart.Series[i].Enabled = false;
-
-                        //enable the peaks/exp fit curves
-                        signal_data_chart_main.Series[i_peaks_index].Enabled = false;
-                        signal_data_chart_main.Series[i_exp_fit_index].Enabled = false;
+                        signal_data_chart_main.Series[j].Enabled = enable;
                     }
-                    catch { }
                 }
             }
         }
@@ -1690,6 +1786,76 @@ namespace Damping_Data_Processor
 
         //manipulate chart functions
 
+        public void update_tooltip_average_freqs_est()
+        {
+            //get index/values of annotation trim lines and do some boundry checking
+
+            int xmax = 0;
+            int xmin = 0;
+            double ymax = 0;
+            double ymin = 0;
+
+            if (freq_peaks_trim_vertical_line_1.X > freq_peaks_trim_vertical_line_2.X)
+            {
+                xmax = Convert.ToInt32(Math.Floor(freq_peaks_trim_vertical_line_1.X));
+                xmin = Convert.ToInt32(Math.Ceiling(freq_peaks_trim_vertical_line_2.X));
+            }
+            else
+            {
+                xmax = Convert.ToInt32(Math.Floor(freq_peaks_trim_vertical_line_2.X));
+                xmin = Convert.ToInt32(Math.Ceiling(freq_peaks_trim_vertical_line_1.X));
+            }
+
+
+            if (freq_peaks_trim_horizontal_line_1.Y > freq_peaks_trim_horizontal_line_2.Y)
+            {
+                ymax = freq_peaks_trim_horizontal_line_1.Y;
+                ymin = freq_peaks_trim_horizontal_line_2.Y;
+            }
+            else
+            {
+                ymax = freq_peaks_trim_horizontal_line_2.Y;
+                ymin = freq_peaks_trim_horizontal_line_1.Y;
+            }
+
+
+
+
+
+
+
+
+            string tooltip_text = String.Empty;
+
+            for (int i = 0; i < freq_peaks_chart.Series.Count(); i++)
+            {
+                List<double> temp_average_Y = new List<double>();
+                List<double> temp_average_X = new List<double>();
+
+                for (int j = 0; j < freq_peaks_chart.Series[i].Points.Count(); j++)
+                {
+                    temp_average_Y.Add(freq_peaks_chart.Series[i].Points[j].YValues[0]);
+                    temp_average_X.Add(freq_peaks_chart.Series[i].Points[j].XValue);
+                }
+
+                for (int k = temp_average_Y.Count - 1; k >= 0; k--)
+                {
+                    if (temp_average_X[k] > xmax || temp_average_X[k] < xmin)
+                    {
+                        temp_average_Y.RemoveAt(k);
+                        continue;
+                    }
+                    if (temp_average_Y[k] > ymax || temp_average_Y[k] < ymin)
+                    {
+                        temp_average_Y.RemoveAt(k);
+                        continue;
+                    }
+                }
+                tooltip_text += freq_peaks_chart.Series[i].Name + " (Avg): " + Math.Round(temp_average_Y.Average(), 4) + "Hz\r\n";
+            }
+            toolTip1.SetToolTip(freq_peaks_chart, tooltip_text);
+        }
+
         public void plot_freq_peaks_response(List<double> time_value, List<double> frequency_peaks, string series_name)
         {
             if (time_value.Count > frequency_peaks.Count)
@@ -1721,6 +1887,9 @@ namespace Damping_Data_Processor
             freq_peaks_chart.ChartAreas[0].AxisY.IsStartedFromZero = false;
 
             freq_peaks_chart.ChartAreas[0].AxisX.LabelStyle.Format = "0.00";
+
+
+
 
         }
 
@@ -1778,7 +1947,7 @@ namespace Damping_Data_Processor
                 List<string> data_direction_name_filter = new List<string>();
                 foreach (string name in data_direction_name)
                 {
-                    data_direction_name_filter.Add(name + "(Filt.)");
+                    data_direction_name_filter.Add(name + " (Filt.)");
                 }
 
                 plot_data_on_chart(signal_data_chart_main, data_direction_name_filter, generic_input_data_double_clone_filtered, "Time (Seconds)", y_axis_label_data_chart);
@@ -2153,6 +2322,7 @@ namespace Damping_Data_Processor
             if (is_data_filtered[select_data_set_tool_strip_combo_box.SelectedIndex] == true)
             {
                 results_summary_text = results_summary_text + "The data sets were bandpass filtered with cutoff frequencies of " + low_cutoff_freq + " Hz and " + high_cutoff_freq + " Hz.\r\n";
+                results_summary_text = results_summary_text + header_border;
             }
             results_summary_text = results_summary_text + "\r\n";
 
@@ -2237,7 +2407,7 @@ namespace Damping_Data_Processor
                         }
 
                         local_maximas_time_values.Clear();
-                        for (int i =0; i< local_maximas_indexs.Count; i++)
+                        for (int i = 0; i < local_maximas_indexs.Count; i++)
                         {
                             local_maximas_time_values.Add(time_dataset[local_maximas_indexs[i]]);
                         }
@@ -2297,7 +2467,7 @@ namespace Damping_Data_Processor
 
                     if (natural_frequncy_peaks.Count == 0)
                     {
-                        string message = "There was an error with the quality of the frequency estimation data "+data_direction_name[data_direction_index] +"(distance between peaks).";
+                        string message = "There was an error with the quality of the frequency estimation data " + data_direction_name[data_direction_index] + "(distance between peaks).";
                         string title = "Error";
                         FlexibleMessageBox.Show(message, title);
                         return;
@@ -2404,14 +2574,14 @@ namespace Damping_Data_Processor
             Console.WriteLine($"Finished Execution Time: {watch.ElapsedMilliseconds} ms");
 
 
-            string dataset_name = get_filename_from_filepath(csv_input_filepaths_short[select_data_set_tool_strip_combo_box.SelectedIndex]);
-            string plots_sufolder_filepath = save_results_folder + @"\Plots " + dataset_name + @"\";
-            Directory.CreateDirectory(plots_sufolder_filepath);
+            //string dataset_name = get_filename_from_filepath(csv_input_filepaths_short[select_data_set_tool_strip_combo_box.SelectedIndex]);
+            //string plots_sufolder_filepath = save_results_folder + @"\Plots " + dataset_name + @"\";
+            //Directory.CreateDirectory(plots_sufolder_filepath);
 
             //save the charts
-            signal_data_chart_main.SaveImage(plots_sufolder_filepath + "Signal Data Plot " + dataset_name + ".png", ChartImageFormat.Png);
-            freq_dft_chart.SaveImage(plots_sufolder_filepath + "DFT Plot " + dataset_name + ".png", ChartImageFormat.Png);
-            freq_peaks_chart.SaveImage(plots_sufolder_filepath + "Frequency Estimation Plot " + dataset_name + ".png", ChartImageFormat.Png);
+            //signal_data_chart_main.SaveImage(plots_sufolder_filepath + "Signal Data Plot " + dataset_name + ".png", ChartImageFormat.Png);
+            //freq_dft_chart.SaveImage(plots_sufolder_filepath + "DFT Plot " + dataset_name + ".png", ChartImageFormat.Png);
+            //freq_peaks_chart.SaveImage(plots_sufolder_filepath + "Frequency Estimation Plot " + dataset_name + ".png", ChartImageFormat.Png);
 
         }
 
@@ -2462,6 +2632,9 @@ namespace Damping_Data_Processor
             //draw the annoation trim lines on the peaks freqs plot
             draw_annotation_trim_lines_freq_plot(freq_peaks_chart, freq_peaks_trim_vertical_line_1, freq_peaks_trim_vertical_line_2, freq_peaks_trim_horizontal_line_1, freq_peaks_trim_horizontal_line_2);
             update_process_icons(false);
+
+            //Thread.Sleep(50);
+            //update_tooltip_average_freqs_est();
         }
 
         private void reset_data_trimming_button_Click(object sender, EventArgs e)
@@ -2559,7 +2732,7 @@ namespace Damping_Data_Processor
             List<string> data_direction_name_filter = new List<string>();
             foreach (string name in data_direction_name)
             {
-                data_direction_name_filter.Add(name + "(Filt.)");
+                data_direction_name_filter.Add(name + " (Filt.)");
             }
 
 
@@ -3081,11 +3254,18 @@ namespace Damping_Data_Processor
         private void freq_peaks_chart_AnnotationPositionChanged(object sender, EventArgs e)
         {
             check_if_annotations_in_chartview(freq_peaks_chart);
+
+            //update_tooltip_average_freqs_est();
         }
 
         private void summary_results_textbox_DoubleClick(object sender, EventArgs e)
         {
             display_results_message_box();
+        }
+
+        private void select_data_direction_check_list_box_QueryAccessibilityHelp(object sender, QueryAccessibilityHelpEventArgs e)
+        {
+
         }
     }
 

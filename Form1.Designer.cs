@@ -351,6 +351,7 @@ namespace Damping_Data_Processor
             this.select_data_direction_check_list_box.Size = new System.Drawing.Size(87, 109);
             this.select_data_direction_check_list_box.TabIndex = 41;
             this.select_data_direction_check_list_box.SelectedIndexChanged += new System.EventHandler(this.select_data_direction_check_list_box_SelectedIndexChanged);
+            this.select_data_direction_check_list_box.QueryAccessibilityHelp += new System.Windows.Forms.QueryAccessibilityHelpEventHandler(this.select_data_direction_check_list_box_QueryAccessibilityHelp);
             // 
             // label8
             // 
@@ -665,7 +666,7 @@ namespace Damping_Data_Processor
             this.freq_estimation_reject_freq_checkbox.Checked = true;
             this.freq_estimation_reject_freq_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.freq_estimation_reject_freq_checkbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.freq_estimation_reject_freq_checkbox.Location = new System.Drawing.Point(1203, 553);
+            this.freq_estimation_reject_freq_checkbox.Location = new System.Drawing.Point(1196, 553);
             this.freq_estimation_reject_freq_checkbox.Name = "freq_estimation_reject_freq_checkbox";
             this.freq_estimation_reject_freq_checkbox.Size = new System.Drawing.Size(177, 17);
             this.freq_estimation_reject_freq_checkbox.TabIndex = 65;
