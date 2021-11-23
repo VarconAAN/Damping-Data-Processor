@@ -446,21 +446,21 @@ namespace Damping_Data_Processor
             // selectInputFolderToolStripMenuItem
             // 
             this.selectInputFolderToolStripMenuItem.Name = "selectInputFolderToolStripMenuItem";
-            this.selectInputFolderToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.selectInputFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.selectInputFolderToolStripMenuItem.Text = "Select input folder";
             this.selectInputFolderToolStripMenuItem.Click += new System.EventHandler(this.selectInputFolderToolStripMenuItem_Click);
             // 
             // saveSessionToolStripMenuItem
             // 
             this.saveSessionToolStripMenuItem.Name = "saveSessionToolStripMenuItem";
-            this.saveSessionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.saveSessionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveSessionToolStripMenuItem.Text = "Save session";
             this.saveSessionToolStripMenuItem.Click += new System.EventHandler(this.saveSessionToolStripMenuItem_Click);
             // 
             // loadSessionToolStripMenuItem
             // 
             this.loadSessionToolStripMenuItem.Name = "loadSessionToolStripMenuItem";
-            this.loadSessionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.loadSessionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.loadSessionToolStripMenuItem.Text = "Load session";
             this.loadSessionToolStripMenuItem.Click += new System.EventHandler(this.loadSessionToolStripMenuItem_Click);
             // 

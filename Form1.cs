@@ -129,6 +129,9 @@ namespace Damping_Data_Processor
         List<Color> exp_curve_colors = new List<Color>();
         List<Color> signal_colors = new List<Color>();
 
+        //tag for dataset in session
+        string dr_in_progress_text_tag = " [Reduction in Progress]";
+
         ////list to dtetrmine which series are enebaled/disaabled when data directiosn are selected/unslected
         //List<List<string>> data_direction_series_tracker = new List<List<string>>();
 
@@ -352,6 +355,17 @@ namespace Damping_Data_Processor
 
         //generic program functions
 
+        public void update_csv_dropdown_filename_with_tag(string tag)
+        {
+            int i = select_data_set_tool_strip_combo_box.SelectedIndex;
+            if (!csv_input_filepaths_short[i].Contains(tag))
+            {
+                csv_input_filepaths_short[i] = csv_input_filepaths_short[i] + tag;
+                select_data_set_tool_strip_combo_box.Items[i] = select_data_set_tool_strip_combo_box.Items[i] + tag;
+            }
+
+        }
+
         public void automatically_update_freq_repsonse_plot()
         {
             //get the data set to perfom analysis on (filter or unfiltered)
@@ -363,6 +377,10 @@ namespace Damping_Data_Processor
             else
             {
                 selected_data_sets = new List<List<double>>(generic_input_data_double_clone);
+            }
+            if (selected_data_sets.Count <= 0)
+            {
+                return;
             }
             //remove the time list from data to be porocessed
             selected_data_sets.RemoveAt(0);
@@ -2632,6 +2650,8 @@ namespace Damping_Data_Processor
             //draw the annoation trim lines on the peaks freqs plot
             draw_annotation_trim_lines_freq_plot(freq_peaks_chart, freq_peaks_trim_vertical_line_1, freq_peaks_trim_vertical_line_2, freq_peaks_trim_horizontal_line_1, freq_peaks_trim_horizontal_line_2);
             update_process_icons(false);
+
+            //update_csv_dropdown_filename_with_tag(dr_in_progress_text_tag);
 
             //Thread.Sleep(50);
             //update_tooltip_average_freqs_est();
