@@ -342,7 +342,7 @@ namespace Damping_Data_Processor
         public Boolean check_if_list_list_double_is_empty(List<List<List<double>>> list)
         {
             Boolean is_empty = true;
-            for (int i = 0; i < list.Count - 1; i++)
+            for (int i = 0; i < list.Count; i++)
             {
                 if (list[i].Count > 0)
                 {
@@ -478,6 +478,7 @@ namespace Damping_Data_Processor
                 //string plots_sufolder_filepath = save_results_folder + @"\Plots " + dataset_name + @"\";
                 //Directory.CreateDirectory(plots_sufolder_filepath);
 
+                //string dataset_name = get_filename_from_filepath(csv_input_filepaths_short[catalog_index]);
                 signal_data_chart_main.SaveImage(save_results_folder_subfolder + "Signal Data Plot " + dataset_name + ".png", ChartImageFormat.Png);
                 freq_dft_chart.SaveImage(save_results_folder_subfolder + "DFT Plot " + dataset_name + ".png", ChartImageFormat.Png);
                 freq_peaks_chart.SaveImage(save_results_folder_subfolder + "Frequency Estimation Plot " + dataset_name + ".png", ChartImageFormat.Png);
@@ -856,9 +857,13 @@ namespace Damping_Data_Processor
 
             for (int i = 0; i < datasets_xyz[0].Count; i++)
             {
-                xy.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) + Math.Pow(datasets_xyz[2][i], 2)));
-                xz.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) + Math.Pow(datasets_xyz[3][i], 2)));
-                yz.Add(Math.Sqrt(Math.Pow(datasets_xyz[2][i], 2) + Math.Pow(datasets_xyz[3][i], 2)));
+                //xy.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) + Math.Pow(datasets_xyz[2][i], 2)));
+                //xz.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) + Math.Pow(datasets_xyz[3][i], 2)));
+                //yz.Add(Math.Sqrt(Math.Pow(datasets_xyz[2][i], 2) + Math.Pow(datasets_xyz[3][i], 2)));
+                
+                xy.Add(vector_sum_two_points(datasets_xyz[1][i], datasets_xyz[2][i]));
+                xz.Add(vector_sum_two_points(datasets_xyz[1][i], datasets_xyz[3][i]));
+                yz.Add(vector_sum_two_points(datasets_xyz[2][i], datasets_xyz[3][i]));
             }
 
             datasets_xyz.Add(xy);
@@ -866,6 +871,34 @@ namespace Damping_Data_Processor
             datasets_xyz.Add(yz);
 
             return datasets_xyz;
+        }
+
+        public double vector_sum_two_points(double p1, double p2)
+        {
+            if (p1 == p2)
+            {
+                return p1;
+            }
+            if (p1 == -p2)
+            {
+                return 0;
+            }
+
+            if (Math.Abs(p1) > Math.Abs(p2))
+            {
+                if (p1 < 0)
+                {
+                    return -Math.Sqrt(Math.Pow(p1, 2) + Math.Pow(p2, 2));
+                }
+            }
+            else
+            {
+                if (p2 < 0)
+                {
+                    return -Math.Sqrt(Math.Pow(p1, 2) + Math.Pow(p2, 2));
+                }
+            }
+            return Math.Sqrt(Math.Pow(p1, 2) + Math.Pow(p2, 2));
         }
 
         public void plot_freq_response(List<List<double>> freq_span, List<List<double>> real_spectrum, List<string> data_direction_names)
@@ -1485,7 +1518,6 @@ namespace Damping_Data_Processor
             else if (generic_input_data_double_clone_catalog[select_data_set_tool_strip_combo_box.SelectedIndex].Count > 0)
             {
                 selected_dataset = generic_input_data_double_clone_catalog[select_data_set_tool_strip_combo_box.SelectedIndex];
-
                 generic_input_data_double_clone_filtered = new List<List<double>>();
                 generic_input_data_double_clone = generic_input_data_double_clone_catalog[select_data_set_tool_strip_combo_box.SelectedIndex];
                 generic_input_data_double_master = generic_input_data_double_master_catalog[select_data_set_tool_strip_combo_box.SelectedIndex];
@@ -1959,6 +1991,11 @@ namespace Damping_Data_Processor
 
             //add data to catalog
             generic_input_data_double_clone_catalog[select_data_set_tool_strip_combo_box.SelectedIndex] = generic_input_data_double_clone;
+            //add data to catalog
+            if (is_data_filtered[select_data_set_tool_strip_combo_box.SelectedIndex])
+            {
+                generic_input_data_double_clone_filtered_catalog[select_data_set_tool_strip_combo_box.SelectedIndex] = new List<List<double>>(generic_input_data_double_clone_filtered);
+            }
 
             if (is_data_filtered[select_data_set_tool_strip_combo_box.SelectedIndex] == true && generic_input_data_double_clone_filtered.Count > 0)
             {
@@ -2296,7 +2333,7 @@ namespace Damping_Data_Processor
 
 
             //autosave all data sets at the default location in the background
-            save_session(false, false, true);
+            //save_session(false, false, true);
 
             //clear plotting values
             real_spectrum = new List<List<double>>();
@@ -2651,10 +2688,21 @@ namespace Damping_Data_Processor
             draw_annotation_trim_lines_freq_plot(freq_peaks_chart, freq_peaks_trim_vertical_line_1, freq_peaks_trim_vertical_line_2, freq_peaks_trim_horizontal_line_1, freq_peaks_trim_horizontal_line_2);
             update_process_icons(false);
 
+            //draw the annoation trim lines on the peaks freqs plot
+            draw_annotation_trim_lines_freq_plot(freq_peaks_chart, freq_peaks_trim_vertical_line_1, freq_peaks_trim_vertical_line_2, freq_peaks_trim_horizontal_line_1, freq_peaks_trim_horizontal_line_2);
+
+            //autosave all data sets at the default location in the background
+            save_session(false, false, true);
+
             //update_csv_dropdown_filename_with_tag(dr_in_progress_text_tag);
 
             //Thread.Sleep(50);
             //update_tooltip_average_freqs_est();
+
+            //string dataset_name = get_filename_from_filepath(csv_input_filepaths_short[catalog_index]);
+            //signal_data_chart_main.SaveImage(save_results_folder_subfolder + "Signal Data Plot " + dataset_name + ".png", ChartImageFormat.Png);
+            //freq_dft_chart.SaveImage(save_results_folder_subfolder + "DFT Plot " + dataset_name + ".png", ChartImageFormat.Png);
+            //freq_peaks_chart.SaveImage(save_results_folder_subfolder + "Frequency Estimation Plot " + dataset_name + ".png", ChartImageFormat.Png);
         }
 
         private void reset_data_trimming_button_Click(object sender, EventArgs e)
@@ -3052,7 +3100,7 @@ namespace Damping_Data_Processor
                 csv_input_filepaths = drs.csv_input_filepaths_drs;
                 csv_input_filepaths_short = drs.csv_input_filepaths_short_drs;
 
-                low_cutoff_freq_tracker = drs.low_cutoff_freq_tracker_drs;
+                low_cutoff_freq_tracker = drs.low_cutoff_freq_tracker_drs; 
                 high_cutoff_freq_tracker = drs.high_cutoff_freq_tracker_drs;
 
                 is_data_filtered = drs.is_data_filtered_drs;
