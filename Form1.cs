@@ -132,9 +132,14 @@ namespace Damping_Data_Processor
         //tag for dataset in session
         string dr_in_progress_text_tag = " [Reduction in Progress]";
 
-        ////list to dtetrmine which series are enebaled/disaabled when data directiosn are selected/unslected
-        //List<List<string>> data_direction_series_tracker = new List<List<string>>();
 
+        //keeps track of all calculated results for session
+        List<List<List<double>>> session_results_tracker = new List<List<List<double>>>();
+
+        //STORES STREAMS FOR SCREENSHOTS OF THE PLOTS FOR EACH DATASET
+        //List<List<System.IO.MemoryStream>> chart_screenshot_tracker = new List<List<System.IO.MemoryStream>>();
+        List<List<Byte[]>> chart_screenshot_tracker_byte_array = new List<List<Byte[]>>();
+        //List<List<Image>> chart_screenshot_tracker_image_var = new List<List<Image>>();
 
 
         public form1()
@@ -157,6 +162,13 @@ namespace Damping_Data_Processor
             peak_picking_method_combobox.Items.Add("1. Fast Peak Picker (works best on filtered data)");
             peak_picking_method_combobox.Items.Add("2. Classic Peak Picker (Slow)");
             peak_picking_method_combobox.SelectedIndex = 0;
+
+            data_direction_name.Add("X");
+            data_direction_name.Add("Y");
+            data_direction_name.Add("Z");
+            data_direction_name.Add("XY_VS");
+            data_direction_name.Add("XZ_VS");
+            data_direction_name.Add("YZ_VS");
 
             //disable manual freq estimation
             manual_freq_est_checkbox.Enabled = false;
@@ -243,6 +255,125 @@ namespace Damping_Data_Processor
 
         }
 
+        public void export_session_results_to_csv(string folder_filepath, string filename)
+        {
+            List<List<string>> csv_data = new List<List<string>>();
+
+            List<string> header_row = new List<string>();
+            header_row.Add("Dataset Name");
+            header_row.Add("Dataset Direction");
+            header_row.Add("Natural Frequency DFT (Hz)");
+            header_row.Add("Natural Frequency Peaks (Hz)");
+            header_row.Add("Damping Ratio DFT frequency (%)");
+            header_row.Add("Damping Ratio Peaks frequency (%)");
+            header_row.Add("R_squared");
+            header_row.Add("");
+            header_row.Add("Natural Frequency DFT (Hz) Average");
+            header_row.Add("Natural Frequency Peaks (Hz) Average");
+            header_row.Add("Damping Ratio DFT frequency (%) Average");
+            header_row.Add("Damping Ratio Peaks frequency (%) Average");
+
+            List<string> row1 = new List<string>();
+            row1.Add("");
+            row1.Add("");
+            row1.Add("");
+            row1.Add("");
+            row1.Add("");
+            row1.Add("");
+            row1.Add("");
+            row1.Add("");
+            row1.Add("=AVERAGE(C2:C999)");
+            row1.Add("=AVERAGE(D2:D999)");
+            row1.Add("=AVERAGE(E2:E999)");
+            row1.Add("=AVERAGE(F2:F999)");
+
+            List<string> row2 = new List<string>();
+            row2.Add("");
+            row2.Add("");
+            row2.Add("");
+            row2.Add("");
+            row2.Add("");
+            row2.Add("");
+            row2.Add("");
+            row2.Add("");
+            row2.Add("Natural Frequency Average (Hz)");
+            row2.Add("");
+            row2.Add("Damping Ratio Average (%)");
+            row2.Add("");
+
+            List<string> row3 = new List<string>();
+            row3.Add("");
+            row3.Add("");
+            row3.Add("");
+            row3.Add("");
+            row3.Add("");
+            row3.Add("");
+            row3.Add("");
+            row3.Add("");
+            row3.Add(@"=AVERAGE(I2:J2)");
+            row3.Add("");
+            row3.Add(@"=AVERAGE(K2:L2)");
+            row3.Add("");
+
+            List<string> empty_row = new List<string>();
+            empty_row.Add("");
+            //empty_row.Add("");
+            //empty_row.Add("");
+            //empty_row.Add("");
+            //empty_row.Add("");
+            //empty_row.Add("");
+            //empty_row.Add("");
+            //empty_row.Add("");
+            //empty_row.Add("");
+            //empty_row.Add("");
+            //empty_row.Add("");
+            //empty_row.Add("");
+
+            csv_data.Add(header_row);
+            csv_data.Add(row1);
+            csv_data.Add(row2);
+            csv_data.Add(row3);
+
+            for (int i = 0; i < session_results_tracker.Count; i++)
+            {
+                string dataset_name = csv_input_filepaths_short[i];
+
+                if (session_results_tracker[i].Count > 0)
+                {
+                    for (int data_direction_index = 0; data_direction_index < 6; data_direction_index++)
+                    {
+                        if (session_results_tracker[i][data_direction_index].Count > 0)
+                        {
+                            List<string> temp_row = convert_list_double_to_list_string(session_results_tracker[i][data_direction_index]);
+                            temp_row.Insert(0, data_direction_name[data_direction_index]);
+                            temp_row.Insert(0, dataset_name);
+
+                            csv_data.Add(temp_row);
+                        }
+                        else
+                        {
+                            //csv_data.Add(empty_row);
+                        }
+                    }
+                    csv_data.Add(empty_row);
+                }
+
+            }
+            process_save_dataset_as_csv(csv_data, folder_filepath + filename + ".csv");
+        }
+
+        public List<string> convert_list_double_to_list_string(List<double> list_double)
+        {
+            List<string> list_string = new List<string>();
+            for (int i = 0; i < list_double.Count; i++)
+            {
+                list_string.Add(list_double[i].ToString());
+
+            }
+            return list_string;
+        }
+
+
         public void save_session(Boolean display_error_message = true, Boolean ask_user_save_location = true, Boolean autosave_tag = false)
         {
             if (check_if_list_list_double_is_empty(generic_input_data_double_master_catalog) && check_if_list_list_double_is_empty(generic_input_data_double_clone_catalog) && check_if_list_list_double_is_empty(generic_input_data_double_clone_filtered_catalog))
@@ -273,6 +404,9 @@ namespace Damping_Data_Processor
             drs.x_index_trim_upper_index_master_drs = x_index_trim_upper_index_master;
             drs.input_folder_drs = input_folder;
             drs.data_direction_checkmark_tracker_drs = data_direction_checkmark_tracker;
+            drs.session_results_tracker_drs = session_results_tracker;
+            //drs.chart_screenshot_tracker_drs = chart_screenshot_tracker;
+            drs.chart_screenshot_tracker_byte_array_drs = chart_screenshot_tracker_byte_array;
 
 
             //get default session file name (using the last folder in the input folder filepath and append the filetype extension
@@ -310,21 +444,33 @@ namespace Damping_Data_Processor
             else
             {
                 save_filepath = input_folder + output_folder_name + default_file_name;
+                Directory.CreateDirectory(input_folder + output_folder_name);
             }
 
             // If the file name is not an empty string open it for saving.
             if (!String.IsNullOrEmpty(save_filepath))
             {
-                try
-                {
-                    File.WriteAllText(save_filepath, JsonConvert.SerializeObject(drs));
-                }
-                catch
-                {
-                    string message = "The autosave/session attempt has failed, try again.";
-                    string title = "Error";
-                    FlexibleMessageBox.Show(message, title);
-                }
+                //try
+                //{
+
+                //FileStream fs = File.Open(save_filepath, FileMode.Create);
+
+                Serialize(drs, save_filepath);
+
+                //using (TextWriter textWriter = File.CreateText(save_filepath))
+                //{
+                //    var serializer = new JsonSerializer();
+                //    serializer.Serialize(textWriter, drs);
+                //}
+
+                //File.WriteAllText(save_filepath, JsonConvert.SerializeObject(drs));
+                //}
+                //catch
+                //{
+                //    string message = "The autosave/session save attempt has failed, try again.";
+                //    string title = "Error";
+                //    FlexibleMessageBox.Show(message, title);
+                //}
 
             }
             else
@@ -413,7 +559,7 @@ namespace Damping_Data_Processor
             activity_log_textbox.AppendText(log + "\n\r\n\r");
         }
 
-        public void export_acceleration_datasets_csv(Boolean export_master = true, Boolean export_clone = true, Boolean export_filter = true)
+        public void export_acceleration_datasets_csv(Boolean export_master = true, Boolean export_clone = true, Boolean export_filter = true, Boolean export_all_datasets = true, int dataset_export_index = 0)
         {
             if (generic_input_data_double_master_catalog.Count == 0)
             {
@@ -426,6 +572,12 @@ namespace Damping_Data_Processor
 
             for (int catalog_index = 0; catalog_index < generic_input_data_double_master_catalog.Count; catalog_index++)
             {
+                if (export_all_datasets == false)
+                {
+                    catalog_index = dataset_export_index;
+                }
+
+
 
                 //check for empty data then skip
                 if (generic_input_data_double_master_catalog[catalog_index].Count == 0)
@@ -458,7 +610,15 @@ namespace Damping_Data_Processor
                 //create the folder
                 Directory.CreateDirectory(save_results_folder);
 
-                string save_results_folder_subfolder = save_results_folder + "/" + dataset_name + "/";
+                string save_results_folder_subfolder = save_results_folder + dataset_name + @"\";
+                //create the folder
+                Directory.CreateDirectory(save_results_folder_subfolder);
+
+                save_results_folder_subfolder = save_results_folder_subfolder + (DateTime.Now.ToString().Replace(":", "_")).Replace("/", "_") + @"\";
+                //save_results_folder_subfolder = save_results_folder_subfolder + "test" + @"\";
+                //save_results_folder_subfolder = save_results_folder_subfolder;
+                //save_results_folder_subfolder = save_results_folder_subfolder.Replace("/", "_");
+                //create folder
                 Directory.CreateDirectory(save_results_folder_subfolder);
 
                 if (export_master == true)
@@ -474,14 +634,25 @@ namespace Damping_Data_Processor
                     process_save_dataset_as_csv(generic_input_data_double_clone_filtered_catalog[catalog_index], save_results_folder_subfolder + dataset_name_trimmed_filtered + " Acc. Data[Filt Trim].csv");
                 }
 
+                //save the results in csv file
+                export_session_results_to_csv(save_results_folder, "Summary Results");
+
+                string dataset_result_summary_text_concatenated = concat_dataset_results_summary();
+                File.WriteAllText(save_results_folder + "Summary Results.txt", dataset_result_summary_text_concatenated);
+
                 //save plots
                 //string plots_sufolder_filepath = save_results_folder + @"\Plots " + dataset_name + @"\";
                 //Directory.CreateDirectory(plots_sufolder_filepath);
 
-                //string dataset_name = get_filename_from_filepath(csv_input_filepaths_short[catalog_index]);
-                signal_data_chart_main.SaveImage(save_results_folder_subfolder + "Signal Data Plot " + dataset_name + ".png", ChartImageFormat.Png);
-                freq_dft_chart.SaveImage(save_results_folder_subfolder + "DFT Plot " + dataset_name + ".png", ChartImageFormat.Png);
-                freq_peaks_chart.SaveImage(save_results_folder_subfolder + "Frequency Estimation Plot " + dataset_name + ".png", ChartImageFormat.Png);
+                //string dataset_name = get_filename_from_filepath(csv_input_filepaths_short[catalog_index]);                
+                export_image_streams_chart_screenshot_tracker(catalog_index, save_results_folder_subfolder);
+
+                //signal_data_chart_main.SaveImage(save_results_folder_subfolder + "Signal Data Plot " + dataset_name + ".png", ChartImageFormat.Png);
+                //freq_dft_chart.SaveImage(save_results_folder_subfolder + "DFT Plot " + dataset_name + ".png", ChartImageFormat.Png);
+                //freq_peaks_chart.SaveImage(save_results_folder_subfolder + "Frequency Estimation Plot " + dataset_name + ".png", ChartImageFormat.Png);
+
+
+
 
                 //play sound to allert user
                 System.Media.SystemSounds.Beep.Play();
@@ -539,6 +710,57 @@ namespace Damping_Data_Processor
                 //    save_list_of_list_string_as_csv(csv_data_clone_filter, save_results_folder + "Accel. Datasets " + dataset_name_trimmed_filtered + " [Trimmed & Filtered].csv");
                 //}
 
+                if (export_all_datasets == false)
+                {
+                    return;
+                }
+            }
+        }
+
+        public void export_image_streams_chart_screenshot_tracker(int dataset_index, string output_folder_filepath)
+        {
+            //output_folder_filepath= output_folder_filepath+ @"\";
+
+            string dataset_name = get_filename_from_filepath(csv_input_filepaths_short[dataset_index]);
+
+            //if (chart_screenshot_tracker_image_var[dataset_index].Count > 0)
+            //{
+            //    //save images from stream
+
+            //    Image chart_screenshot_1 = (chart_screenshot_tracker_image_var[dataset_index][0]);
+            //    Image chart_screenshot_2 = (chart_screenshot_tracker_image_var[dataset_index][1]);
+            //    Image chart_screenshot_3 = (chart_screenshot_tracker_image_var[dataset_index][2]);
+
+            //    string chart_filepath_1 = output_folder_filepath + "Signal Data Plot " + dataset_name + ".png";
+            //    string chart_filepath_2 = output_folder_filepath + "DFT Plot " + dataset_name + ".png";
+            //    string chart_filepath_3 = output_folder_filepath + "Freq Estimation Plot " + dataset_name + ".png";
+
+            //    chart_screenshot_1.Save(chart_filepath_1);
+            //    chart_screenshot_2.Save(chart_filepath_2);
+            //    chart_screenshot_3.Save(chart_filepath_3);
+
+            //}
+
+            if (chart_screenshot_tracker_byte_array[dataset_index].Count > 0)
+            {
+                //save images from stream
+
+                //Image chart_screenshot_1 = Image.FromStream(new MemoryStream(chart_screenshot_tracker_byte_array[dataset_index][0]));
+                //Image chart_screenshot_2 = Image.FromStream(new MemoryStream(chart_screenshot_tracker_byte_array[dataset_index][1]));
+                //Image chart_screenshot_3 = Image.FromStream(new MemoryStream(chart_screenshot_tracker_byte_array[dataset_index][2]));
+
+                string chart_filepath_1 = output_folder_filepath + "Signal Data Plot " + dataset_name + ".png";
+                string chart_filepath_2 = output_folder_filepath + "DFT Plot " + dataset_name + ".png";
+                string chart_filepath_3 = output_folder_filepath + "Freq Estimation Plot " + dataset_name + ".png";
+
+                //chart_screenshot_1.Save(chart_filepath_1);
+                //chart_screenshot_2.Save(chart_filepath_2);
+                //chart_screenshot_3.Save(chart_filepath_3);
+
+                File.WriteAllBytes(chart_filepath_1, chart_screenshot_tracker_byte_array[dataset_index][0]);
+                File.WriteAllBytes(chart_filepath_2, chart_screenshot_tracker_byte_array[dataset_index][1]);
+                File.WriteAllBytes(chart_filepath_3, chart_screenshot_tracker_byte_array[dataset_index][2]);
+
             }
         }
 
@@ -562,6 +784,27 @@ namespace Damping_Data_Processor
             }
             //transpose the data to work better with excel
             dataset_string = transpose_list_of_list_string(dataset_string);
+
+            //save the data at the output folder
+            save_list_of_list_string_as_csv(dataset_string, save_filepath);
+
+            activity_log("Dataset exported: " + save_filepath);
+
+            return true;
+        }
+
+        public Boolean process_save_dataset_as_csv(List<List<string>> dataset_string, string save_filepath)
+        {
+            //string list overload
+
+            //check if data set is empty
+            if (dataset_string.Count == 0)
+            {
+                //string message = "There is no dataset to export";
+                //string title = "Error";
+                //FlexibleMessageBox.Show(message, title);
+                return false;
+            }
 
             //save the data at the output folder
             save_list_of_list_string_as_csv(dataset_string, save_filepath);
@@ -860,7 +1103,7 @@ namespace Damping_Data_Processor
                 //xy.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) + Math.Pow(datasets_xyz[2][i], 2)));
                 //xz.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) + Math.Pow(datasets_xyz[3][i], 2)));
                 //yz.Add(Math.Sqrt(Math.Pow(datasets_xyz[2][i], 2) + Math.Pow(datasets_xyz[3][i], 2)));
-                
+
                 xy.Add(vector_sum_two_points(datasets_xyz[1][i], datasets_xyz[2][i]));
                 xz.Add(vector_sum_two_points(datasets_xyz[1][i], datasets_xyz[3][i]));
                 yz.Add(vector_sum_two_points(datasets_xyz[2][i], datasets_xyz[3][i]));
@@ -1634,6 +1877,18 @@ namespace Damping_Data_Processor
             //clear all saved summaries
             dataset_result_summary_text_list.Clear();
 
+            //clear other various
+            chart_screenshot_tracker_byte_array.Clear();
+            low_cutoff_freq_tracker.Clear();
+            high_cutoff_freq_tracker.Clear();
+            is_data_filtered.Clear();
+            x_index_trim_lower_index_trimmed.Clear();
+            x_index_trim_upper_index_trimmed.Clear();
+            x_index_trim_lower_index_master.Clear();
+            x_index_trim_upper_index_master.Clear();
+            data_direction_checkmark_tracker.Clear();
+            session_results_tracker.Clear();
+
             //open windows explorer to retrieve user folder
             select_folder(out input_folder);
 
@@ -1705,6 +1960,15 @@ namespace Damping_Data_Processor
                 temp.Add(false);
                 temp.Add(false);
                 data_direction_checkmark_tracker.Add(temp);
+
+                //add blank lists for each dataset
+                session_results_tracker.Add(new List<List<double>>());
+
+
+                //add blank lists for each dataset
+                //chart_screenshot_tracker.Add(new List<MemoryStream>());
+                chart_screenshot_tracker_byte_array.Add(new List<Byte[]>());
+
             }
 
             for (int i = 0; i < csv_input_filepaths.Count; i++)
@@ -1821,16 +2085,26 @@ namespace Damping_Data_Processor
 
         public void save_list_of_list_string_as_csv(List<List<string>> data, string filepath)
         {
-
-            const string SEPARATOR = ",";
-            using (StreamWriter writer = new StreamWriter(filepath))
+            try
             {
-                data.ForEach(line =>
+                const string SEPARATOR = ",";
+                using (StreamWriter writer = new StreamWriter(filepath))
                 {
-                    var lineArray = line.Select(c =>
-                        c.Contains(SEPARATOR) ? c.Replace(SEPARATOR.ToString(), "\\" + SEPARATOR) : c).ToArray();
-                    writer.WriteLine(string.Join(SEPARATOR, lineArray));
-                });
+                    data.ForEach(line =>
+                    {
+                        var lineArray = line.Select(c =>
+                            c.Contains(SEPARATOR) ? c.Replace(SEPARATOR.ToString(), "\\" + SEPARATOR) : c).ToArray();
+                        writer.WriteLine(string.Join(SEPARATOR, lineArray));
+                    });
+                }
+            }
+            catch
+            {
+                string message = "Cannot save " + filepath + " as an exsiting file with the same name cannot be accessed. Try clsoing the specified file and try again";
+                string title = "Error";
+                FlexibleMessageBox.Show(message, title);
+                return;
+
             }
         }
 
@@ -2328,8 +2602,15 @@ namespace Damping_Data_Processor
 
         private void calculate_damp_ratio_and_freq(Boolean recalculate_damp_ratio_trimmed_freq_values = false)
         {
+            current_selected_csv_checkedlistbox_index = select_data_set_tool_strip_combo_box.SelectedIndex;
+
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
+
+            //results session tracker and sublists used for allocating data
+            session_results_tracker[current_selected_csv_checkedlistbox_index].Clear();
+            List<List<double>> session_results_tracker_sub_list = new List<List<double>>();
+            List<double> session_results_tracker_sub_sub_list = new List<double>();
 
 
             //autosave all data sets at the default location in the background
@@ -2410,8 +2691,17 @@ namespace Damping_Data_Processor
             natural_frequencies[4] = (natural_frequencies[0] + natural_frequencies[2]) / 2;
             natural_frequencies[5] = (natural_frequencies[1] + natural_frequencies[2]) / 2;
 
-
-
+            //add blank data for indexing purposes
+            if (freq_peaks_storage.Count < 6)
+            {
+                for (int data_direction_index = 0; data_direction_index < selected_data_sets.Count; data_direction_index++)
+                {
+                    freq_peaks_storage.Add(new List<double>());
+                    local_maximas_indexs_storage.Add(new List<int>());
+                    peak_amplitudes_storage.Add(new List<double>());
+                    local_maximas_time_values_storage.Add(new List<double>());
+                }
+            }
 
             //after the natural frequencies have been analyzed run loop to get results
             for (int data_direction_index = 0; data_direction_index < selected_data_sets.Count; data_direction_index++)
@@ -2485,10 +2775,10 @@ namespace Damping_Data_Processor
 
                         Console.WriteLine($"Plot found peaks and their freqs Execution Time: {watch.ElapsedMilliseconds} ms");
 
-                        freq_peaks_storage.Add(natural_frequncy_peaks);
-                        local_maximas_indexs_storage.Add(local_maximas_indexs);
-                        peak_amplitudes_storage.Add(peak_amplitudes);
-                        local_maximas_time_values_storage.Add(local_maximas_time_values);
+                        freq_peaks_storage[data_direction_index] = (natural_frequncy_peaks);
+                        local_maximas_indexs_storage[data_direction_index] = (local_maximas_indexs);
+                        peak_amplitudes_storage[data_direction_index] = (peak_amplitudes);
+                        local_maximas_time_values_storage[data_direction_index] = (local_maximas_time_values);
 
                         //freq_peaks_storage.RemoveAt(freq_peaks_storage.Count - 1);
                         //local_maximas_indexs_storage.RemoveAt(local_maximas_indexs_storage.Count - 1);
@@ -2612,11 +2902,33 @@ namespace Damping_Data_Processor
 
                     results_summary_text = results_summary_text + "The R Squared value of the exp. curve fit is (" + data_direction_name[data_direction_index] + " direction): " + Math.Round(coffecient_of_determination, 3) + "\r\n\r\n";
                     results_summary_text = results_summary_text + header_border + "\r\n\r\n";
+
+
+                    //save resulsts into resulst session tracker
+                    session_results_tracker_sub_sub_list.Add(natural_frequencies[data_direction_index]);
+                    session_results_tracker_sub_sub_list.Add(peak_freqs[data_direction_index]);
+                    session_results_tracker_sub_sub_list.Add(damp_ratio_exp_fft_freq * 100);
+                    session_results_tracker_sub_sub_list.Add(damp_ratio_exp_peaks * 100);
+                    session_results_tracker_sub_sub_list.Add(coffecient_of_determination);
+
+
                 }
-
-
+                else
+                {
+                    //when the data direction is not selected
+                    session_results_tracker_sub_sub_list = new List<double>();
+                    //for(int ind=0;ind<5; ind++)
+                    //{
+                    //    //add empty null data
+                    //    session_results_tracker_sub_sub_list.Add(0);
+                    //}
+                }
+                session_results_tracker_sub_list.Add(session_results_tracker_sub_sub_list);
+                session_results_tracker_sub_sub_list = new List<double>();
 
             }
+            session_results_tracker[current_selected_csv_checkedlistbox_index] = session_results_tracker_sub_list;
+            session_results_tracker_sub_list = new List<List<double>>();
 
             ////draw the annoation trim lines on the peaks freqs plot
             //draw_annotation_trim_lines_freq_plot(freq_peaks_chart, freq_peaks_trim_vertical_line_1, freq_peaks_trim_vertical_line_2, freq_peaks_trim_horizontal_line_1, freq_peaks_trim_horizontal_line_2);
@@ -2638,6 +2950,10 @@ namespace Damping_Data_Processor
             //freq_dft_chart.SaveImage(plots_sufolder_filepath + "DFT Plot " + dataset_name + ".png", ChartImageFormat.Png);
             //freq_peaks_chart.SaveImage(plots_sufolder_filepath + "Frequency Estimation Plot " + dataset_name + ".png", ChartImageFormat.Png);
 
+            //draw the annoation trim lines on the peaks freqs plot
+            draw_annotation_trim_lines_freq_plot(freq_peaks_chart, freq_peaks_trim_vertical_line_1, freq_peaks_trim_vertical_line_2, freq_peaks_trim_horizontal_line_1, freq_peaks_trim_horizontal_line_2);
+
+            update_chart_screenshot_tracker();
         }
 
         public void remove_non_signal_series_plot()
@@ -2679,20 +2995,103 @@ namespace Damping_Data_Processor
             }
         }
 
+        public void update_chart_screenshot_tracker()
+        {
+            //List<MemoryStream> temp_list = new List<MemoryStream>();
+
+            //test
+            //List<Image> temp_list2 = new List<Image>();
+            List<Byte[]> temp_list3 = new List<Byte[]>();
+
+            //allocating streams
+            MemoryStream image_stream_1 = new MemoryStream();
+            MemoryStream image_stream_2 = new MemoryStream();
+            MemoryStream image_stream_3 = new MemoryStream();
+
+            //signal_data_chart_main.SaveImage(save_results_folder_subfolder + "Signal Data Plot " + dataset_name + ".png", ChartImageFormat.Png);
+            //freq_dft_chart.SaveImage(save_results_folder_subfolder + "DFT Plot " + dataset_name + ".png", ChartImageFormat.Png);
+            //freq_peaks_chart.SaveImage(save_results_folder_subfolder + "Frequency Estimation Plot " + dataset_name + ".png", ChartImageFormat.Png);
+
+            signal_data_chart_main.SaveImage(image_stream_1, ChartImageFormat.Png);
+            freq_dft_chart.SaveImage(image_stream_2, ChartImageFormat.Png);
+            freq_peaks_chart.SaveImage(image_stream_3, ChartImageFormat.Png);
+
+            //Byte[] byte_array_from_stream1 = ReadFully(image_stream_1);
+            //Byte[] byte_array_from_stream2 = ReadFully(image_stream_2);
+            //Byte[] byte_array_from_stream3 = ReadFully(image_stream_3);
+
+
+            Byte[] byte_array_from_stream1 = (image_stream_1).ToArray();
+            Byte[] byte_array_from_stream2 = (image_stream_2).ToArray();
+            Byte[] byte_array_from_stream3 = (image_stream_3).ToArray();
+
+            //chart_screenshot_tracker_byte_array
+
+            //Image chart_screenshot_1 = System.Drawing.Image.FromStream(image_stream_1);
+            //Image chart_screenshot_2 = System.Drawing.Image.FromStream(image_stream_2);
+            //Image chart_screenshot_3 = System.Drawing.Image.FromStream(image_stream_3);
+
+            //temp_list.Add(image_stream_1);
+            //temp_list.Add(image_stream_2);
+            //temp_list.Add(image_stream_3);
+
+            //test
+            //temp_list2.Add(chart_screenshot_1);
+            //temp_list2.Add(chart_screenshot_2);
+            //temp_list2.Add(chart_screenshot_3);
+
+            temp_list3.Add(byte_array_from_stream1);
+            temp_list3.Add(byte_array_from_stream2);
+            temp_list3.Add(byte_array_from_stream3);
+
+            //chart_screenshot_tracker[select_data_set_tool_strip_combo_box.SelectedIndex].Clear();
+            //chart_screenshot_tracker[select_data_set_tool_strip_combo_box.SelectedIndex] = temp_list;
+
+            chart_screenshot_tracker_byte_array[select_data_set_tool_strip_combo_box.SelectedIndex].Clear();
+            chart_screenshot_tracker_byte_array[select_data_set_tool_strip_combo_box.SelectedIndex] = temp_list3;
+
+        }
+
+        public byte[] ImageToByteArray(System.Drawing.Image imageIn)
+        {
+            using (var ms = new MemoryStream())
+            {
+                imageIn.Save(ms, imageIn.RawFormat);
+                return ms.ToArray();
+            }
+        }
+
+        public static byte[] ReadFully(Stream input)
+        {
+            byte[] buffer = new byte[16 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int read;
+                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    ms.Write(buffer, 0, read);
+                }
+                return ms.ToArray();
+            }
+        }
+
 
         private void calculate_damp_ratio_and_freq_button_Click(object sender, EventArgs e)
         {
+            //Console.WriteLine(GC.GetTotalMemory());
+
             update_process_icons(true);
             calculate_damp_ratio_and_freq();
             //draw the annoation trim lines on the peaks freqs plot
             draw_annotation_trim_lines_freq_plot(freq_peaks_chart, freq_peaks_trim_vertical_line_1, freq_peaks_trim_vertical_line_2, freq_peaks_trim_horizontal_line_1, freq_peaks_trim_horizontal_line_2);
             update_process_icons(false);
 
-            //draw the annoation trim lines on the peaks freqs plot
-            draw_annotation_trim_lines_freq_plot(freq_peaks_chart, freq_peaks_trim_vertical_line_1, freq_peaks_trim_vertical_line_2, freq_peaks_trim_horizontal_line_1, freq_peaks_trim_horizontal_line_2);
 
-            //autosave all data sets at the default location in the background
-            save_session(false, false, true);
+            if (autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem.Checked == true)
+            {
+                //autosave all data sets at the default location in the background
+                save_session(false, false, true);
+            }
 
             //update_csv_dropdown_filename_with_tag(dr_in_progress_text_tag);
 
@@ -2703,6 +3102,8 @@ namespace Damping_Data_Processor
             //signal_data_chart_main.SaveImage(save_results_folder_subfolder + "Signal Data Plot " + dataset_name + ".png", ChartImageFormat.Png);
             //freq_dft_chart.SaveImage(save_results_folder_subfolder + "DFT Plot " + dataset_name + ".png", ChartImageFormat.Png);
             //freq_peaks_chart.SaveImage(save_results_folder_subfolder + "Frequency Estimation Plot " + dataset_name + ".png", ChartImageFormat.Png);
+
+
         }
 
         private void reset_data_trimming_button_Click(object sender, EventArgs e)
@@ -2860,25 +3261,8 @@ namespace Damping_Data_Processor
         private void exportResultsSummaryEditedDatasetsToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
-            string dataset_result_summary_text_concatenated = concat_dataset_results_summary();
+            //string dataset_result_summary_text_concatenated = concat_dataset_results_summary();
 
-            //check to see if results are ready for export
-            if (String.IsNullOrEmpty(dataset_result_summary_text_concatenated))
-            {
-                return;
-            }
-
-            //save the results text
-            System.IO.File.WriteAllText(save_results_folder + "Damping Reduction Results Summary" + ".txt", dataset_result_summary_text_concatenated);
-
-            ////save the charts
-            //signal_data_chart_main.SaveImage(save_results_folder + "Signal Data Plot.png", ChartImageFormat.Png);
-            //freq_dft_chart.SaveImage(save_results_folder + "DFT Plot.png", ChartImageFormat.Png);
-            //freq_peaks_chart.SaveImage(save_results_folder + "Frequency Estimation Plot.png", ChartImageFormat.Png);
-
-            //save all data sets master , trimmed, trimmed filtered using the catalog
-
-            //select all data sets for export
             Boolean export_master = true;
             Boolean export_clone = true;
             Boolean export_filter = true;
@@ -2890,6 +3274,8 @@ namespace Damping_Data_Processor
 
         private void select_data_set_tool_strip_combo_box_SelectedIndexChanged_1(object sender, EventArgs e)
         {
+            update_chart_screenshot_tracker();
+
             update_process_icons(true);
 
             enable_all_user_controls(true);
@@ -2928,8 +3314,11 @@ namespace Damping_Data_Processor
             //preform fft freq response analysis on all data sets
             automatically_update_freq_repsonse_plot();
 
-            //autosave all data sets at the default location in the background
-            save_session(false, false, true);
+            if (autosaveAfterSwitchingDatasetsToolStripMenuItem.Checked == true)
+            {
+                //autosave all data sets at the default location in the background
+                save_session(false, false, true);
+            }
 
             update_process_icons(false);
         }
@@ -3090,7 +3479,12 @@ namespace Damping_Data_Processor
             // If the file name is not an empty string open it for saving.
             if (!String.IsNullOrEmpty(session_load_filepath))
             {
-                damping_reduction_session drs = JsonConvert.DeserializeObject<damping_reduction_session>(File.ReadAllText(session_load_filepath));
+
+                //FileStream fs = File.Open(session_load_filepath, FileMode.Open);
+                damping_reduction_session drs = Deserialize(session_load_filepath);
+
+
+                //damping_reduction_session drs = JsonConvert.DeserializeObject<damping_reduction_session>(File.ReadAllText(session_load_filepath));
 
                 //store datasets
                 generic_input_data_double_master_catalog = drs.generic_input_data_double_master_catalog_drs;
@@ -3100,7 +3494,7 @@ namespace Damping_Data_Processor
                 csv_input_filepaths = drs.csv_input_filepaths_drs;
                 csv_input_filepaths_short = drs.csv_input_filepaths_short_drs;
 
-                low_cutoff_freq_tracker = drs.low_cutoff_freq_tracker_drs; 
+                low_cutoff_freq_tracker = drs.low_cutoff_freq_tracker_drs;
                 high_cutoff_freq_tracker = drs.high_cutoff_freq_tracker_drs;
 
                 is_data_filtered = drs.is_data_filtered_drs;
@@ -3115,6 +3509,13 @@ namespace Damping_Data_Processor
 
                 data_direction_checkmark_tracker = drs.data_direction_checkmark_tracker_drs;
 
+                session_results_tracker = drs.session_results_tracker_drs;
+
+                chart_screenshot_tracker_byte_array = drs.chart_screenshot_tracker_byte_array_drs;
+
+
+                //chart_screenshot_tracker = drs.chart_screenshot_tracker_drs;
+
                 update_program_after_load_session();
             }
             else
@@ -3125,6 +3526,38 @@ namespace Damping_Data_Processor
                 return;
             }
         }
+
+
+        public static void Serialize(damping_reduction_session drs, string serializationPath)
+        {
+            using (Stream stream = File.Open(serializationPath, FileMode.Create))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                binaryFormatter.Serialize(stream, drs);
+                stream.Close();
+            }
+        }
+
+        public static damping_reduction_session Deserialize(string serializationFilePath)
+        {
+            using (Stream stream = File.Open(serializationFilePath, FileMode.Open))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+
+                damping_reduction_session drs = (damping_reduction_session)binaryFormatter.Deserialize(stream);
+
+                return drs;
+            }
+        }
+
+
+
+
+
+
+
+
+
 
 
         private void freq_dft_chart_AxisViewChanged_1(object sender, ViewEventArgs e)
@@ -3286,11 +3719,6 @@ namespace Damping_Data_Processor
             }
         }
 
-        private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
-        {
-            calculate_damp_ratio_and_freq();
-        }
-
         private void reset_trim_lines_button_Click(object sender, EventArgs e)
         {
             //draw the annoation trim lines on the peaks freqs plot
@@ -3334,6 +3762,56 @@ namespace Damping_Data_Processor
         private void select_data_direction_check_list_box_QueryAccessibilityHelp(object sender, QueryAccessibilityHelpEventArgs e)
         {
 
+        }
+
+        private void exportCurrentDatasetsResultsOnlyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //check to see if results are ready for export
+            //if (String.IsNullOrEmpty(dataset_result_summary_text_concatenated))
+            //{
+            //    return;
+            //}
+
+            ////save the results text
+            //System.IO.File.WriteAllText(save_results_folder + "Damping Reduction Results Summary" + ".txt", dataset_result_summary_text_concatenated);
+
+            ////save the charts
+            //signal_data_chart_main.SaveImage(save_results_folder + "Signal Data Plot.png", ChartImageFormat.Png);
+            //freq_dft_chart.SaveImage(save_results_folder + "DFT Plot.png", ChartImageFormat.Png);
+            //freq_peaks_chart.SaveImage(save_results_folder + "Frequency Estimation Plot.png", ChartImageFormat.Png);
+
+            //save all data sets master , trimmed, trimmed filtered using the catalog
+
+            //select all data sets for export
+            Boolean export_master = true;
+            Boolean export_clone = true;
+            Boolean export_filter = true;
+
+            export_acceleration_datasets_csv(export_master, export_clone, export_filter, false, select_data_set_tool_strip_combo_box.SelectedIndex);
+        }
+
+        private void autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem.Checked == true)
+            {
+                autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem.Checked = false;
+            }
+            else
+            {
+                autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem.Checked = true;
+            }
+        }
+
+        private void autosaveAfterSwitchingDatasetsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (autosaveAfterSwitchingDatasetsToolStripMenuItem.Checked == true)
+            {
+                autosaveAfterSwitchingDatasetsToolStripMenuItem.Checked = false;
+            }
+            else
+            {
+                autosaveAfterSwitchingDatasetsToolStripMenuItem.Checked = true;
+            }
         }
     }
 
@@ -3447,7 +3925,52 @@ namespace Damping_Data_Processor
 
         //stroed checked directions
         public List<List<Boolean>> data_direction_checkmark_tracker_drs = new List<List<Boolean>>();
+
+        //store all results
+        public List<List<List<double>>> session_results_tracker_drs = new List<List<List<double>>>();
+
+        //stores datastreams of chart scxreenshots
+        //public List<List<System.IO.MemoryStream>> chart_screenshot_tracker_drs = new List<List<System.IO.MemoryStream>>();
+
+        public List<List<Byte[]>> chart_screenshot_tracker_byte_array_drs = new List<List<Byte[]>>();
+
     }
 
 
 }
+
+///// <summary>
+///// Handles the (de)serialization of <see cref="Stream"/>.
+///// </summary>
+///// <remarks>
+///// The <see cref="Stream"/> will be written as a Base64 encoded string, on the inverse it will be converted from a Base64 string to a <see cref="MemoryStream"/>.
+///// </remarks>
+//public class StreamStringConverter : JsonConverter
+//{
+//    private static Type AllowedType = typeof(Stream);
+
+//    public override bool CanConvert(Type objectType)
+//        => objectType == AllowedType;
+
+//    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+//    {
+//        var objectContents = (string)reader.Value;
+//        var base64Decoded = Convert.FromBase64String(objectContents);
+
+//        var memoryStream = new MemoryStream(base64Decoded);
+
+//        return memoryStream;
+//    }
+
+//    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+//    {
+//        var valueStream = (FileStream)value;
+//        var fileBytes = new byte[valueStream.Length];
+
+//        valueStream.Read(fileBytes, 0, (int)valueStream.Length);
+
+//        var bytesAsString = Convert.ToBase64String(fileBytes);
+
+//        writer.WriteValue(bytesAsString);
+//    }
+//}

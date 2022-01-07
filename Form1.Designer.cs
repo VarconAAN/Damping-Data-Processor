@@ -67,17 +67,20 @@ namespace Damping_Data_Processor
             this.saveSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.select_data_set_tool_strip_combo_box = new System.Windows.Forms.ToolStripComboBox();
-            this.exportResultsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportResultsSummaryEditedDatasetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.displayResultsSummaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportTrimmedDatasetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.freqResponseTransformPlotYAxisScaleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.linear_or_log_combobox = new System.Windows.Forms.ToolStripComboBox();
+            this.autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.autosaveAfterSwitchingDatasetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportResultsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportCurrentDatasetsResultsOnlyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.displayResultsSummaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportTrimmedDatasetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutStructuralDampingReductionProcessorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -424,8 +427,8 @@ namespace Damping_Data_Processor
             this.menu_strip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.select_data_set_tool_strip_combo_box,
-            this.exportResultsToolStripMenuItem,
             this.settingsToolStripMenuItem,
+            this.exportResultsToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.menu_strip.Location = new System.Drawing.Point(0, 0);
             this.menu_strip.Name = "menu_strip";
@@ -469,64 +472,18 @@ namespace Damping_Data_Processor
             this.select_data_set_tool_strip_combo_box.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.select_data_set_tool_strip_combo_box.MaxDropDownItems = 100;
             this.select_data_set_tool_strip_combo_box.Name = "select_data_set_tool_strip_combo_box";
-            this.select_data_set_tool_strip_combo_box.Size = new System.Drawing.Size(600, 23);
+            this.select_data_set_tool_strip_combo_box.Size = new System.Drawing.Size(800, 23);
             this.select_data_set_tool_strip_combo_box.SelectedIndexChanged += new System.EventHandler(this.select_data_set_tool_strip_combo_box_SelectedIndexChanged_1);
             this.select_data_set_tool_strip_combo_box.Click += new System.EventHandler(this.select_data_set_tool_strip_combo_box_Click);
-            // 
-            // exportResultsToolStripMenuItem
-            // 
-            this.exportResultsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportResultsSummaryEditedDatasetsToolStripMenuItem,
-            this.displayResultsSummaryToolStripMenuItem,
-            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem,
-            this.exportTrimmedDatasetsToolStripMenuItem,
-            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem});
-            this.exportResultsToolStripMenuItem.Name = "exportResultsToolStripMenuItem";
-            this.exportResultsToolStripMenuItem.Size = new System.Drawing.Size(93, 23);
-            this.exportResultsToolStripMenuItem.Text = "Export Results";
-            this.exportResultsToolStripMenuItem.Click += new System.EventHandler(this.exportResultsToolStripMenuItem_Click);
-            // 
-            // exportResultsSummaryEditedDatasetsToolStripMenuItem
-            // 
-            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Name = "exportResultsSummaryEditedDatasetsToolStripMenuItem";
-            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Size = new System.Drawing.Size(369, 22);
-            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Text = "Export results summary and all datasets to output folder";
-            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Click += new System.EventHandler(this.exportResultsSummaryEditedDatasetsToolStripMenuItem_Click);
-            // 
-            // displayResultsSummaryToolStripMenuItem
-            // 
-            this.displayResultsSummaryToolStripMenuItem.Name = "displayResultsSummaryToolStripMenuItem";
-            this.displayResultsSummaryToolStripMenuItem.Size = new System.Drawing.Size(369, 22);
-            this.displayResultsSummaryToolStripMenuItem.Text = "Display total results summary";
-            this.displayResultsSummaryToolStripMenuItem.Click += new System.EventHandler(this.displayResultsSummaryToolStripMenuItem_Click);
-            // 
-            // exportUneditedDatasetsToOutputFolderToolStripMenuItem
-            // 
-            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem.Name = "exportUneditedDatasetsToOutputFolderToolStripMenuItem";
-            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem.Size = new System.Drawing.Size(369, 22);
-            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem.Text = "Export unedited datasets to output folder";
-            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem.Click += new System.EventHandler(this.exportUneditedDatasetsToOutputFolderToolStripMenuItem_Click);
-            // 
-            // exportTrimmedDatasetsToolStripMenuItem
-            // 
-            this.exportTrimmedDatasetsToolStripMenuItem.Name = "exportTrimmedDatasetsToolStripMenuItem";
-            this.exportTrimmedDatasetsToolStripMenuItem.Size = new System.Drawing.Size(369, 22);
-            this.exportTrimmedDatasetsToolStripMenuItem.Text = "Export trimmed datasets to output folder";
-            this.exportTrimmedDatasetsToolStripMenuItem.Click += new System.EventHandler(this.exportTrimmedDatasetsToolStripMenuItem_Click);
-            // 
-            // exportFilteredAndTrimmedDatasetsToolStripMenuItem
-            // 
-            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem.Name = "exportFilteredAndTrimmedDatasetsToolStripMenuItem";
-            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem.Size = new System.Drawing.Size(369, 22);
-            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem.Text = "Export filtered and trimmed datasets to output folder";
-            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem.Click += new System.EventHandler(this.exportFilteredAndTrimmedDatasetsToolStripMenuItem_Click);
             // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem,
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem,
-            this.freqResponseTransformPlotYAxisScaleToolStripMenuItem});
+            this.freqResponseTransformPlotYAxisScaleToolStripMenuItem,
+            this.autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem,
+            this.autosaveAfterSwitchingDatasetsToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 23);
             this.settingsToolStripMenuItem.Text = "Settings";
@@ -563,6 +520,80 @@ namespace Damping_Data_Processor
             this.linear_or_log_combobox.Name = "linear_or_log_combobox";
             this.linear_or_log_combobox.Size = new System.Drawing.Size(121, 23);
             this.linear_or_log_combobox.DropDownClosed += new System.EventHandler(this.linear_or_log_combobox_DropDownClosed);
+            // 
+            // autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem
+            // 
+            this.autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem.Name = "autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem";
+            this.autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
+            this.autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem.Text = "Autosave after \"Calculate Damping Ratio and Freq.\"";
+            this.autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem.ToolTipText = "Disabling improves program speed";
+            this.autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem.Click += new System.EventHandler(this.autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem_Click);
+            // 
+            // autosaveAfterSwitchingDatasetsToolStripMenuItem
+            // 
+            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.Checked = true;
+            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.Name = "autosaveAfterSwitchingDatasetsToolStripMenuItem";
+            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
+            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.Text = "Autosave after switching datasets";
+            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.ToolTipText = "Disabling improves program speed";
+            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.Click += new System.EventHandler(this.autosaveAfterSwitchingDatasetsToolStripMenuItem_Click);
+            // 
+            // exportResultsToolStripMenuItem
+            // 
+            this.exportResultsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem,
+            this.exportCurrentDatasetsResultsOnlyToolStripMenuItem,
+            this.displayResultsSummaryToolStripMenuItem,
+            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem,
+            this.exportTrimmedDatasetsToolStripMenuItem,
+            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem});
+            this.exportResultsToolStripMenuItem.Name = "exportResultsToolStripMenuItem";
+            this.exportResultsToolStripMenuItem.Size = new System.Drawing.Size(93, 23);
+            this.exportResultsToolStripMenuItem.Text = "Export Results";
+            this.exportResultsToolStripMenuItem.Click += new System.EventHandler(this.exportResultsToolStripMenuItem_Click);
+            // 
+            // exportResultsSummaryEditedDatasetsToolStripMenuItem
+            // 
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Name = "exportResultsSummaryEditedDatasetsToolStripMenuItem";
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Size = new System.Drawing.Size(402, 22);
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Text = "Export Results Summary and All Session Data to Output Folder";
+            this.exportResultsSummaryEditedDatasetsToolStripMenuItem.Click += new System.EventHandler(this.exportResultsSummaryEditedDatasetsToolStripMenuItem_Click);
+            // 
+            // exportCurrentDatasetsResultsOnlyToolStripMenuItem
+            // 
+            this.exportCurrentDatasetsResultsOnlyToolStripMenuItem.Name = "exportCurrentDatasetsResultsOnlyToolStripMenuItem";
+            this.exportCurrentDatasetsResultsOnlyToolStripMenuItem.Size = new System.Drawing.Size(402, 22);
+            this.exportCurrentDatasetsResultsOnlyToolStripMenuItem.Text = "Export Current Dataset Results Only";
+            this.exportCurrentDatasetsResultsOnlyToolStripMenuItem.Click += new System.EventHandler(this.exportCurrentDatasetsResultsOnlyToolStripMenuItem_Click);
+            // 
+            // displayResultsSummaryToolStripMenuItem
+            // 
+            this.displayResultsSummaryToolStripMenuItem.Name = "displayResultsSummaryToolStripMenuItem";
+            this.displayResultsSummaryToolStripMenuItem.Size = new System.Drawing.Size(402, 22);
+            this.displayResultsSummaryToolStripMenuItem.Text = "Display total results summary";
+            this.displayResultsSummaryToolStripMenuItem.Click += new System.EventHandler(this.displayResultsSummaryToolStripMenuItem_Click);
+            // 
+            // exportUneditedDatasetsToOutputFolderToolStripMenuItem
+            // 
+            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem.Name = "exportUneditedDatasetsToOutputFolderToolStripMenuItem";
+            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem.Size = new System.Drawing.Size(402, 22);
+            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem.Text = "Export unedited datasets to output folder";
+            this.exportUneditedDatasetsToOutputFolderToolStripMenuItem.Click += new System.EventHandler(this.exportUneditedDatasetsToOutputFolderToolStripMenuItem_Click);
+            // 
+            // exportTrimmedDatasetsToolStripMenuItem
+            // 
+            this.exportTrimmedDatasetsToolStripMenuItem.Name = "exportTrimmedDatasetsToolStripMenuItem";
+            this.exportTrimmedDatasetsToolStripMenuItem.Size = new System.Drawing.Size(402, 22);
+            this.exportTrimmedDatasetsToolStripMenuItem.Text = "Export trimmed datasets to output folder";
+            this.exportTrimmedDatasetsToolStripMenuItem.Click += new System.EventHandler(this.exportTrimmedDatasetsToolStripMenuItem_Click);
+            // 
+            // exportFilteredAndTrimmedDatasetsToolStripMenuItem
+            // 
+            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem.Name = "exportFilteredAndTrimmedDatasetsToolStripMenuItem";
+            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem.Size = new System.Drawing.Size(402, 22);
+            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem.Text = "Export filtered and trimmed datasets to output folder";
+            this.exportFilteredAndTrimmedDatasetsToolStripMenuItem.Click += new System.EventHandler(this.exportFilteredAndTrimmedDatasetsToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
@@ -931,6 +962,9 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.CheckBox freq_estimation_reject_freq_checkbox;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.ToolStripMenuItem exportCurrentDatasetsResultsOnlyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem autosaveAfterSwitchingDatasetsToolStripMenuItem;
     }
 }
 
