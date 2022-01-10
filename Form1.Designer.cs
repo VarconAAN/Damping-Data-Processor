@@ -124,13 +124,13 @@ namespace Damping_Data_Processor
             this.signal_data_chart_main.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
             this.signal_data_chart_main.Legends.Add(legend1);
-            this.signal_data_chart_main.Location = new System.Drawing.Point(367, 31);
+            this.signal_data_chart_main.Location = new System.Drawing.Point(367, 41);
             this.signal_data_chart_main.Name = "signal_data_chart_main";
             series1.ChartArea = "ChartArea1";
             series1.Legend = "Legend1";
             series1.Name = "Series1";
             this.signal_data_chart_main.Series.Add(series1);
-            this.signal_data_chart_main.Size = new System.Drawing.Size(1076, 501);
+            this.signal_data_chart_main.Size = new System.Drawing.Size(1076, 488);
             this.signal_data_chart_main.TabIndex = 0;
             this.signal_data_chart_main.Text = "chart1";
             this.signal_data_chart_main.AnnotationPositionChanged += new System.EventHandler(this.signal_data_chart_main_AnnotationPositionChanged);
@@ -139,7 +139,7 @@ namespace Damping_Data_Processor
             // 
             // trim_data_button
             // 
-            this.trim_data_button.Location = new System.Drawing.Point(0, 97);
+            this.trim_data_button.Location = new System.Drawing.Point(0, 110);
             this.trim_data_button.Name = "trim_data_button";
             this.trim_data_button.Size = new System.Drawing.Size(129, 44);
             this.trim_data_button.TabIndex = 1;
@@ -161,7 +161,7 @@ namespace Damping_Data_Processor
             // input_folder_textbox
             // 
             this.input_folder_textbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.input_folder_textbox.Location = new System.Drawing.Point(2, 44);
+            this.input_folder_textbox.Location = new System.Drawing.Point(2, 57);
             this.input_folder_textbox.Multiline = true;
             this.input_folder_textbox.Name = "input_folder_textbox";
             this.input_folder_textbox.ReadOnly = true;
@@ -171,7 +171,7 @@ namespace Damping_Data_Processor
             // reset_data_trimming_button
             // 
             this.reset_data_trimming_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.reset_data_trimming_button.Location = new System.Drawing.Point(135, 97);
+            this.reset_data_trimming_button.Location = new System.Drawing.Point(135, 110);
             this.reset_data_trimming_button.Name = "reset_data_trimming_button";
             this.reset_data_trimming_button.Size = new System.Drawing.Size(135, 44);
             this.reset_data_trimming_button.TabIndex = 13;
@@ -349,7 +349,7 @@ namespace Damping_Data_Processor
             // 
             this.select_data_direction_check_list_box.CheckOnClick = true;
             this.select_data_direction_check_list_box.FormattingEnabled = true;
-            this.select_data_direction_check_list_box.Location = new System.Drawing.Point(276, 32);
+            this.select_data_direction_check_list_box.Location = new System.Drawing.Point(276, 45);
             this.select_data_direction_check_list_box.Name = "select_data_direction_check_list_box";
             this.select_data_direction_check_list_box.Size = new System.Drawing.Size(87, 109);
             this.select_data_direction_check_list_box.TabIndex = 41;
@@ -359,7 +359,7 @@ namespace Damping_Data_Processor
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(278, 144);
+            this.label8.Location = new System.Drawing.Point(278, 157);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(85, 13);
             this.label8.TabIndex = 42;
@@ -432,7 +432,7 @@ namespace Damping_Data_Processor
             this.aboutToolStripMenuItem});
             this.menu_strip.Location = new System.Drawing.Point(0, 0);
             this.menu_strip.Name = "menu_strip";
-            this.menu_strip.Size = new System.Drawing.Size(1447, 27);
+            this.menu_strip.Size = new System.Drawing.Size(1447, 40);
             this.menu_strip.TabIndex = 48;
             this.menu_strip.Text = "menuStrip1";
             // 
@@ -443,36 +443,37 @@ namespace Damping_Data_Processor
             this.saveSessionToolStripMenuItem,
             this.loadSessionToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 23);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 36);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // selectInputFolderToolStripMenuItem
             // 
             this.selectInputFolderToolStripMenuItem.Name = "selectInputFolderToolStripMenuItem";
-            this.selectInputFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.selectInputFolderToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.selectInputFolderToolStripMenuItem.Text = "Select input folder";
             this.selectInputFolderToolStripMenuItem.Click += new System.EventHandler(this.selectInputFolderToolStripMenuItem_Click);
             // 
             // saveSessionToolStripMenuItem
             // 
             this.saveSessionToolStripMenuItem.Name = "saveSessionToolStripMenuItem";
-            this.saveSessionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveSessionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.saveSessionToolStripMenuItem.Text = "Save session";
             this.saveSessionToolStripMenuItem.Click += new System.EventHandler(this.saveSessionToolStripMenuItem_Click);
             // 
             // loadSessionToolStripMenuItem
             // 
             this.loadSessionToolStripMenuItem.Name = "loadSessionToolStripMenuItem";
-            this.loadSessionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.loadSessionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.loadSessionToolStripMenuItem.Text = "Load session";
             this.loadSessionToolStripMenuItem.Click += new System.EventHandler(this.loadSessionToolStripMenuItem_Click);
             // 
             // select_data_set_tool_strip_combo_box
             // 
             this.select_data_set_tool_strip_combo_box.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.select_data_set_tool_strip_combo_box.Font = new System.Drawing.Font("Segoe UI", 15F);
             this.select_data_set_tool_strip_combo_box.MaxDropDownItems = 100;
             this.select_data_set_tool_strip_combo_box.Name = "select_data_set_tool_strip_combo_box";
-            this.select_data_set_tool_strip_combo_box.Size = new System.Drawing.Size(800, 23);
+            this.select_data_set_tool_strip_combo_box.Size = new System.Drawing.Size(1000, 36);
             this.select_data_set_tool_strip_combo_box.SelectedIndexChanged += new System.EventHandler(this.select_data_set_tool_strip_combo_box_SelectedIndexChanged_1);
             this.select_data_set_tool_strip_combo_box.Click += new System.EventHandler(this.select_data_set_tool_strip_combo_box_Click);
             // 
@@ -485,7 +486,7 @@ namespace Damping_Data_Processor
             this.autosaveAfterCalculateDampingRatioAndFreqToolStripMenuItem,
             this.autosaveAfterSwitchingDatasetsToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 23);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 36);
             this.settingsToolStripMenuItem.Text = "Settings";
             // 
             // importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem
@@ -549,7 +550,7 @@ namespace Damping_Data_Processor
             this.exportTrimmedDatasetsToolStripMenuItem,
             this.exportFilteredAndTrimmedDatasetsToolStripMenuItem});
             this.exportResultsToolStripMenuItem.Name = "exportResultsToolStripMenuItem";
-            this.exportResultsToolStripMenuItem.Size = new System.Drawing.Size(93, 23);
+            this.exportResultsToolStripMenuItem.Size = new System.Drawing.Size(93, 36);
             this.exportResultsToolStripMenuItem.Text = "Export Results";
             this.exportResultsToolStripMenuItem.Click += new System.EventHandler(this.exportResultsToolStripMenuItem_Click);
             // 
@@ -601,7 +602,7 @@ namespace Damping_Data_Processor
             this.documentationToolStripMenuItem,
             this.aboutStructuralDampingReductionProcessorToolStripMenuItem});
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 23);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 36);
             this.aboutToolStripMenuItem.Text = "About";
             // 
             // documentationToolStripMenuItem
@@ -631,7 +632,7 @@ namespace Damping_Data_Processor
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(86, 28);
+            this.label4.Location = new System.Drawing.Point(86, 41);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(108, 13);
             this.label4.TabIndex = 49;
