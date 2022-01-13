@@ -74,7 +74,6 @@ namespace Damping_Data_Processor
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.freqResponseTransformPlotYAxisScaleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.linear_or_log_combobox = new System.Windows.Forms.ToolStripComboBox();
-            this.autosaveAfterSwitchingDatasetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutStructuralDampingReductionProcessorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -484,7 +483,7 @@ namespace Damping_Data_Processor
             // 
             this.exportResultDataFromCurrentSlelectedDatasetObjectToolStripMenuItem.Name = "exportResultDataFromCurrentSlelectedDatasetObjectToolStripMenuItem";
             this.exportResultDataFromCurrentSlelectedDatasetObjectToolStripMenuItem.Size = new System.Drawing.Size(370, 22);
-            this.exportResultDataFromCurrentSlelectedDatasetObjectToolStripMenuItem.Text = "Export result data from current slelected dataset object";
+            this.exportResultDataFromCurrentSlelectedDatasetObjectToolStripMenuItem.Text = "Export result data from current selected dataset object";
             this.exportResultDataFromCurrentSlelectedDatasetObjectToolStripMenuItem.Click += new System.EventHandler(this.exportResultDataFromCurrentSlelectedDatasetObjectToolStripMenuItem_Click);
             // 
             // settingsToolStripMenuItem
@@ -492,8 +491,7 @@ namespace Damping_Data_Processor
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem,
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem,
-            this.freqResponseTransformPlotYAxisScaleToolStripMenuItem,
-            this.autosaveAfterSwitchingDatasetsToolStripMenuItem});
+            this.freqResponseTransformPlotYAxisScaleToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 36);
             this.settingsToolStripMenuItem.Text = "Settings";
@@ -530,16 +528,6 @@ namespace Damping_Data_Processor
             this.linear_or_log_combobox.Name = "linear_or_log_combobox";
             this.linear_or_log_combobox.Size = new System.Drawing.Size(121, 23);
             this.linear_or_log_combobox.DropDownClosed += new System.EventHandler(this.linear_or_log_combobox_DropDownClosed);
-            // 
-            // autosaveAfterSwitchingDatasetsToolStripMenuItem
-            // 
-            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.Checked = true;
-            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.Name = "autosaveAfterSwitchingDatasetsToolStripMenuItem";
-            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
-            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.Text = "Autosave after switching datasets";
-            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.ToolTipText = "Disabling improves program speed";
-            this.autosaveAfterSwitchingDatasetsToolStripMenuItem.Click += new System.EventHandler(this.autosaveAfterSwitchingDatasetsToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
@@ -902,7 +890,6 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.CheckBox freq_estimation_reject_freq_checkbox;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.ToolStripMenuItem autosaveAfterSwitchingDatasetsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveDatasetToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportResultDataFromCurrentSlelectedDatasetObjectToolStripMenuItem;
     }
