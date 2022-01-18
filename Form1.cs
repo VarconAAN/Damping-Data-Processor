@@ -223,6 +223,7 @@ namespace Damping_Data_Processor
         public void export_session_results_to_csv(string folder_filepath, string filename)
         {
             List<List<string>> csv_data = new List<List<string>>();
+            const string quote = "\"";
 
             List<string> header_row = new List<string>();
             header_row.Add("Dataset Name");
@@ -237,6 +238,8 @@ namespace Damping_Data_Processor
             header_row.Add("Natural Frequency Peaks (Hz) Average");
             header_row.Add("Damping Ratio DFT frequency (%) Average");
             header_row.Add("Damping Ratio Peaks frequency (%) Average");
+            //header_row.Add("");
+            //header_row.Add("Minimum R_Squared Thresehold");
 
             List<string> row1 = new List<string>();
             row1.Add("");
@@ -251,6 +254,8 @@ namespace Damping_Data_Processor
             row1.Add("=AVERAGE(D2:D999)");
             row1.Add("=AVERAGE(E2:E999)");
             row1.Add("=AVERAGE(F2:F999)");
+            //row1.Add("");
+            //row1.Add("0.95");
 
             List<string> row2 = new List<string>();
             row2.Add("");
@@ -1790,26 +1795,50 @@ namespace Damping_Data_Processor
 
         public void save_list_of_list_string_as_csv(List<List<string>> data, string filepath)
         {
+            string message = "Cannot save " + filepath + " as an exsiting file with the same name cannot be accessed. Try closing the specified file and try again";
+            string title = "Error";
+
+            ////check if file is locked
+            //if (IsFileLocked(new FileInfo(filepath)))
+            //{
+            //    FlexibleMessageBox.Show(message, title);
+            //    return;
+            //}
+
+
             try
             {
+                //const string SEPARATOR = ",";
+                //using (StreamWriter writer = new StreamWriter(filepath))
+                //{
+                //    data.ForEach(line =>
+                //    {
+                //        var lineArray = line.Select(c => c.Contains(SEPARATOR) ? c.Replace(SEPARATOR.ToString(), "\\" + SEPARATOR) : c).ToArray();
+                //        writer.WriteLine(string.Join(SEPARATOR, lineArray));
+                //    });
+                //}
+
+                const string quote = "\"";
                 const string SEPARATOR = ",";
                 using (StreamWriter writer = new StreamWriter(filepath))
                 {
-                    data.ForEach(line =>
+                    for (int i = 0; i < data.Count; i++)
                     {
-                        var lineArray = line.Select(c =>
-                            c.Contains(SEPARATOR) ? c.Replace(SEPARATOR.ToString(), "\\" + SEPARATOR) : c).ToArray();
-                        writer.WriteLine(string.Join(SEPARATOR, lineArray));
-                    });
+                        ////wrap every cell with quotes
+                        //for (int j = 0; j < data[i].Count; j++)
+                        //{
+                        //    data[i][j] = data[i][j];
+                        //}
+                        //add a comma between every cell
+                        writer.WriteLine(string.Join(SEPARATOR, data[i]));
+                    }
+
                 }
             }
             catch
             {
-                string message = "Cannot save " + filepath + " as an exsiting file with the same name cannot be accessed. Try clsoing the specified file and try again";
-                string title = "Error";
                 FlexibleMessageBox.Show(message, title);
                 return;
-
             }
         }
 
@@ -1894,7 +1923,7 @@ namespace Damping_Data_Processor
 
             if (time_value.Count() != frequency_peaks.Count())
             {
-                string message = "freq peeaks plot data is not same length";
+                string message = "freq peaks plot data is not same length";
                 string title = "Error";
                 FlexibleMessageBox.Show(message, title);
                 return;
@@ -2679,6 +2708,9 @@ namespace Damping_Data_Processor
         {
             changes_cursor_icon_to_loading(true);
 
+            current_dataset_filepath_label.Visible = true;
+            current_dataset_filepath_label.Text = dataset_input_filepaths_short[dataset_index];
+
             //autosave the last dataset (if one loaded) and seriliaze it to a file
             //remove the corresponding csv from the combolist dropdown and add the new json file version of the last dataset
             save_dataset_object();
@@ -2717,19 +2749,30 @@ namespace Damping_Data_Processor
                 plot_data_on_chart(signal_data_chart_main, data_direction_name, drd.datasets_filter_trim, "Time (Seconds)", y_axis_label_data_chart);
                 //plot the trimming annotations
                 draw_vertical_annotations(signal_data_chart_main, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, drd.datasets_filter_trim[0]);
+
+                additonal_plots_manager(drd.datasets_filter_trim, drd.natural_freq_fft);
+
             }
             else if (drd.datasets_trim.Count > 0)
             {
                 plot_data_on_chart(signal_data_chart_main, data_direction_name, drd.datasets_trim, "Time (Seconds)", y_axis_label_data_chart);
                 //plot the trimming annotations
                 draw_vertical_annotations(signal_data_chart_main, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, drd.datasets_trim[0]);
+
+                additonal_plots_manager(drd.datasets_trim, drd.natural_freq_fft);
             }
             else
             {
                 plot_data_on_chart(signal_data_chart_main, data_direction_name, drd.datasets_master, "Time (Seconds)", y_axis_label_data_chart);
                 //plot the trimming annotations
                 draw_vertical_annotations(signal_data_chart_main, lower_data_boundary_vertical_line, upper_data_boundary_vertical_line, drd.datasets_master[0]);
+
+                additonal_plots_manager(drd.datasets_master, drd.natural_freq_fft);
             }
+
+
+
+
 
             enable_all_user_controls(true);
 
@@ -3155,11 +3198,6 @@ namespace Damping_Data_Processor
                     }
                     else
                     {
-                        ////reuse the peeaks stroage data as it is the trimmed data from the freq est. plot window
-                        //natural_frequncy_peaks = new List<double>(freq_peaks_storage[ddi]);
-                        //local_maximas_indexs = new List<int>(local_maximas_indexs_storage[ddi]);
-                        //peak_amplitudes = new List<double>(peak_amplitudes_storage[ddi]);
-                        //local_maximas_time_values = new List<double>(local_maximas_time_values_storage[ddi]);
 
                         plot_peaks_chart(drd.local_maximas_indicies[ddi], selected_data_set_abs, data_direction_name[ddi] + " Peaks", ddi);
 
@@ -3363,7 +3401,7 @@ namespace Damping_Data_Processor
         {
             session_results_tracker.Clear();
 
-            for (int i = 0; i<dataset_input_filepaths.Count; i++)
+            for (int i = 0; i < dataset_input_filepaths.Count; i++)
             {
                 if (dataset_input_filepaths[i].Contains(dataset_object_file_extension))
                 {
@@ -3378,7 +3416,7 @@ namespace Damping_Data_Processor
             export_session_results_to_csv(input_folder + output_folder_name, "Damping Reduction Results");
         }
 
-        public void get_session_result_data_from_drd (damping_reduction_dataset drd_temp)
+        public void get_session_result_data_from_drd(damping_reduction_dataset drd_temp)
         {
 
             List<List<double>> session_results_tracker_sub_list = new List<List<double>>();
@@ -3408,7 +3446,7 @@ namespace Damping_Data_Processor
                 }
                 session_results_tracker.Add(session_results_tracker_sub_list);
             }
-     
+
         }
 
 
@@ -3626,6 +3664,37 @@ namespace Damping_Data_Processor
 
         //utility functions
 
+        public void additonal_plots_manager(List<List<double>> selected_data_sets, List<double> natural_frequencies)
+        {
+            freq_peaks_chart.Series.Clear();
+
+
+            //List<List<double>> all_selected_data_set_abs = new List<double>();
+            for (int ddi = 0; ddi < 6; ddi++)
+            {
+                if (drd.local_maximas_indicies.Count > 0 && drd.local_maximas_indicies[ddi].Count>0 && drd.local_maximas_amplitudes[ddi].Count>0 && drd.local_maximas_times[ddi].Count>0)
+                {
+                    //create an absoluted data set for the analysis
+                    List<double> single_selected_data_set_abs = new List<double>();
+                    for (int i = 0; i < selected_data_sets[ddi+1].Count; i++)
+                    {
+                        single_selected_data_set_abs.Add(Math.Abs(selected_data_sets[ddi+1][i]));
+                    }
+                    //all_selected_data_set_abs.Add(single_selected_data_set_abs);
+
+                    //plot peaks
+                    plot_peaks_chart(drd.local_maximas_indicies[ddi], single_selected_data_set_abs, data_direction_name[ddi] + " Peaks", ddi);
+
+                    //exp curve fit plot
+                    exp_curve_fit_and_plot(ddi, single_selected_data_set_abs, natural_frequencies);
+
+                    //plot the freq peaks response
+                    plot_freq_peaks_response(drd.local_maximas_times[ddi], drd.natural_freq_dist_btwn_peaks[ddi], data_direction_name[ddi]);
+                }
+
+            }
+        }
+
         public void remove_non_signal_series_plot()
         {
             for (int i = signal_data_chart_main.Series.Count - 1; i > 5; i--)
@@ -3682,8 +3751,8 @@ namespace Damping_Data_Processor
             //using peaks freq
             damp_ratio_exp_peaks = Math.Abs(p_exp_coeff[1] / (2 * Math.PI * drd.natural_freq_dist_btwn_peaks_average[ddi]));
 
-            drd.damp_ratio_exp_fft_freq[ddi] = damp_ratio_exp_fft_freq*100;
-            drd.damp_ratio_exp_peaks[ddi] = damp_ratio_exp_peaks*100;
+            drd.damp_ratio_exp_fft_freq[ddi] = damp_ratio_exp_fft_freq * 100;
+            drd.damp_ratio_exp_peaks[ddi] = damp_ratio_exp_peaks * 100;
 
             List<double> exp_curve_fit_values = plot_fitted_exponential_curve(p_exp_coeff[0], p_exp_coeff[1], data_direction_name[ddi], ddi);
 
@@ -4031,6 +4100,11 @@ namespace Damping_Data_Processor
         }
 
         private void freq_dft_chart_AxisViewChanged_1(object sender, ViewEventArgs e)
+        {
+
+        }
+
+        private void current_dataset_filepath_label_Click(object sender, EventArgs e)
         {
 
         }

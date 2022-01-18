@@ -94,6 +94,7 @@ namespace Damping_Data_Processor
             this.freq_estimation_high_cutoff_freq_numupdown = new System.Windows.Forms.NumericUpDown();
             this.label13 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
+            this.current_dataset_filepath_label = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.signal_data_chart_main)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
@@ -347,7 +348,6 @@ namespace Damping_Data_Processor
             this.select_data_direction_check_list_box.Size = new System.Drawing.Size(87, 109);
             this.select_data_direction_check_list_box.TabIndex = 41;
             this.select_data_direction_check_list_box.SelectedIndexChanged += new System.EventHandler(this.select_data_direction_check_list_box_SelectedIndexChanged);
-            this.select_data_direction_check_list_box.QueryAccessibilityHelp += new System.Windows.Forms.QueryAccessibilityHelpEventHandler(this.select_data_direction_check_list_box_QueryAccessibilityHelp);
             // 
             // label8
             // 
@@ -767,11 +767,28 @@ namespace Damping_Data_Processor
             this.label14.TabIndex = 66;
             this.label14.Text = "(Discrete Frequency Transform)";
             // 
+            // current_dataset_filepath_label
+            // 
+            this.current_dataset_filepath_label.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.current_dataset_filepath_label.AutoSize = true;
+            this.current_dataset_filepath_label.BackColor = System.Drawing.Color.Transparent;
+            this.current_dataset_filepath_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.current_dataset_filepath_label.Location = new System.Drawing.Point(1181, 45);
+            this.current_dataset_filepath_label.Name = "current_dataset_filepath_label";
+            this.current_dataset_filepath_label.Size = new System.Drawing.Size(98, 13);
+            this.current_dataset_filepath_label.TabIndex = 68;
+            this.current_dataset_filepath_label.Text = "dataset_filepath";
+            this.current_dataset_filepath_label.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.current_dataset_filepath_label.Visible = false;
+            this.current_dataset_filepath_label.Click += new System.EventHandler(this.current_dataset_filepath_label_Click);
+            // 
             // form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.ClientSize = new System.Drawing.Size(1447, 766);
+            this.Controls.Add(this.current_dataset_filepath_label);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.freq_estimation_reject_freq_checkbox);
@@ -892,6 +909,7 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.ToolStripMenuItem saveDatasetToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportResultDataFromCurrentSlelectedDatasetObjectToolStripMenuItem;
+        private System.Windows.Forms.Label current_dataset_filepath_label;
     }
 }
 
