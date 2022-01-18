@@ -2789,6 +2789,11 @@ namespace Damping_Data_Processor
             automatically_update_freq_repsonse_plot();
 
             scan_input_folder_for_datasets();
+    
+            for(int i=0; i<freq_peaks_chart.Series.Count; i++)
+            {
+                freq_peaks_chart.Series[i].Enabled = true;
+            }
 
             changes_cursor_icon_to_loading(false);
         }
