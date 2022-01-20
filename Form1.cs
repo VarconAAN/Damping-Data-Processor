@@ -167,6 +167,16 @@ namespace Damping_Data_Processor
             signal_colors.Add(Color.SaddleBrown);
 
 
+            bandpass_freq_buffer_choices_combobox.Items.Add(0.05);
+            bandpass_freq_buffer_choices_combobox.Items.Add(0.1);
+            bandpass_freq_buffer_choices_combobox.Items.Add(0.2);
+            bandpass_freq_buffer_choices_combobox.Items.Add(0.3);
+            bandpass_freq_buffer_choices_combobox.Items.Add(0.4);
+            bandpass_freq_buffer_choices_combobox.Items.Add(0.5);
+            bandpass_freq_buffer_choices_combobox.Items.Add(0.6);
+
+            bandpass_freq_buffer_choices_combobox.SelectedIndex = 1;
+
 
             enable_all_user_controls(false);
         }
@@ -472,7 +482,7 @@ namespace Damping_Data_Processor
 
         }
 
-        public void automatically_update_freq_repsonse_plot()
+        public List<double> automatically_update_freq_repsonse_plot()
         {
             //get the data set to perfom analysis on (filter or unfiltered)
             List<List<double>> selected_data_sets = new List<List<double>>();
@@ -486,13 +496,23 @@ namespace Damping_Data_Processor
             }
             if (selected_data_sets.Count <= 0)
             {
-                return;
+                return new List<double>();
             }
             //remove the time list from data to be porocessed
             selected_data_sets.RemoveAt(0);
 
             //preform fft freq response analysis on all data sets
             List<double> natural_frequencies = fft_analysis(selected_data_sets, data_direction_name);
+
+            //update text
+            string ta1_text = string.Empty;
+            for (int i = 0; i < natural_frequencies.Count; i++)
+            {
+                ta1_text += data_direction_name[i] + ": " + Math.Round(natural_frequencies[i],3) + " Hz\r\n";
+            }
+            nat_freq_textbox.Text = ta1_text;
+
+            return natural_frequencies;
         }
 
         public void changes_cursor_icon_to_loading(Boolean processing)
@@ -2068,14 +2088,24 @@ namespace Damping_Data_Processor
 
         public void plot_data_on_freq_chart(Chart chart_name, List<string> data_sets_names, List<List<double>> freq_span, List<List<double>> mag_values, string x_axis_label, string y_axis_label)
         {
+            chart_name.Annotations.Clear();
 
             //List<List<double>> sampled_data_sets = sample_plotting_data(data_sets, chart_width);
+
+            List<double> max_freqs = new List<double>();
 
             //create series and plot
             chart_name.Series.Clear();
 
             for (int i = 0; i < freq_span.Count; i++)
             {
+                List<double> freq_temp = freq_span[i];
+                freq_temp.RemoveAt(0);                
+                List<double> mag_temp = mag_values[i];
+                mag_temp.RemoveAt(0);
+
+                max_freqs.Add(get_actual_max_freq(freq_temp, mag_temp));
+
                 System.Windows.Forms.DataVisualization.Charting.Series series = chart_name.Series.Add(data_sets_names[i] + " Freq. Resp.");
                 series.ChartType = SeriesChartType.Line;
                 series.Points.DataBindXY(freq_span[i], mag_values[i]);
@@ -2102,6 +2132,21 @@ namespace Damping_Data_Processor
                 chart_name.ChartAreas[0].AxisY.IsLogarithmic = false;
             }
 
+            ////string ta1_text = string.Empty;
+            ////for(int i =0; i< data_sets_names.Count;i++)
+            ////{
+            ////    ta1_text += data_sets_names[i] + ": " + max_freqs[i] + "Hz\n";
+            ////}
+            ////TextAnnotation ta1 = new TextAnnotation();
+            ////ta1.Text = ta1_text;
+            //////ta1.Alignment = ContentAlignment.TopRight;
+            ////ta1.AnchorX = 70;
+            ////ta1.AnchorY = 20;
+            ////ta1.IsMultiline = true;
+            ////ta1.ClipToChartArea=chart_name.ChartAreas[0].ToString();
+            ////chart_name.Annotations.Add(ta1);
+
+            //nat_freq_textbox.Text = ta1_text;
         }
 
         public void draw_vertical_annotations(Chart chart_name, VerticalLineAnnotation line1, VerticalLineAnnotation line2, List<double> time_data_list)
@@ -2706,6 +2751,8 @@ namespace Damping_Data_Processor
 
         public void new_dataset_selected(int dataset_index)
         {
+            nat_freq_textbox.Text = String.Empty;
+
             changes_cursor_icon_to_loading(true);
 
             current_dataset_filepath_label.Visible = true;
@@ -2786,7 +2833,13 @@ namespace Damping_Data_Processor
             summary_results_textbox.Text = string.Empty;
 
             //preform fft freq response analysis on all data sets
-            automatically_update_freq_repsonse_plot();
+            List<double> nat_freqs = automatically_update_freq_repsonse_plot();
+            //auto update the bandpass freqs is selected
+            if(automaticFilterFrequencySelectionToolStripMenuItem.Checked == true)
+            {
+                low_freq_cutoff_numupdown.Value = Convert.ToDecimal(nat_freqs.Average()- Convert.ToDouble(bandpass_freq_buffer_choices_combobox.SelectedItem));
+                high_freq_cutoff_numupdown.Value = Convert.ToDecimal(nat_freqs.Average()+ Convert.ToDouble(bandpass_freq_buffer_choices_combobox.SelectedItem));
+            }
 
             scan_input_folder_for_datasets();
     
@@ -3778,8 +3831,7 @@ namespace Damping_Data_Processor
             results_summary_text = results_summary_text + "Trimmed from " + first_timestamp + " seconds to " + second_timestamp + " seconds.\r\n";
             if (drd.is_data_filtered == true)
             {
-                results_summary_text = results_summary_text + "The data sets were bandpass filtered with cutoff frequencies of " + drd.low_cutoff_freq + " Hz and " + drd.high_cutoff_freq
-                    + " Hz.\r\n";
+                results_summary_text = results_summary_text + "The data sets were bandpass filtered with cutoff frequencies of " + Math.Round(drd.low_cutoff_freq,3) + " Hz and " + Math.Round(drd.high_cutoff_freq,3) + " Hz.\r\n";
                 results_summary_text = results_summary_text + header_border;
             }
             results_summary_text = results_summary_text + "\r\n";
@@ -4010,26 +4062,26 @@ namespace Damping_Data_Processor
 
         private void importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Checked == true)
-            {
-                importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Checked = false;
-            }
-            else
-            {
-                importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Checked = true;
-            }
+            //if (importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Checked == true)
+            //{
+            //    importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Checked = false;
+            //}
+            //else
+            //{
+            //    importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Checked = true;
+            //}
         }
 
         private void recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Checked == true)
-            {
-                recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Checked = false;
-            }
-            else
-            {
-                recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Checked = true;
-            }
+            //if (recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Checked == true)
+            //{
+            //    recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Checked = false;
+            //}
+            //else
+            //{
+            //    recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Checked = true;
+            //}
         }
 
         private void select_data_set_tool_strip_combo_box_SelectedIndexChanged_1(object sender, EventArgs e)
@@ -4113,8 +4165,70 @@ namespace Damping_Data_Processor
         {
 
         }
+
+        private void automaticFilterFrequencySelectionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 
+
+
+
+
+    [Serializable]
+    public class damping_reduction_dataset
+    {
+        //store datasets
+        public List<List<double>> datasets_master = new List<List<double>>();
+        public List<List<double>> datasets_trim = new List<List<double>>();
+        public List<List<double>> datasets_filter_trim = new List<List<double>>();
+
+        //store other data related to calcualting damping ratio 
+        public List<List<double>> natural_freq_dist_btwn_peaks = new List<List<double>>();
+
+        //found maximas
+        public List<List<int>> local_maximas_indicies = new List<List<int>>();
+        public List<List<double>> local_maximas_amplitudes = new List<List<double>>();
+        public List<List<double>> local_maximas_times = new List<List<double>>();
+
+        //data results
+        public List<double> natural_freq_fft = new List<double>();
+        public List<double> natural_freq_dist_btwn_peaks_average = new List<double>();
+        public List<double> damp_ratio_exp_fft_freq = new List<double>();
+        public List<double> damp_ratio_exp_peaks = new List<double>();
+        public List<double> cofefficient_of_determination = new List<double>();
+
+        //user readable results
+        public string dataset_result_summary = String.Empty;
+
+        //stores all csv filepath found in the slected input folder
+        public string dataset_input_filepath = String.Empty;
+        //stores all csv filepath found in the slected input folder (in short form for readability)
+        public string dataset_input_filepath_short = string.Empty;
+
+        //keep track of what cutoff frequencies are used
+        public double low_cutoff_freq = -1;
+        public double high_cutoff_freq = -1;
+
+        public Boolean is_data_filtered = false;
+
+        //holds the values where the annotation will be placed (relative to the trimmed dataset)
+        public int lower_trim_index_x = -1;
+        public int upper_trim_index_x = -1;
+
+        //holds the values where the annotation is placed relative to the original time dataset (not trimmed)
+        //useful when applying a filter to a dataset that has been trimmed twice
+        public int lower_trim_index_x_relative_master_dataset = -1;
+        public int upper_trim_index_x_relative_master_dataset = -1;
+
+        //stroed checked directions
+        public List<Boolean> data_direction_checkmark_tracker = new List<Boolean>();
+
+        //store screencaps of the three plots
+        public List<Byte[]> chart_screenshot_tracker_byte_array = new List<Byte[]>();
+
+    }
 
     public class ZScoreOutput
     {
@@ -4189,61 +4303,6 @@ namespace Damping_Data_Processor
             }
             return ret;
         }
-    }
-
-
-    [Serializable]
-    public class damping_reduction_dataset
-    {
-        //store datasets
-        public List<List<double>> datasets_master = new List<List<double>>();
-        public List<List<double>> datasets_trim = new List<List<double>>();
-        public List<List<double>> datasets_filter_trim = new List<List<double>>();
-
-        //store other data related to calcualting damping ratio 
-        public List<List<double>> natural_freq_dist_btwn_peaks = new List<List<double>>();
-
-        //found maximas
-        public List<List<int>> local_maximas_indicies = new List<List<int>>();
-        public List<List<double>> local_maximas_amplitudes = new List<List<double>>();
-        public List<List<double>> local_maximas_times = new List<List<double>>();
-
-        //data results
-        public List<double> natural_freq_fft = new List<double>();
-        public List<double> natural_freq_dist_btwn_peaks_average = new List<double>();
-        public List<double> damp_ratio_exp_fft_freq = new List<double>();
-        public List<double> damp_ratio_exp_peaks = new List<double>();
-        public List<double> cofefficient_of_determination = new List<double>();
-
-        //user readable results
-        public string dataset_result_summary = String.Empty;
-
-        //stores all csv filepath found in the slected input folder
-        public string dataset_input_filepath = String.Empty;
-        //stores all csv filepath found in the slected input folder (in short form for readability)
-        public string dataset_input_filepath_short = string.Empty;
-
-        //keep track of what cutoff frequencies are used
-        public double low_cutoff_freq = -1;
-        public double high_cutoff_freq = -1;
-
-        public Boolean is_data_filtered = false;
-
-        //holds the values where the annotation will be placed (relative to the trimmed dataset)
-        public int lower_trim_index_x = -1;
-        public int upper_trim_index_x = -1;
-
-        //holds the values where the annotation is placed relative to the original time dataset (not trimmed)
-        //useful when applying a filter to a dataset that has been trimmed twice
-        public int lower_trim_index_x_relative_master_dataset = -1;
-        public int upper_trim_index_x_relative_master_dataset = -1;
-
-        //stroed checked directions
-        public List<Boolean> data_direction_checkmark_tracker = new List<Boolean>();
-
-        //store screencaps of the three plots
-        public List<Byte[]> chart_screenshot_tracker_byte_array = new List<Byte[]>();
-
     }
 
 }

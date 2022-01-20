@@ -74,6 +74,8 @@ namespace Damping_Data_Processor
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.freqResponseTransformPlotYAxisScaleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.linear_or_log_combobox = new System.Windows.Forms.ToolStripComboBox();
+            this.automaticFilterFrequencySelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bandpass_freq_buffer_choices_combobox = new System.Windows.Forms.ToolStripComboBox();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutStructuralDampingReductionProcessorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -95,6 +97,8 @@ namespace Damping_Data_Processor
             this.label13 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.current_dataset_filepath_label = new System.Windows.Forms.Label();
+            this.nat_freq_textbox = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.signal_data_chart_main)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
@@ -273,13 +277,13 @@ namespace Damping_Data_Processor
             this.freq_dft_chart.ChartAreas.Add(chartArea2);
             legend2.Name = "Legend1";
             this.freq_dft_chart.Legends.Add(legend2);
-            this.freq_dft_chart.Location = new System.Drawing.Point(367, 576);
+            this.freq_dft_chart.Location = new System.Drawing.Point(480, 576);
             this.freq_dft_chart.Name = "freq_dft_chart";
             series2.ChartArea = "ChartArea1";
             series2.Legend = "Legend1";
             series2.Name = "Series1";
             this.freq_dft_chart.Series.Add(series2);
-            this.freq_dft_chart.Size = new System.Drawing.Size(557, 184);
+            this.freq_dft_chart.Size = new System.Drawing.Size(444, 184);
             this.freq_dft_chart.TabIndex = 30;
             this.freq_dft_chart.Text = "chart1";
             this.freq_dft_chart.AxisViewChanged += new System.EventHandler<System.Windows.Forms.DataVisualization.Charting.ViewEventArgs>(this.freq_dft_chart_AxisViewChanged_1);
@@ -491,13 +495,15 @@ namespace Damping_Data_Processor
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem,
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem,
-            this.freqResponseTransformPlotYAxisScaleToolStripMenuItem});
+            this.freqResponseTransformPlotYAxisScaleToolStripMenuItem,
+            this.automaticFilterFrequencySelectionToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 36);
             this.settingsToolStripMenuItem.Text = "Settings";
             // 
             // importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem
             // 
+            this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.CheckOnClick = true;
             this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Name = "importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem";
             this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
             this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem.Text = "Import .csv files from output folder when selecting input folder?";
@@ -506,6 +512,7 @@ namespace Damping_Data_Processor
             // recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem
             // 
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Checked = true;
+            this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.CheckOnClick = true;
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Name = "recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem";
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
@@ -528,6 +535,23 @@ namespace Damping_Data_Processor
             this.linear_or_log_combobox.Name = "linear_or_log_combobox";
             this.linear_or_log_combobox.Size = new System.Drawing.Size(121, 23);
             this.linear_or_log_combobox.DropDownClosed += new System.EventHandler(this.linear_or_log_combobox_DropDownClosed);
+            // 
+            // automaticFilterFrequencySelectionToolStripMenuItem
+            // 
+            this.automaticFilterFrequencySelectionToolStripMenuItem.Checked = true;
+            this.automaticFilterFrequencySelectionToolStripMenuItem.CheckOnClick = true;
+            this.automaticFilterFrequencySelectionToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.automaticFilterFrequencySelectionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.bandpass_freq_buffer_choices_combobox});
+            this.automaticFilterFrequencySelectionToolStripMenuItem.Name = "automaticFilterFrequencySelectionToolStripMenuItem";
+            this.automaticFilterFrequencySelectionToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
+            this.automaticFilterFrequencySelectionToolStripMenuItem.Text = "Automatic Bandpass Filter Frequencies Buffer Selection (Hz)";
+            this.automaticFilterFrequencySelectionToolStripMenuItem.Click += new System.EventHandler(this.automaticFilterFrequencySelectionToolStripMenuItem_Click);
+            // 
+            // bandpass_freq_buffer_choices_combobox
+            // 
+            this.bandpass_freq_buffer_choices_combobox.Name = "bandpass_freq_buffer_choices_combobox";
+            this.bandpass_freq_buffer_choices_combobox.Size = new System.Drawing.Size(121, 23);
             // 
             // aboutToolStripMenuItem
             // 
@@ -783,11 +807,36 @@ namespace Damping_Data_Processor
             this.current_dataset_filepath_label.Visible = false;
             this.current_dataset_filepath_label.Click += new System.EventHandler(this.current_dataset_filepath_label_Click);
             // 
+            // nat_freq_textbox
+            // 
+            this.nat_freq_textbox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.nat_freq_textbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.nat_freq_textbox.Location = new System.Drawing.Point(367, 593);
+            this.nat_freq_textbox.Multiline = true;
+            this.nat_freq_textbox.Name = "nat_freq_textbox";
+            this.nat_freq_textbox.Size = new System.Drawing.Size(107, 167);
+            this.nat_freq_textbox.TabIndex = 69;
+            // 
+            // label15
+            // 
+            this.label15.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.label15.AutoSize = true;
+            this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label15.Location = new System.Drawing.Point(366, 577);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(64, 13);
+            this.label15.TabIndex = 70;
+            this.label15.Text = "Peak Freqs.";
+            // 
             // form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.ClientSize = new System.Drawing.Size(1447, 766);
+            this.Controls.Add(this.label15);
+            this.Controls.Add(this.nat_freq_textbox);
             this.Controls.Add(this.current_dataset_filepath_label);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.label14);
@@ -910,6 +959,10 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.ToolStripMenuItem saveDatasetToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportResultDataFromCurrentSlelectedDatasetObjectToolStripMenuItem;
         private System.Windows.Forms.Label current_dataset_filepath_label;
+        private System.Windows.Forms.ToolStripMenuItem automaticFilterFrequencySelectionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripComboBox bandpass_freq_buffer_choices_combobox;
+        private System.Windows.Forms.TextBox nat_freq_textbox;
+        private System.Windows.Forms.Label label15;
     }
 }
 
