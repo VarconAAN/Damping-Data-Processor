@@ -503,6 +503,7 @@ namespace Damping_Data_Processor
 
             //preform fft freq response analysis on all data sets
             List<double> natural_frequencies = fft_analysis(selected_data_sets, data_direction_name);
+            drd.natural_freq_fft = natural_frequencies;
 
             //update text
             string ta1_text = string.Empty;
@@ -637,26 +638,103 @@ namespace Damping_Data_Processor
 
             string dataset_name = get_filename_from_filepath(c_drd.dataset_input_filepath_short);
 
+            //save screenshots
             if (c_drd.chart_screenshot_tracker_byte_array.Count > 0)
             {
                 //save images from stream
-
-                //Image chart_screenshot_1 = Image.FromStream(new MemoryStream(chart_screenshot_tracker_byte_array[dataset_index][0]));
-                //Image chart_screenshot_2 = Image.FromStream(new MemoryStream(chart_screenshot_tracker_byte_array[dataset_index][1]));
-                //Image chart_screenshot_3 = Image.FromStream(new MemoryStream(chart_screenshot_tracker_byte_array[dataset_index][2]));
 
                 string chart_filepath_1 = output_folder_filepath + "Signal Data Plot " + dataset_name + ".png";
                 string chart_filepath_2 = output_folder_filepath + "DFT Plot " + dataset_name + ".png";
                 string chart_filepath_3 = output_folder_filepath + "Freq Estimation Plot " + dataset_name + ".png";
 
-                //chart_screenshot_1.Save(chart_filepath_1);
-                //chart_screenshot_2.Save(chart_filepath_2);
-                //chart_screenshot_3.Save(chart_filepath_3);
-
                 File.WriteAllBytes(chart_filepath_1, c_drd.chart_screenshot_tracker_byte_array[0]);
                 File.WriteAllBytes(chart_filepath_2, c_drd.chart_screenshot_tracker_byte_array[1]);
                 File.WriteAllBytes(chart_filepath_3, c_drd.chart_screenshot_tracker_byte_array[2]);
 
+            }
+
+            //create and save a  plot showing the relative area of timmed area comapred to the whole dataset (for user reference)
+            // create 2 plots: filtered and unfiltered
+
+            generate_trim_location_plot(c_drd, c_drd.datasets_master, output_folder_filepath, dataset_name, "Unfiltered Trim Location");
+            generate_trim_location_plot(c_drd, c_drd.datasets_master_filtered, output_folder_filepath, dataset_name, "Filtered Trim Location");
+
+
+        }
+
+        public void generate_trim_location_plot(damping_reduction_dataset c_drd, List<List<double>> dataset_values, string output_folder_filepath, string dataset_name, string image_filename)
+        {
+            using (var chart_trim_section_view = new Chart())
+            {
+                chart_trim_section_view.ChartAreas.Add(new ChartArea());
+
+                List<List<double>> master_preview_data_list = new List<List<double>>();
+                List<string> master_preview_data_names = new List<string>();
+
+                master_preview_data_list.Add((c_drd.datasets_master[0]));
+
+                for (int ddi = 1; ddi < c_drd.data_direction_checkmark_tracker.Count; ddi++)
+                {
+                    if (c_drd.data_direction_checkmark_tracker[ddi - 1] == true)
+                    {
+                        //copy the master data
+                        List<double> master_preview_data = new List<double>(dataset_values[ddi]);
+
+                        ////set default values for clipping/trimming the master dataset
+                        //int min_clip_index = 0;
+                        //int max_clip_index = master_preview_data.Count - 1;
+
+                        //clip the data
+                        //List<double> master_preview_data_clipped = master_preview_data.GetRange(min_clip_index, max_clip_index - min_clip_index);
+
+                        master_preview_data_list.Add(master_preview_data);
+                        master_preview_data_names.Add(data_direction_name[ddi - 1]);
+                    }
+                }
+
+                //annotation placement indexs
+                double lower_annotation_index = c_drd.datasets_master[0][c_drd.lower_trim_index_x_relative_master_dataset];
+                double upper_annoation_index = c_drd.datasets_master[0][c_drd.upper_trim_index_x_relative_master_dataset];
+
+                //setup annoatation lines
+                VerticalLineAnnotation line1 = new VerticalLineAnnotation();
+                VerticalLineAnnotation line2 = new VerticalLineAnnotation();
+
+                line1.AxisX = chart_trim_section_view.ChartAreas[0].AxisX;
+                line1.AllowMoving = true;
+                line1.IsInfinitive = true;
+                line1.ClipToChartArea = chart_trim_section_view.ChartAreas[0].Name;
+                //line1.Name = "line 1";
+                line1.LineColor = Color.Purple;
+                line1.LineWidth = 3;         // use your numbers!
+                line1.X = lower_annotation_index;
+                //add to the chart
+                chart_trim_section_view.Annotations.Add(line1);
+
+                // the vertical line and its properties
+                //line2 = new VerticalLineAnnotation();
+
+                chart_trim_section_view.Annotations.Remove(line2);
+
+                line2.AxisX = chart_trim_section_view.ChartAreas[0].AxisX;
+                line2.AllowMoving = true;
+                line2.IsInfinitive = true;
+                line2.ClipToChartArea = chart_trim_section_view.ChartAreas[0].Name;
+                //line2.Name = "line 2";
+                line2.LineColor = Color.Purple;
+                line2.LineWidth = 3;         // use your numbers!
+                line2.X = upper_annoation_index;
+                //add to the chart
+                chart_trim_section_view.Annotations.Add(line2);
+
+                plot_data_on_chart(chart_trim_section_view, master_preview_data_names, master_preview_data_list, "Time (Seconds)", y_axis_label_data_chart);
+                chart_trim_section_view.Size = new Size(1000, 500);
+
+
+                //foreach (var pnt in series) s.Points.Add(pnt);
+                //chart_trim_section_view.Series.Add(s);
+                string filepath_img = output_folder_filepath + image_filename + dataset_name + ".png";
+                chart_trim_section_view.SaveImage(filepath_img, ChartImageFormat.Png);
             }
         }
 
@@ -2834,12 +2912,8 @@ namespace Damping_Data_Processor
 
             //preform fft freq response analysis on all data sets
             List<double> nat_freqs = automatically_update_freq_repsonse_plot();
-            //auto update the bandpass freqs is selected
-            if(automaticFilterFrequencySelectionToolStripMenuItem.Checked == true)
-            {
-                low_freq_cutoff_numupdown.Value = Convert.ToDecimal(nat_freqs.Average()- Convert.ToDouble(bandpass_freq_buffer_choices_combobox.SelectedItem));
-                high_freq_cutoff_numupdown.Value = Convert.ToDecimal(nat_freqs.Average()+ Convert.ToDouble(bandpass_freq_buffer_choices_combobox.SelectedItem));
-            }
+
+            update_bandpass_filter_cutoff_frequencies();
 
             scan_input_folder_for_datasets();
     
@@ -2849,6 +2923,26 @@ namespace Damping_Data_Processor
             }
 
             changes_cursor_icon_to_loading(false);
+        }
+
+        public void update_bandpass_filter_cutoff_frequencies()
+        {
+            List<double> selected_nat_freqs = new List<double>();
+
+            for(int i=0; i < drd.data_direction_checkmark_tracker.Count; i++)
+            {
+                if (drd.data_direction_checkmark_tracker[i] == true)
+                {
+                    selected_nat_freqs.Add(drd.natural_freq_fft[i]);
+                }
+            }
+
+            //auto update the bandpass freqs is selected
+            if (automaticFilterFrequencySelectionToolStripMenuItem.Checked == true)
+            {
+                low_freq_cutoff_numupdown.Value = Convert.ToDecimal(selected_nat_freqs.Average() - Convert.ToDouble(bandpass_freq_buffer_choices_combobox.SelectedItem));
+                high_freq_cutoff_numupdown.Value = Convert.ToDecimal(selected_nat_freqs.Average() + Convert.ToDouble(bandpass_freq_buffer_choices_combobox.SelectedItem));
+            }
         }
 
         public void process_data_from_csv_file(string current_selected_dataset_filepath, ref damping_reduction_dataset drs_dataset)
@@ -3003,12 +3097,15 @@ namespace Damping_Data_Processor
 
         public void apply_bandpass_filter()
         {
+
+
             changes_cursor_icon_to_loading(true);
 
             drd.is_data_filtered = true;
 
             //copy trim data to filterted data for processing
             drd.datasets_filter_trim = new List<List<double>>(drd.datasets_trim);
+            drd.datasets_master_filtered = new List<List<double>>(drd.datasets_master);
 
             //get cutoff freqs
             drd.low_cutoff_freq = Convert.ToDouble(low_freq_cutoff_numupdown.Value);
@@ -3025,6 +3122,7 @@ namespace Damping_Data_Processor
                     //if data set was actually trimmed the get the trimmed time set otherwise leave as is
                     if (drd.upper_trim_index_x > 0)
                     {
+                        //drd.datasets_master_filtered.Add(drd.datasets_master[i]);
                         drd.datasets_filter_trim[0] = drd.datasets_master[i].GetRange(drd.lower_trim_index_x_relative_master_dataset, drd.upper_trim_index_x_relative_master_dataset - drd.lower_trim_index_x_relative_master_dataset);
                     }
                 }
@@ -3032,13 +3130,17 @@ namespace Damping_Data_Processor
                 {
                     if (drd.upper_trim_index_x > 0)
                     {
-                        //generic_input_data_double_clone_filtered[i] = (bandpass.ProcessSamples(convert_double_list_to_array(generic_input_data_double_master[i])).ToList()).GetRange(x_index_trim_lower_index_master[select_data_set_tool_strip_combo_box.SelectedIndex], x_index_trim_upper_index_master[select_data_set_tool_strip_combo_box.SelectedIndex] - x_index_trim_lower_index_master[select_data_set_tool_strip_combo_box.SelectedIndex]);
-                        drd.datasets_filter_trim[i] = (bandpass.ProcessSamples(convert_double_list_to_array(drd.datasets_master[i])).ToList()).GetRange(drd.lower_trim_index_x_relative_master_dataset, drd.upper_trim_index_x_relative_master_dataset - drd.lower_trim_index_x_relative_master_dataset);
+
+                        //drd.datasets_filter_trim[i] = (bandpass.ProcessSamples(convert_double_list_to_array(drd.datasets_master[i])).ToList()).GetRange(drd.lower_trim_index_x_relative_master_dataset, drd.upper_trim_index_x_relative_master_dataset - drd.lower_trim_index_x_relative_master_dataset);
+                        drd.datasets_master_filtered[i] = bandpass.ProcessSamples(convert_double_list_to_array(drd.datasets_master[i])).ToList();
+                        drd.datasets_filter_trim[i] = drd.datasets_master_filtered[i].GetRange(drd.lower_trim_index_x_relative_master_dataset, drd.upper_trim_index_x_relative_master_dataset - drd.lower_trim_index_x_relative_master_dataset);
                     }
                     else
                     {
-                        //generic_input_data_double_clone_filtered[i] = (bandpass.ProcessSamples(convert_double_list_to_array(generic_input_data_double_master[i])).ToList());
-                        drd.datasets_filter_trim[i] = (bandpass.ProcessSamples(convert_double_list_to_array(drd.datasets_trim[i])).ToList());
+
+                        //drd.datasets_filter_trim[i] = (bandpass.ProcessSamples(convert_double_list_to_array(drd.datasets_trim[i])).ToList());
+                        drd.datasets_master_filtered[i] = (bandpass.ProcessSamples(convert_double_list_to_array(drd.datasets_trim[i])).ToList());
+                        drd.datasets_filter_trim[i] = drd.datasets_master_filtered[i];
                     }
                 }
             }
@@ -3766,7 +3868,7 @@ namespace Damping_Data_Processor
         {
             //List<MemoryStream> temp_list = new List<MemoryStream>();
 
-            //test
+            //test//
             //List<Image> temp_list2 = new List<Image>();
             List<Byte[]> temp_list3 = new List<Byte[]>();
 
@@ -3952,6 +4054,7 @@ namespace Damping_Data_Processor
         private void select_data_direction_check_list_box_SelectedIndexChanged(object sender, EventArgs e)
         {
             check_checked_chart_series();
+            update_bandpass_filter_cutoff_frequencies();
         }
 
         private void recalc_damp_ratio_freq_peak_button_Click(object sender, EventArgs e)
@@ -4183,6 +4286,7 @@ namespace Damping_Data_Processor
         public List<List<double>> datasets_master = new List<List<double>>();
         public List<List<double>> datasets_trim = new List<List<double>>();
         public List<List<double>> datasets_filter_trim = new List<List<double>>();
+        public List<List<double>> datasets_master_filtered = new List<List<double>>();
 
         //store other data related to calcualting damping ratio 
         public List<List<double>> natural_freq_dist_btwn_peaks = new List<List<double>>();
