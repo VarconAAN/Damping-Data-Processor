@@ -87,6 +87,7 @@ namespace Damping_Data_Processor
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.manual_freq_est_checkbox = new System.Windows.Forms.CheckBox();
             this.freq_estimation_reject_freq_checkbox = new System.Windows.Forms.CheckBox();
+            this.label16 = new System.Windows.Forms.Label();
             this.manual_freq_est_numupdown = new System.Windows.Forms.NumericUpDown();
             this.recalc_damp_ratio_freq_peak_button = new System.Windows.Forms.Button();
             this.peak_picking_method_combobox = new System.Windows.Forms.ComboBox();
@@ -99,6 +100,7 @@ namespace Damping_Data_Processor
             this.current_dataset_filepath_label = new System.Windows.Forms.Label();
             this.nat_freq_textbox = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
+            this.input_data_sample_rate_numupdown = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.signal_data_chart_main)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
@@ -109,6 +111,7 @@ namespace Damping_Data_Processor
             ((System.ComponentModel.ISupportInitialize)(this.lower_freq_plot_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.manual_freq_est_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.freq_estimation_high_cutoff_freq_numupdown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.input_data_sample_rate_numupdown)).BeginInit();
             this.SuspendLayout();
             // 
             // signal_data_chart_main
@@ -137,7 +140,7 @@ namespace Damping_Data_Processor
             // 
             // trim_data_button
             // 
-            this.trim_data_button.Location = new System.Drawing.Point(0, 110);
+            this.trim_data_button.Location = new System.Drawing.Point(0, 131);
             this.trim_data_button.Name = "trim_data_button";
             this.trim_data_button.Size = new System.Drawing.Size(129, 44);
             this.trim_data_button.TabIndex = 1;
@@ -148,7 +151,7 @@ namespace Damping_Data_Processor
             // calculate_damp_ratio_and_freq_button
             // 
             this.calculate_damp_ratio_and_freq_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.calculate_damp_ratio_and_freq_button.Location = new System.Drawing.Point(2, 319);
+            this.calculate_damp_ratio_and_freq_button.Location = new System.Drawing.Point(2, 340);
             this.calculate_damp_ratio_and_freq_button.Name = "calculate_damp_ratio_and_freq_button";
             this.calculate_damp_ratio_and_freq_button.Size = new System.Drawing.Size(361, 49);
             this.calculate_damp_ratio_and_freq_button.TabIndex = 2;
@@ -159,7 +162,7 @@ namespace Damping_Data_Processor
             // input_folder_textbox
             // 
             this.input_folder_textbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.input_folder_textbox.Location = new System.Drawing.Point(2, 57);
+            this.input_folder_textbox.Location = new System.Drawing.Point(2, 78);
             this.input_folder_textbox.Multiline = true;
             this.input_folder_textbox.Name = "input_folder_textbox";
             this.input_folder_textbox.ReadOnly = true;
@@ -169,7 +172,7 @@ namespace Damping_Data_Processor
             // reset_data_trimming_button
             // 
             this.reset_data_trimming_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.reset_data_trimming_button.Location = new System.Drawing.Point(135, 110);
+            this.reset_data_trimming_button.Location = new System.Drawing.Point(135, 131);
             this.reset_data_trimming_button.Name = "reset_data_trimming_button";
             this.reset_data_trimming_button.Size = new System.Drawing.Size(135, 44);
             this.reset_data_trimming_button.TabIndex = 13;
@@ -185,7 +188,7 @@ namespace Damping_Data_Processor
             0,
             0,
             65536});
-            this.low_freq_cutoff_numupdown.Location = new System.Drawing.Point(2, 184);
+            this.low_freq_cutoff_numupdown.Location = new System.Drawing.Point(2, 205);
             this.low_freq_cutoff_numupdown.Maximum = new decimal(new int[] {
             9999999,
             0,
@@ -208,7 +211,7 @@ namespace Damping_Data_Processor
             0,
             0,
             65536});
-            this.high_freq_cutoff_numupdown.Location = new System.Drawing.Point(183, 184);
+            this.high_freq_cutoff_numupdown.Location = new System.Drawing.Point(183, 205);
             this.high_freq_cutoff_numupdown.Maximum = new decimal(new int[] {
             99999999,
             0,
@@ -231,7 +234,7 @@ namespace Damping_Data_Processor
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(2, 169);
+            this.label2.Location = new System.Drawing.Point(2, 190);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(138, 13);
             this.label2.TabIndex = 25;
@@ -241,7 +244,7 @@ namespace Damping_Data_Processor
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(215, 168);
+            this.label3.Location = new System.Drawing.Point(215, 189);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(140, 13);
             this.label3.TabIndex = 26;
@@ -249,7 +252,7 @@ namespace Damping_Data_Processor
             // 
             // apply_filter_button
             // 
-            this.apply_filter_button.Location = new System.Drawing.Point(2, 210);
+            this.apply_filter_button.Location = new System.Drawing.Point(2, 231);
             this.apply_filter_button.Name = "apply_filter_button";
             this.apply_filter_button.Size = new System.Drawing.Size(175, 26);
             this.apply_filter_button.TabIndex = 27;
@@ -259,7 +262,7 @@ namespace Damping_Data_Processor
             // 
             // remove_filter_button
             // 
-            this.remove_filter_button.Location = new System.Drawing.Point(183, 210);
+            this.remove_filter_button.Location = new System.Drawing.Point(183, 231);
             this.remove_filter_button.Name = "remove_filter_button";
             this.remove_filter_button.Size = new System.Drawing.Size(175, 26);
             this.remove_filter_button.TabIndex = 28;
@@ -295,12 +298,12 @@ namespace Damping_Data_Processor
             | System.Windows.Forms.AnchorStyles.Left)));
             this.summary_results_textbox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.summary_results_textbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.summary_results_textbox.Location = new System.Drawing.Point(2, 390);
+            this.summary_results_textbox.Location = new System.Drawing.Point(2, 409);
             this.summary_results_textbox.Multiline = true;
             this.summary_results_textbox.Name = "summary_results_textbox";
             this.summary_results_textbox.ReadOnly = true;
             this.summary_results_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.summary_results_textbox.Size = new System.Drawing.Size(358, 234);
+            this.summary_results_textbox.Size = new System.Drawing.Size(358, 215);
             this.summary_results_textbox.TabIndex = 31;
             this.summary_results_textbox.DoubleClick += new System.EventHandler(this.summary_results_textbox_DoubleClick);
             // 
@@ -347,7 +350,7 @@ namespace Damping_Data_Processor
             // 
             this.select_data_direction_check_list_box.CheckOnClick = true;
             this.select_data_direction_check_list_box.FormattingEnabled = true;
-            this.select_data_direction_check_list_box.Location = new System.Drawing.Point(276, 45);
+            this.select_data_direction_check_list_box.Location = new System.Drawing.Point(276, 66);
             this.select_data_direction_check_list_box.Name = "select_data_direction_check_list_box";
             this.select_data_direction_check_list_box.Size = new System.Drawing.Size(87, 109);
             this.select_data_direction_check_list_box.TabIndex = 41;
@@ -356,7 +359,7 @@ namespace Damping_Data_Processor
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(278, 157);
+            this.label8.Location = new System.Drawing.Point(278, 178);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(85, 13);
             this.label8.TabIndex = 42;
@@ -579,7 +582,7 @@ namespace Damping_Data_Processor
             // 
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(123, 370);
+            this.label12.Location = new System.Drawing.Point(116, 389);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(118, 17);
             this.label12.TabIndex = 32;
@@ -589,7 +592,7 @@ namespace Damping_Data_Processor
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(86, 41);
+            this.label4.Location = new System.Drawing.Point(86, 62);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(108, 13);
             this.label4.TabIndex = 49;
@@ -640,7 +643,7 @@ namespace Damping_Data_Processor
             // 
             this.manual_freq_est_checkbox.AutoSize = true;
             this.manual_freq_est_checkbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.manual_freq_est_checkbox.Location = new System.Drawing.Point(0, 282);
+            this.manual_freq_est_checkbox.Location = new System.Drawing.Point(0, 303);
             this.manual_freq_est_checkbox.Name = "manual_freq_est_checkbox";
             this.manual_freq_est_checkbox.Size = new System.Drawing.Size(287, 17);
             this.manual_freq_est_checkbox.TabIndex = 56;
@@ -664,11 +667,22 @@ namespace Damping_Data_Processor
         "");
             this.freq_estimation_reject_freq_checkbox.UseVisualStyleBackColor = true;
             // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label16.Location = new System.Drawing.Point(2, 45);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(251, 13);
+            this.label16.TabIndex = 71;
+            this.label16.Text = "Input Data Sample Rate (Samples/Second)";
+            this.toolTip1.SetToolTip(this.label16, "Only applied when first importing .csv dataset");
+            // 
             // manual_freq_est_numupdown
             // 
             this.manual_freq_est_numupdown.DecimalPlaces = 3;
             this.manual_freq_est_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.manual_freq_est_numupdown.Location = new System.Drawing.Point(295, 281);
+            this.manual_freq_est_numupdown.Location = new System.Drawing.Point(295, 302);
             this.manual_freq_est_numupdown.Maximum = new decimal(new int[] {
             99999999,
             0,
@@ -703,7 +717,7 @@ namespace Damping_Data_Processor
             // peak_picking_method_combobox
             // 
             this.peak_picking_method_combobox.FormattingEnabled = true;
-            this.peak_picking_method_combobox.Location = new System.Drawing.Point(0, 257);
+            this.peak_picking_method_combobox.Location = new System.Drawing.Point(0, 278);
             this.peak_picking_method_combobox.Name = "peak_picking_method_combobox";
             this.peak_picking_method_combobox.Size = new System.Drawing.Size(358, 21);
             this.peak_picking_method_combobox.TabIndex = 58;
@@ -712,7 +726,7 @@ namespace Damping_Data_Processor
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(0, 241);
+            this.label5.Location = new System.Drawing.Point(0, 262);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(109, 13);
             this.label5.TabIndex = 59;
@@ -721,7 +735,7 @@ namespace Damping_Data_Processor
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(17, 300);
+            this.label7.Location = new System.Drawing.Point(17, 321);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(176, 13);
             this.label7.TabIndex = 60;
@@ -830,11 +844,38 @@ namespace Damping_Data_Processor
             this.label15.TabIndex = 70;
             this.label15.Text = "Peak Freqs.";
             // 
+            // input_data_sample_rate_numupdown
+            // 
+            this.input_data_sample_rate_numupdown.DecimalPlaces = 6;
+            this.input_data_sample_rate_numupdown.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.input_data_sample_rate_numupdown.Location = new System.Drawing.Point(259, 43);
+            this.input_data_sample_rate_numupdown.Maximum = new decimal(new int[] {
+            999999999,
+            0,
+            0,
+            0});
+            this.input_data_sample_rate_numupdown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            393216});
+            this.input_data_sample_rate_numupdown.Name = "input_data_sample_rate_numupdown";
+            this.input_data_sample_rate_numupdown.Size = new System.Drawing.Size(104, 20);
+            this.input_data_sample_rate_numupdown.TabIndex = 72;
+            this.input_data_sample_rate_numupdown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.input_data_sample_rate_numupdown.Value = new decimal(new int[] {
+            1024,
+            0,
+            0,
+            0});
+            // 
             // form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.ClientSize = new System.Drawing.Size(1447, 766);
+            this.Controls.Add(this.input_data_sample_rate_numupdown);
+            this.Controls.Add(this.label16);
             this.Controls.Add(this.label15);
             this.Controls.Add(this.nat_freq_textbox);
             this.Controls.Add(this.current_dataset_filepath_label);
@@ -897,6 +938,7 @@ namespace Damping_Data_Processor
             ((System.ComponentModel.ISupportInitialize)(this.lower_freq_plot_cutoff_numupdown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.manual_freq_est_numupdown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.freq_estimation_high_cutoff_freq_numupdown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.input_data_sample_rate_numupdown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -963,6 +1005,8 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.ToolStripComboBox bandpass_freq_buffer_choices_combobox;
         private System.Windows.Forms.TextBox nat_freq_textbox;
         private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.NumericUpDown input_data_sample_rate_numupdown;
     }
 }
 
