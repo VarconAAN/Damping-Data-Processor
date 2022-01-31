@@ -807,12 +807,10 @@ namespace Damping_Data_Processor
             // 
             // current_dataset_filepath_label
             // 
-            this.current_dataset_filepath_label.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.current_dataset_filepath_label.AutoSize = true;
             this.current_dataset_filepath_label.BackColor = System.Drawing.Color.Transparent;
             this.current_dataset_filepath_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.current_dataset_filepath_label.Location = new System.Drawing.Point(1181, 45);
+            this.current_dataset_filepath_label.Location = new System.Drawing.Point(371, 511);
             this.current_dataset_filepath_label.Name = "current_dataset_filepath_label";
             this.current_dataset_filepath_label.Size = new System.Drawing.Size(98, 13);
             this.current_dataset_filepath_label.TabIndex = 68;
@@ -926,7 +924,7 @@ namespace Damping_Data_Processor
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Structural Damping Reduction Processor";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.form1_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.signal_data_chart_main)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).EndInit();

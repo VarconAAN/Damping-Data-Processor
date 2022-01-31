@@ -29,7 +29,7 @@ namespace Damping_Data_Processor
         //GLOBAL VARIABLES
 
         //this class variable stores all current info for the current selected dataset
-        damping_reduction_dataset drd = new damping_reduction_dataset();
+        public damping_reduction_dataset drd = new damping_reduction_dataset();
 
         //allocate vertical annotation
         VerticalLineAnnotation lower_data_boundary_vertical_line = new VerticalLineAnnotation();
@@ -180,6 +180,10 @@ namespace Damping_Data_Processor
             input_data_sample_rate = Convert.ToDouble(input_data_sample_rate_numupdown.Value);
 
             enable_all_user_controls(false);
+
+            signal_data_chart_main.Titles.Add("Absolute Signal Data");
+            freq_dft_chart.Titles.Add("DFT Frequency Response");
+            freq_peaks_chart.Titles.Add("Frequency Samples based on Distance btwn Peaks");
         }
 
         public double get_actual_max_freq(List<double> freq_span, List<double> mag_span)
@@ -360,6 +364,28 @@ namespace Damping_Data_Processor
 
         //generic program functions
 
+        public void constrain_freq_dft_plot_cutoff_freqs()
+        {
+            decimal low_cutoff = lower_freq_plot_cutoff_numupdown.Value;
+            decimal high_cutoff = upper_freq_plot_cutoff_numupdown.Value;
+
+            if(low_cutoff>= high_cutoff)
+            {
+                low_cutoff = high_cutoff - Convert.ToDecimal(0.001);
+            }
+
+            lower_freq_plot_cutoff_numupdown.Value = low_cutoff;
+            upper_freq_plot_cutoff_numupdown.Value = high_cutoff;
+
+        }
+
+        public T Clamp<T>(T val, T min, T max) where T : IComparable<T>
+        {
+            if (val.CompareTo(min) < 0) return min;
+            else if (val.CompareTo(max) > 0) return max;
+            else return val;
+        }
+
         public void update_csv_dropdown_filename_with_tag(string tag)
         {
             int i = select_data_set_tool_strip_combo_box.SelectedIndex;
@@ -465,12 +491,16 @@ namespace Damping_Data_Processor
             {
                 chart_trim_section_view.ChartAreas.Add(new ChartArea());
 
+                chart_trim_section_view.Titles.Add(image_filename);
+
+                chart_trim_section_view.Legends.Add("Legend");
+
                 List<List<double>> master_preview_data_list = new List<List<double>>();
                 List<string> master_preview_data_names = new List<string>();
 
                 master_preview_data_list.Add((c_drd.datasets_master[0]));
 
-                for (int ddi = 1; ddi < c_drd.data_direction_checkmark_tracker.Count; ddi++)
+                for (int ddi = 1; ddi <= c_drd.data_direction_checkmark_tracker.Count; ddi++)
                 {
                     if (c_drd.data_direction_checkmark_tracker[ddi - 1] == true)
                     {
@@ -530,7 +560,7 @@ namespace Damping_Data_Processor
 
                 //foreach (var pnt in series) s.Points.Add(pnt);
                 //chart_trim_section_view.Series.Add(s);
-                string filepath_img = output_folder_filepath + image_filename + dataset_name + ".png";
+                string filepath_img = output_folder_filepath + image_filename +" "+ dataset_name + ".png";
                 chart_trim_section_view.SaveImage(filepath_img, ChartImageFormat.Png);
             }
         }
@@ -615,8 +645,9 @@ namespace Damping_Data_Processor
             double ss_res = 0;
 
             double sample_average = sample_data.Average();
-            for (int i = 0; i < index_of_sample_data.Count; i++)
+            for (int i = 0; i < sample_data.Count; i++)
             {
+                
                 ss_tot += Math.Pow((sample_data[i] - sample_average), 2);
 
                 ss_res += Math.Pow((sample_data[i] - fitted_data_full[index_of_sample_data[i]]), 2);
@@ -1633,9 +1664,15 @@ namespace Damping_Data_Processor
             //dont include last point it can be a bad data point
             for (int i = 0; i <= peak_indexs.Count - 1; i++)
             {
-                peak_times.Add(drd.datasets_trim[0][peak_indexs[i]]);
-                peak_amplitudes.Add(abs_data[peak_indexs[i]]);
+                if (peak_indexs[i]< abs_data.Count-1) 
+                {
+                    peak_times.Add(drd.datasets_trim[0][peak_indexs[i]]);
+                    peak_amplitudes.Add(abs_data[peak_indexs[i]]);
+                }
             }
+
+
+
             try
             {
                 System.Windows.Forms.DataVisualization.Charting.Series series = signal_data_chart_main.Series.Add(series_name);
@@ -2078,11 +2115,19 @@ namespace Damping_Data_Processor
                 }
             }
 
+            if (selected_nat_freqs.Count == 0)
+            {
+                return;
+            }
+
             //auto update the bandpass freqs is selected
             if (automaticFilterFrequencySelectionToolStripMenuItem.Checked == true)
             {
-                low_freq_cutoff_numupdown.Value = Convert.ToDecimal(selected_nat_freqs.Average() - Convert.ToDouble(bandpass_freq_buffer_choices_combobox.SelectedItem));
-                high_freq_cutoff_numupdown.Value = Convert.ToDecimal(selected_nat_freqs.Average() + Convert.ToDouble(bandpass_freq_buffer_choices_combobox.SelectedItem));
+
+
+
+                low_freq_cutoff_numupdown.Value =  Clamp(Convert.ToDecimal(selected_nat_freqs.Average() - Convert.ToDouble(bandpass_freq_buffer_choices_combobox.SelectedItem)), low_freq_cutoff_numupdown.Minimum, low_freq_cutoff_numupdown.Maximum);
+                high_freq_cutoff_numupdown.Value = Clamp(Convert.ToDecimal(selected_nat_freqs.Average() + Convert.ToDouble(bandpass_freq_buffer_choices_combobox.SelectedItem)), high_freq_cutoff_numupdown.Minimum, high_freq_cutoff_numupdown.Maximum);
             }
         }
 
@@ -2121,6 +2166,8 @@ namespace Damping_Data_Processor
         public void trim_data_function()
         {
             changes_cursor_icon_to_loading(true);
+
+            clear_result_data_from_dataset_object(drd);
 
             double x_index_trim_lower = 0;
             double x_index_trim_upper = 0;
@@ -2200,6 +2247,8 @@ namespace Damping_Data_Processor
         public void reset_to_master_dataset()
         {
             changes_cursor_icon_to_loading(true);
+
+            clear_result_data_from_dataset_object(drd);
 
             //clear all visible UI elements
             summary_results_textbox.Clear();
@@ -2963,6 +3012,40 @@ namespace Damping_Data_Processor
 
         }
 
+        public void save_dataset_on_form_close()
+        {
+            //if there is valid data
+            if (drd.datasets_trim.Count > 0 || drd.datasets_filter_trim.Count>0)
+            {
+                string message = "Did you want save your dataset object?";
+                string title = "Exit";
+                MessageBoxButtons buttons = MessageBoxButtons.YesNo;
+                DialogResult result = MessageBox.Show(message, title, buttons);
+                if (result == DialogResult.Yes)
+                {
+                    save_dataset_object();
+                }
+
+            }
+        }
+
+        public void clear_result_data_from_dataset_object(damping_reduction_dataset c_drd)
+        {
+            c_drd.natural_freq_dist_btwn_peaks = new List<List<double>>();
+
+            c_drd.local_maximas_indicies = new List<List<int>>();
+            c_drd.local_maximas_amplitudes = new List<List<double>>();
+            c_drd.local_maximas_times = new List<List<double>>();
+
+
+            c_drd.natural_freq_dist_btwn_peaks_average = new List<double>();
+            c_drd.damp_ratio_exp_fft_freq = new List<double>();
+            c_drd.damp_ratio_exp_peaks = new List<double>();
+            c_drd.cofefficient_of_determination = new List<double>();
+
+            c_drd.dataset_result_summary = string.Empty;
+        }
+
         //utility functions
 
         public void additonal_plots_manager(List<List<double>> selected_data_sets, List<double> natural_frequencies)
@@ -3037,8 +3120,11 @@ namespace Damping_Data_Processor
             List<double> selected_data_set_maximas = new List<double>();
             for (int i = 0; i < drd.local_maximas_indicies[ddi].Count; i++)
             {
-                time_maximas.Add(drd.datasets_trim[0][drd.local_maximas_indicies[ddi][i]]);
-                selected_data_set_maximas.Add(selected_data_set_abs[drd.local_maximas_indicies[ddi][i]]);
+                if (drd.local_maximas_indicies[ddi][i]< drd.datasets_trim[0].Count-1 && drd.local_maximas_indicies[ddi][i]< selected_data_set_abs.Count-1)
+                {
+                    time_maximas.Add(drd.datasets_trim[0][drd.local_maximas_indicies[ddi][i]]);
+                    selected_data_set_maximas.Add(selected_data_set_abs[drd.local_maximas_indicies[ddi][i]]);
+                }
             }
 
             //y=p[0] e ^ (p[1] *x)
@@ -3276,11 +3362,13 @@ namespace Damping_Data_Processor
 
         private void upper_freq_plot_cutoff_numupdown_ValueChanged(object sender, EventArgs e)
         {
+            constrain_freq_dft_plot_cutoff_freqs();
             plot_freq_response(freq_span, real_spectrum, data_direction_name);
         }
 
         private void lower_freq_plot_cutoff_numupdown_ValueChanged(object sender, EventArgs e)
         {
+            constrain_freq_dft_plot_cutoff_freqs();
             plot_freq_response(freq_span, real_spectrum, data_direction_name);
         }
 
@@ -3336,6 +3424,11 @@ namespace Damping_Data_Processor
         private void selectInputFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
             update_program_after_input_folder_select();
+        }
+
+        private void form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            save_dataset_on_form_close();
         }
 
         //useless control functions
@@ -3414,6 +3507,8 @@ namespace Damping_Data_Processor
         {
 
         }
+
+
     }
 
 
