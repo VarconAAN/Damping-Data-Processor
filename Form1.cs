@@ -405,6 +405,31 @@ namespace Damping_Data_Processor
 
         //generic program functions
 
+        public List<List<string>> export_peaks_csv(damping_reduction_dataset cur_drd)
+        {
+            List<List<string>> peak_csv = new List<List<string>>();
+
+            for (int i = 0; i < cur_drd.local_maximas_times.Count; i++)
+            {
+                if (cur_drd.local_maximas_times[i].Count != 0)
+                {
+                    List<string> peak_times = convert_list_double_to_list_string(cur_drd.local_maximas_times[i]);
+                    List<string> peak_amplitudes = convert_list_double_to_list_string(cur_drd.local_maximas_amplitudes[i]);
+
+                    peak_times.Insert(0, "Peak Time (s) [" + data_direction_name[i] + "]");
+                    peak_amplitudes.Insert(0, "Peak Amp. (s) [" + data_direction_name[i] + "]");
+
+                    peak_csv.Add(peak_times);
+                    peak_csv.Add(peak_amplitudes);
+                }
+            }
+            peak_csv = transpose_list_of_list_string(peak_csv);
+
+            return (peak_csv);
+            
+            //process_save_dataset_as_csv(peak_csv, filepath);
+        }
+
         public List<double> calculate_max_displacement_XYZ(damping_reduction_dataset c_drd)
         {
             List<List<double>> displacement_datasets = c_drd.datasets_trim;
@@ -2810,15 +2835,22 @@ namespace Damping_Data_Processor
             }
 
             //export the datasets
+
+            //unedited dataset
             process_save_dataset_as_csv(c_drd.datasets_master, save_results_folder_subfolder + dataset_name + " Acc Data[Unedited].csv");
             if (c_drd.datasets_trim.Count > 0)
             {
+                //trimmed dataset
                 process_save_dataset_as_csv(c_drd.datasets_trim, save_results_folder_subfolder + dataset_name_trimmed + " Acc Data[Trim].csv");
             }
             if (c_drd.datasets_filter_trim.Count > 0)
             {
+                //trimed/filtered dataset
                 process_save_dataset_as_csv(c_drd.datasets_filter_trim, save_results_folder_subfolder + dataset_name_trimmed_filtered + " Acc Data[Filt Trim].csv");
             }
+
+            //export peaks as csv file
+            process_save_dataset_as_csv(export_peaks_csv(c_drd), save_results_folder_subfolder + dataset_name + " Peaks.csv");
 
 
             //string dataset_result_summary_text_concatenated = concat_dataset_results_summary();
@@ -2873,7 +2905,6 @@ namespace Damping_Data_Processor
 
         public void get_session_result_data_from_drd(damping_reduction_dataset drd_temp)
         {
-
             List<List<double>> session_results_tracker_sub_list = new List<List<double>>();
 
             if (drd_temp.natural_freq_fft.Count == 6)
