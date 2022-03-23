@@ -336,9 +336,9 @@ namespace Damping_Data_Processor
             row3.Add("");
             row3.Add("");
             row3.Add("");
-            row3.Add(@"=AVERAGE(I2:J2)");
+            row3.Add(@"=AVERAGE(J2:K2)");
             row3.Add("");
-            row3.Add(@"=AVERAGE(K2:L2)");
+            row3.Add(@"=AVERAGE(L2:M2)");
             row3.Add("");
 
             List<string> empty_row = new List<string>();
@@ -2838,19 +2838,20 @@ namespace Damping_Data_Processor
 
             //unedited dataset
             process_save_dataset_as_csv(c_drd.datasets_master, save_results_folder_subfolder + dataset_name + " Acc Data[Unedited].csv");
-            if (c_drd.datasets_trim.Count > 0)
-            {
-                //trimmed dataset
-                process_save_dataset_as_csv(c_drd.datasets_trim, save_results_folder_subfolder + dataset_name_trimmed + " Acc Data[Trim].csv");
-            }
-            if (c_drd.datasets_filter_trim.Count > 0)
-            {
-                //trimed/filtered dataset
-                process_save_dataset_as_csv(c_drd.datasets_filter_trim, save_results_folder_subfolder + dataset_name_trimmed_filtered + " Acc Data[Filt Trim].csv");
-            }
+            //if (c_drd.datasets_trim.Count > 0)
+            //{
+            //    //trimmed dataset
+            //    process_save_dataset_as_csv(c_drd.datasets_trim, save_results_folder_subfolder + dataset_name_trimmed + " Acc Data[Trim].csv");
+            //}
+            //if (c_drd.datasets_filter_trim.Count > 0)
+            //{
+            //    //trimed/filtered dataset
+            //    process_save_dataset_as_csv(c_drd.datasets_filter_trim, save_results_folder_subfolder + dataset_name_trimmed_filtered + " Acc Data[Filt Trim].csv");
+            //}
 
             //export peaks as csv file
-            process_save_dataset_as_csv(export_peaks_csv(c_drd), save_results_folder_subfolder + dataset_name + " Peaks.csv");
+            List<List<string>> peaks_string_data = export_peaks_csv(c_drd);
+            process_save_dataset_as_csv(peaks_string_data, save_results_folder_subfolder + dataset_name + " Peaks.csv");
 
 
             //string dataset_result_summary_text_concatenated = concat_dataset_results_summary();
