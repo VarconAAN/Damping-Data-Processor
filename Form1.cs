@@ -16,8 +16,8 @@ using Newtonsoft.Json;
 using MathNet.Filtering;
 using System.Threading;
 using JR.Utils.GUI.Forms;
-using ClosedXML.Report;
 using ClosedXML;
+using ClosedXML.Excel;
 
 
 
@@ -112,41 +112,6 @@ namespace Damping_Data_Processor
 
         public form1()
         {
-
-
-            //dataset_result_row test1 = new dataset_result_row();
-            //test1.val1 = "data1";
-            //test1.val2 = "data2";
-            //test1.val3 = "data3";
-
-            //dataset_result_row test2 = new dataset_result_row();
-            //test1.val1 = "data4";
-            //test1.val2 = "data5";
-            //test1.val3 = "data6";
-
-            //datasets_result_object dataset_object = new datasets_result_object();
-            //dataset_object.dataset_result_rows.Add(test1);
-            //dataset_object.dataset_result_rows.Add(test2);
-
-            //List<string> test4 = new List<string>();
-            //test4.Add( "data1");
-            //test4.Add( "data2");
-            //test4.Add( "data3");
-
-
-            ////test
-            //string filepath_test = @"C:\Users\aanderson\OneDrive - Varcon Inc\Documents\Projects\Damping Data Processor\ClosedXML\closedXMLtest.xlsx";
-            //string filepath_test1 = @"C:\Users\aanderson\OneDrive - Varcon Inc\Documents\Projects\Damping Data Processor\ClosedXML\closedXMLtest1.xlsx";
-            //var template = new XLTemplate(filepath_test);
-
-            //template.AddVariable("val1", test4); 
-
-            //template.Generate();
-
-            //template.SaveAs(filepath_test1);
-            ////Process.Start(new ProcessStartInfo(filepath_test1) { UseShellExecute = true });
-
-
 
             InitializeComponent();
             //scaling the app view
@@ -269,6 +234,129 @@ namespace Damping_Data_Processor
             }
 
             return 0;
+
+        }
+
+        public string int_to_alphabet(int i)
+        {
+            return ((char)(i + 65)).ToString();
+        }
+
+        public void export_session_results_to_excel(string folder_filepath, string filename)
+        {
+            List<string> header_main = new List<string>();
+            header_main.Add("Dataset Name");
+            header_main.Add("Dataset Direction");
+            header_main.Add("Natural Frequency DFT (Hz)");
+            header_main.Add("Natural Frequency Peaks (Hz)");
+            header_main.Add("Damping Ratio DFT Frequency (%)");
+            header_main.Add("Damping Ratio Peaks Frequency (%)");
+            header_main.Add("R Squared");
+            header_main.Add("Max Displacement (m)");
+
+            List<string> header_averages = new List<string>();
+            header_averages.Add("Direction");
+            header_averages.Add("Natural Frequency DFT (Hz) Average");
+            header_averages.Add("Natural Frequency Peaks (Hz) Average");
+            header_averages.Add("Natural Frequency [Peaks+DFT] (Hz) Average");
+            header_averages.Add("Damping Ratio DFT frequency (%) Average");
+            header_averages.Add("Damping Ratio Peaks frequency (%) Average");
+            header_averages.Add("Damping Ratio [Peaks+DFT] frequency (%) Average");
+
+
+            using (var session_results = new XLWorkbook())
+            {
+                //create sheet
+                var worksheet1 = session_results.Worksheets.Add("Session Results");
+                //insert header row
+                for (int i = 0; i < header_main.Count; i++)
+                {
+                    worksheet1.Cell(1, i + 1).Value = header_main[i];
+                }
+
+
+                int row_counter = 2;
+                int table_width = 0;
+
+                //Insert main results section
+                for (int i = 0; i < session_results_tracker.Count; i++)
+                {
+                    string dataset_name = dataset_input_filepaths_short[i];
+
+                    if (session_results_tracker[i].Count > 0)
+                    {
+                        for (int data_direction_index = 0; data_direction_index < 6; data_direction_index++)
+                        {
+                            if (session_results_tracker[i][data_direction_index].Count > 0)
+                            {
+                                List<string> temp_row = convert_list_double_to_list_string(session_results_tracker[i][data_direction_index]);
+                                temp_row.Insert(0, data_direction_name[data_direction_index]);
+                                temp_row.Insert(0, dataset_name);
+
+                                table_width = temp_row.Count;
+
+                                for (int j = 0; j < temp_row.Count; j++)
+                                {
+                                    worksheet1.Cell(row_counter, j + 1).Value = temp_row[j];
+                                }
+                                row_counter++;
+
+                                temp_row.Clear();
+                            }
+                        }
+                    }
+                }
+                row_counter--;
+
+                //make the main data area a table
+                var firstCell = worksheet1.Cell(1, 1);
+                var lastCell = worksheet1.Cell(row_counter, table_width);
+                worksheet1.Range(firstCell.Address, lastCell.Address).CreateTable();
+
+
+                //create results averages area////////////////////////////
+                int start_col = 1;
+                int start_row = row_counter + 4;
+
+                //insert header row
+                for (int i = 0; i < header_averages.Count; i++)
+                {
+                    worksheet1.Cell(start_row-1, i + start_col).Value = header_averages[i];
+                }
+
+                //insert averages
+                for (int i = 0; i < 6; i++)
+                {
+                    string quoted_ddn = @"""" + data_direction_name[i] + @"""";
+
+                    worksheet1.Cell(i + start_row, start_col).Value = data_direction_name[i];
+                    worksheet1.Cell(i + start_row, start_col + 1).FormulaA1 = @"=AVERAGEIFS(C2:C"+ row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
+                    worksheet1.Cell(i + start_row, start_col + 2).FormulaA1 = @"=AVERAGEIFS(D2:D" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
+                    worksheet1.Cell(i + start_row, start_col + 3).FormulaR1C1 = "=AVERAGE(R" + (i + start_row) + "C" + (start_col + 1) + ",R" + (i + start_row) + "C" + (start_col + 2) + ")";
+                    worksheet1.Cell(i + start_row, start_col + 4).FormulaA1 = @"=AVERAGEIFS(E2:E" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
+                    worksheet1.Cell(i + start_row, start_col + 5).FormulaA1 = @"=AVERAGEIFS(F2:F" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
+                    worksheet1.Cell(i + start_row, start_col + 6).FormulaR1C1 = "=AVERAGE(R" + (i + start_row) + "C" + (start_col + 4) + ",R" + (i + start_row) + "C" + (start_col + 5) + ")";
+                }
+
+                worksheet1.Columns().AdjustToContents();
+
+
+                //make the main data area a table
+                var firstCell2 = worksheet1.Cell(start_row-1, start_col);
+                var lastCell2 = worksheet1.Cell(start_row + 6-1, start_col + 6);
+                worksheet1.Range(firstCell2.Address, lastCell2.Address).CreateTable();
+
+
+
+
+                session_results.SaveAs(folder_filepath + filename + ".xlsx");
+
+
+                //worksheet.Cell("A1").Value = "Hello World!";
+                //worksheet.Cell("A2").FormulaA1 = "=MID(A1, 7, 5)"; 
+
+            }
+
 
         }
 
@@ -426,7 +514,7 @@ namespace Damping_Data_Processor
             peak_csv = transpose_list_of_list_string(peak_csv);
 
             return (peak_csv);
-            
+
             //process_save_dataset_as_csv(peak_csv, filepath);
         }
 
@@ -2798,13 +2886,8 @@ namespace Damping_Data_Processor
         //export data functions
         public void export_results_dataset_object(damping_reduction_dataset c_drd)
         {
-            //if (c_drd.datasets_master.Count == 0 || c_drd.natural_freq_fft.Count == 0 )
-            //{
-            //    string message = "There is no dataset to export for "+c_drd.dataset_input_filepath_short;
-            //    string title = "Error";
-            //    FlexibleMessageBox.Show(message, title);
-            //    return;
-            //}
+            //collect items that thrown an error
+            string export_error_filenames = string.Empty;
 
             //get timestamps of trimmed data
             double first_timestamp = Math.Round(c_drd.datasets_trim[0][0], 1);
@@ -2836,35 +2919,95 @@ namespace Damping_Data_Processor
 
             //export the datasets
 
-            //unedited dataset
-            process_save_dataset_as_csv(c_drd.datasets_master, save_results_folder_subfolder + dataset_name + " Acc Data[Unedited].csv");
-            //if (c_drd.datasets_trim.Count > 0)
-            //{
-            //    //trimmed dataset
-            //    process_save_dataset_as_csv(c_drd.datasets_trim, save_results_folder_subfolder + dataset_name_trimmed + " Acc Data[Trim].csv");
-            //}
-            //if (c_drd.datasets_filter_trim.Count > 0)
-            //{
-            //    //trimed/filtered dataset
-            //    process_save_dataset_as_csv(c_drd.datasets_filter_trim, save_results_folder_subfolder + dataset_name_trimmed_filtered + " Acc Data[Filt Trim].csv");
-            //}
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
+            string fp = save_results_folder_subfolder + dataset_name + " Acc Data[Unedited].csv";
+            try
+            {
+                //export unedited dataset
+                process_save_dataset_as_csv(c_drd.datasets_master, fp);
+            }
+            catch
+            {
+                export_error_filenames += fp + "/n/r";
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+            string fp1 = save_results_folder_subfolder + dataset_name_trimmed + " Acc Data[Trim].csv";
+            try
+            {
+                if (c_drd.datasets_trim.Count > 0)
+                {
+                    //trimmed dataset
+                    process_save_dataset_as_csv(c_drd.datasets_trim, fp1);
+                }
+            }
+            catch
+            {
+                export_error_filenames += fp1 + "/n/r";
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            string fp2 = save_results_folder_subfolder + dataset_name_trimmed_filtered + " Acc Data[Filt Trim].csv";
+            try
+            {
+                if (c_drd.datasets_filter_trim.Count > 0)
+                {
+                    //trimed/filtered dataset
+                    process_save_dataset_as_csv(c_drd.datasets_filter_trim, fp2);
+                }
+            }
+            catch
+            {
+                export_error_filenames += fp2 + "/n/r";
+            }
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            string fp3 = save_results_folder_subfolder + dataset_name + " Peaks.csv";
             //export peaks as csv file
-            List<List<string>> peaks_string_data = export_peaks_csv(c_drd);
-            process_save_dataset_as_csv(peaks_string_data, save_results_folder_subfolder + dataset_name + " Peaks.csv");
+            try
+            {
+                List<List<string>> peaks_string_data = export_peaks_csv(c_drd);
+                process_save_dataset_as_csv(peaks_string_data, fp3);
+            }
+            catch
+            {
+                export_error_filenames += fp3 + "/n/r";
+            }
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            string fp4 = save_results_folder_subfolder + "Summary Results.txt";
+            try
+            {
+                //string dataset_result_summary_text_concatenated = concat_dataset_results_summary();
+                File.WriteAllText(fp4, c_drd.dataset_result_summary);
+            }
+            catch
+            {
+                export_error_filenames += fp4 + "/n/r";
+            }
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-            //string dataset_result_summary_text_concatenated = concat_dataset_results_summary();
-            File.WriteAllText(save_results_folder_subfolder + "Summary Results.txt", c_drd.dataset_result_summary);
+            try
+            {
+                export_image_streams_chart_screenshot_tracker(c_drd, save_results_folder_subfolder);
+            }
+            catch
+            {
+                export_error_filenames += "Plot Screenshots/n/r";
+            }
 
-            //string dataset_name = get_filename_from_filepath(csv_input_filepaths_short[catalog_index]);  
+            //show message box if any data failed to export
+            if (!String.IsNullOrEmpty(export_error_filenames))
+            {
+                string message = "There was an error trying to export the following data from " + c_drd.dataset_input_filepath_short + ":\n\r " + export_error_filenames;
+                string title = "Error";
+                FlexibleMessageBox.Show(message, title);
+            }
 
-            //try catch is temeportray until it stopps calling uncproccesed datasets to be exported
-            //try
-            //{
-            export_image_streams_chart_screenshot_tracker(c_drd, save_results_folder_subfolder);
-            //}
-            //catch { }
 
         }
 
@@ -2902,6 +3045,8 @@ namespace Damping_Data_Processor
                 FlexibleMessageBox.Show(message, title);
             }
             export_session_results_to_csv(input_folder + output_folder_name, "Damping Reduction Results");
+
+            export_session_results_to_excel(input_folder + output_folder_name, "Damping Reduction Results");
         }
 
         public void get_session_result_data_from_drd(damping_reduction_dataset drd_temp)
