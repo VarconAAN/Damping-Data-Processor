@@ -916,7 +916,6 @@ namespace Damping_Data_Processor
             this.Controls.Add(this.signal_data_chart_main);
             this.Controls.Add(this.menu_strip);
             this.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menu_strip;
             this.MinimumSize = new System.Drawing.Size(1463, 805);

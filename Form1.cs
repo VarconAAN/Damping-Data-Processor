@@ -264,31 +264,52 @@ namespace Damping_Data_Processor
             header_averages.Add("Damping Ratio [Peaks+DFT] frequency (%) Average");
 
 
+
+
             using (var session_results = new XLWorkbook())
             {
                 //create sheet
                 var worksheet1 = session_results.Worksheets.Add("Session Results");
-                //insert header row
-                for (int i = 0; i < header_main.Count; i++)
-                {
-                    worksheet1.Cell(1, i + 1).Value = header_main[i];
-                }
+
+                ////insert header row
+                //for (int i = 0; i < header_main.Count; i++)
+                //{
+                //    worksheet1.Cell(1, i + 1).Value = header_main[i];
+                //}
 
 
-                int row_counter = 2;
+                int row_counter = 1;
                 int table_width = 0;
+                Boolean insert_header_flag = true;
 
-                //Insert main results section
-                for (int i = 0; i < session_results_tracker.Count; i++)
+                int added_rows = 0;
+
+                for (int data_direction_index = 0; data_direction_index < 6; data_direction_index++)
                 {
-                    string dataset_name = dataset_input_filepaths_short[i];
-
-                    if (session_results_tracker[i].Count > 0)
+                    if (insert_header_flag == true)
                     {
-                        for (int data_direction_index = 0; data_direction_index < 6; data_direction_index++)
+                        //insert header row
+                        for (int i = 0; i < header_main.Count; i++)
                         {
+                            worksheet1.Cell(row_counter, i + 1).Value = header_main[i];
+                        }
+
+                        row_counter++;
+                        insert_header_flag = false;
+                    }
+
+                    //Insert main results section
+                    for (int i = 0; i < session_results_tracker.Count; i++)
+                    {
+                        string dataset_name = dataset_input_filepaths_short[i];
+
+                        if (session_results_tracker[i].Count > 0)
+                        {
+
                             if (session_results_tracker[i][data_direction_index].Count > 0)
                             {
+                                insert_header_flag = true;
+
                                 List<string> temp_row = convert_list_double_to_list_string(session_results_tracker[i][data_direction_index]);
                                 temp_row.Insert(0, data_direction_name[data_direction_index]);
                                 temp_row.Insert(0, dataset_name);
@@ -302,54 +323,183 @@ namespace Damping_Data_Processor
                                 row_counter++;
 
                                 temp_row.Clear();
+
+                                added_rows++;
                             }
                         }
                     }
+                    if (insert_header_flag == true)
+                    {
+                        //make table
+                        var firstCell = worksheet1.Cell(row_counter - added_rows - 1, 1);
+                        var lastCell = worksheet1.Cell(row_counter - 1, table_width);
+                        worksheet1.Range(firstCell.Address, lastCell.Address).CreateTable();
+                    }
+
+                    //add averages
+                    if (added_rows > 1)
+                    {
+
+                        worksheet1.Cell(row_counter, 2).Value = "Average";
+                        for (int col = 3; col <= header_main.Count; col++)
+                        {
+                            worksheet1.Cell(row_counter, col).FormulaR1C1 = "=AVERAGE(R" + (row_counter - 1) + "C" + (col) + ",R" + (row_counter - added_rows) + "C" + (col) + ")";
+                        }
+
+                        row_counter++;
+                    }
+
+                    //insert blank row if data was added
+                    if (insert_header_flag == true)
+                    {
+                        row_counter++;
+                    }
+
+                    added_rows = 0;
                 }
                 row_counter--;
 
-                //make the main data area a table
-                var firstCell = worksheet1.Cell(1, 1);
-                var lastCell = worksheet1.Cell(row_counter, table_width);
-                worksheet1.Range(firstCell.Address, lastCell.Address).CreateTable();
+                ////create results averages area////////////////////////////
+                //int start_col = 1;
+                //int start_row = row_counter + 4;
 
 
-                //create results averages area////////////////////////////
+                //clear header row of any remants
+                for (int i = 1; i < 15; i++)
+                {
+                    worksheet1.Cell(row_counter, i).Value = "";
+                }
+
                 int start_col = 1;
-                int start_row = row_counter + 4;
-
                 //insert header row
                 for (int i = 0; i < header_averages.Count; i++)
                 {
-                    worksheet1.Cell(start_row-1, i + start_col).Value = header_averages[i];
+                    worksheet1.Cell(row_counter, i + start_col).Value = header_averages[i];
                 }
+
+                row_counter++;
+
+
 
                 //insert averages
                 for (int i = 0; i < 6; i++)
                 {
                     string quoted_ddn = @"""" + data_direction_name[i] + @"""";
 
-                    worksheet1.Cell(i + start_row, start_col).Value = data_direction_name[i];
-                    worksheet1.Cell(i + start_row, start_col + 1).FormulaA1 = @"=AVERAGEIFS(C2:C"+ row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
-                    worksheet1.Cell(i + start_row, start_col + 2).FormulaA1 = @"=AVERAGEIFS(D2:D" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
-                    worksheet1.Cell(i + start_row, start_col + 3).FormulaR1C1 = "=AVERAGE(R" + (i + start_row) + "C" + (start_col + 1) + ",R" + (i + start_row) + "C" + (start_col + 2) + ")";
-                    worksheet1.Cell(i + start_row, start_col + 4).FormulaA1 = @"=AVERAGEIFS(E2:E" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
-                    worksheet1.Cell(i + start_row, start_col + 5).FormulaA1 = @"=AVERAGEIFS(F2:F" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
-                    worksheet1.Cell(i + start_row, start_col + 6).FormulaR1C1 = "=AVERAGE(R" + (i + start_row) + "C" + (start_col + 4) + ",R" + (i + start_row) + "C" + (start_col + 5) + ")";
-                }
+                    //worksheet1.Cell(i + row_counter, start_col).Value = data_direction_name[i];
+                    //worksheet1.Cell(i + row_counter, start_col + 1).FormulaA1 = @"=AVERAGEIFS(C2:C" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
+                    //worksheet1.Cell(i + row_counter, start_col + 2).FormulaA1 = @"=AVERAGEIFS(D2:D" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
+                    //worksheet1.Cell(i + row_counter, start_col + 3).FormulaR1C1 = "=AVERAGE(R" + (i + row_counter) + "C" + (start_col + 1) + ",R" + (i + row_counter) + "C" + (start_col + 2) + ")";
+                    //worksheet1.Cell(i + row_counter, start_col + 4).FormulaA1 = @"=AVERAGEIFS(E2:E" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
+                    //worksheet1.Cell(i + row_counter, start_col + 5).FormulaA1 = @"=AVERAGEIFS(F2:F" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
+                    //worksheet1.Cell(i + row_counter, start_col + 6).FormulaR1C1 = "=AVERAGE(R" + (i + row_counter) + "C" + (start_col + 4) + ",R" + (i + row_counter) + "C" + (start_col + 5) + ")";
 
-                worksheet1.Columns().AdjustToContents();
+                    worksheet1.Cell(i + row_counter, start_col).Value = data_direction_name[i];
+                    worksheet1.Cell(i + row_counter, start_col + 1).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (3) + ":R" + (row_counter - 3) + "C" + (3) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+                    worksheet1.Cell(i + row_counter, start_col + 2).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (4) + ":R" + (row_counter - 3) + "C" + (4) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+                    worksheet1.Cell(i + row_counter, start_col + 3).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (5) + ":R" + (row_counter - 3) + "C" + (5) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+                    worksheet1.Cell(i + row_counter, start_col + 4).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (6) + ":R" + (row_counter - 3) + "C" + (6) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+                    worksheet1.Cell(i + row_counter, start_col + 5).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (7) + ":R" + (row_counter - 3) + "C" + (7) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+                    worksheet1.Cell(i + row_counter, start_col + 6).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (8) + ":R" + (row_counter - 3) + "C" + (8) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+
+                }
 
 
                 //make the main data area a table
-                var firstCell2 = worksheet1.Cell(start_row-1, start_col);
-                var lastCell2 = worksheet1.Cell(start_row + 6-1, start_col + 6);
+                var firstCell2 = worksheet1.Cell(row_counter - 1, start_col);
+                var lastCell2 = worksheet1.Cell(row_counter + 5, start_col + 6);
                 worksheet1.Range(firstCell2.Address, lastCell2.Address).CreateTable();
 
-
-
+                worksheet1.Columns().AdjustToContents();
 
                 session_results.SaveAs(folder_filepath + filename + ".xlsx");
+
+                //using (var session_results = new XLWorkbook())
+                //{
+                //    //create sheet
+                //    var worksheet1 = session_results.Worksheets.Add("Session Results");
+                //    //insert header row
+                //    for (int i = 0; i < header_main.Count; i++)
+                //    {
+                //        worksheet1.Cell(1, i + 1).Value = header_main[i];
+                //    }
+
+
+                //    int row_counter = 2;
+                //    int table_width = 0;
+
+                //    //Insert main results section
+                //    for (int i = 0; i < session_results_tracker.Count; i++)
+                //    {
+                //        string dataset_name = dataset_input_filepaths_short[i];
+
+                //        if (session_results_tracker[i].Count > 0)
+                //        {
+                //            for (int data_direction_index = 0; data_direction_index < 6; data_direction_index++)
+                //            {
+                //                if (session_results_tracker[i][data_direction_index].Count > 0)
+                //                {
+                //                    List<string> temp_row = convert_list_double_to_list_string(session_results_tracker[i][data_direction_index]);
+                //                    temp_row.Insert(0, data_direction_name[data_direction_index]);
+                //                    temp_row.Insert(0, dataset_name);
+
+                //                    table_width = temp_row.Count;
+
+                //                    for (int j = 0; j < temp_row.Count; j++)
+                //                    {
+                //                        worksheet1.Cell(row_counter, j + 1).Value = temp_row[j];
+                //                    }
+                //                    row_counter++;
+
+                //                    temp_row.Clear();
+                //                }
+                //            }
+                //        }
+                //    }
+                //    row_counter--;
+
+                //    //make the main data area a table
+                //    var firstCell = worksheet1.Cell(1, 1);
+                //    var lastCell = worksheet1.Cell(row_counter, table_width);
+                //    worksheet1.Range(firstCell.Address, lastCell.Address).CreateTable();
+
+
+                //    //create results averages area////////////////////////////
+                //    int start_col = 1;
+                //    int start_row = row_counter + 4;
+
+                //    //insert header row
+                //    for (int i = 0; i < header_averages.Count; i++)
+                //    {
+                //        worksheet1.Cell(start_row-1, i + start_col).Value = header_averages[i];
+                //    }
+
+                //    //insert averages
+                //    for (int i = 0; i < 6; i++)
+                //    {
+                //        string quoted_ddn = @"""" + data_direction_name[i] + @"""";
+
+                //        worksheet1.Cell(i + start_row, start_col).Value = data_direction_name[i];
+                //        worksheet1.Cell(i + start_row, start_col + 1).FormulaA1 = @"=AVERAGEIFS(C2:C"+ row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
+                //        worksheet1.Cell(i + start_row, start_col + 2).FormulaA1 = @"=AVERAGEIFS(D2:D" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
+                //        worksheet1.Cell(i + start_row, start_col + 3).FormulaR1C1 = "=AVERAGE(R" + (i + start_row) + "C" + (start_col + 1) + ",R" + (i + start_row) + "C" + (start_col + 2) + ")";
+                //        worksheet1.Cell(i + start_row, start_col + 4).FormulaA1 = @"=AVERAGEIFS(E2:E" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
+                //        worksheet1.Cell(i + start_row, start_col + 5).FormulaA1 = @"=AVERAGEIFS(F2:F" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
+                //        worksheet1.Cell(i + start_row, start_col + 6).FormulaR1C1 = "=AVERAGE(R" + (i + start_row) + "C" + (start_col + 4) + ",R" + (i + start_row) + "C" + (start_col + 5) + ")";
+                //    }
+
+                //    worksheet1.Columns().AdjustToContents();
+
+
+                //    //make the main data area a table
+                //    var firstCell2 = worksheet1.Cell(start_row-1, start_col);
+                //    var lastCell2 = worksheet1.Cell(start_row + 6-1, start_col + 6);
+                //    worksheet1.Range(firstCell2.Address, lastCell2.Address).CreateTable();
+
+
+
+
+                //session_results.SaveAs(folder_filepath + filename + ".xlsx");
 
 
                 //worksheet.Cell("A1").Value = "Hello World!";
