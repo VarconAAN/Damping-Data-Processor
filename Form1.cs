@@ -128,7 +128,7 @@ namespace Damping_Data_Processor
 
             peak_picking_method_combobox.Items.Add("1. Fast Peak Picker (works best on filtered data)");
             peak_picking_method_combobox.Items.Add("2. Classic Peak Picker (Slow)");
-            peak_picking_method_combobox.SelectedIndex = 0;
+            peak_picking_method_combobox.SelectedIndex = 1;
 
             data_direction_name.Add("X");
             data_direction_name.Add("Y");
@@ -394,14 +394,23 @@ namespace Damping_Data_Processor
                     //worksheet1.Cell(i + row_counter, start_col + 5).FormulaA1 = @"=AVERAGEIFS(F2:F" + row_counter + ",B2:B" + row_counter + "," + quoted_ddn + ")";
                     //worksheet1.Cell(i + row_counter, start_col + 6).FormulaR1C1 = "=AVERAGE(R" + (i + row_counter) + "C" + (start_col + 4) + ",R" + (i + row_counter) + "C" + (start_col + 5) + ")";
 
+                    //worksheet1.Cell(i + row_counter, start_col).Value = data_direction_name[i];
+                    //worksheet1.Cell(i + row_counter, start_col + 1).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (3) + ":R" + (row_counter - 3) + "C" + (3) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+                    //worksheet1.Cell(i + row_counter, start_col + 2).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (4) + ":R" + (row_counter - 3) + "C" + (4) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+                    //worksheet1.Cell(i + row_counter, start_col + 3).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (5) + ":R" + (row_counter - 3) + "C" + (5) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+                    //worksheet1.Cell(i + row_counter, start_col + 4).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (6) + ":R" + (row_counter - 3) + "C" + (6) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+                    //worksheet1.Cell(i + row_counter, start_col + 5).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (7) + ":R" + (row_counter - 3) + "C" + (7) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+                    //worksheet1.Cell(i + row_counter, start_col + 6).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (8) + ":R" + (row_counter - 3) + "C" + (8) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+
+
                     worksheet1.Cell(i + row_counter, start_col).Value = data_direction_name[i];
                     worksheet1.Cell(i + row_counter, start_col + 1).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (3) + ":R" + (row_counter - 3) + "C" + (3) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
                     worksheet1.Cell(i + row_counter, start_col + 2).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (4) + ":R" + (row_counter - 3) + "C" + (4) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
-                    worksheet1.Cell(i + row_counter, start_col + 3).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (5) + ":R" + (row_counter - 3) + "C" + (5) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
-                    worksheet1.Cell(i + row_counter, start_col + 4).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (6) + ":R" + (row_counter - 3) + "C" + (6) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
-                    worksheet1.Cell(i + row_counter, start_col + 5).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (7) + ":R" + (row_counter - 3) + "C" + (7) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
-                    worksheet1.Cell(i + row_counter, start_col + 6).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (8) + ":R" + (row_counter - 3) + "C" + (8) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+                    worksheet1.Cell(i + row_counter, start_col + 3).FormulaR1C1 = "=AVERAGE(R" + (i + row_counter) + "C" + (2) + ":R" + (i + row_counter) + "C" + (3) + ")";
 
+                    worksheet1.Cell(i + row_counter, start_col + 4).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (5) + ":R" + (row_counter - 3) + "C" + (5) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+                    worksheet1.Cell(i + row_counter, start_col + 5).FormulaR1C1 = "=AVERAGEIFS(R" + (2) + "C" + (6) + ":R" + (row_counter - 3) + "C" + (6) + ",R" + (2) + "C" + (2) + ":R" + (row_counter - 3) + "C" + (2) + " , " + quoted_ddn + ")";
+                    worksheet1.Cell(i + row_counter, start_col + 6).FormulaR1C1 = "=AVERAGE(R" + (i + row_counter) + "C" + (5) + ":R" + (i + row_counter) + "C" + (6) + ")";
                 }
 
 
@@ -643,7 +652,7 @@ namespace Damping_Data_Processor
 
         //generic program functions
 
-        public List<List<string>> export_peaks_csv(damping_reduction_dataset cur_drd)
+        public List<List<string>> export_peaks_csv(damping_reduction_dataset cur_drd, Boolean export_all_peaks = false)
         {
             List<List<string>> peak_csv = new List<List<string>>();
 
@@ -651,8 +660,20 @@ namespace Damping_Data_Processor
             {
                 if (cur_drd.local_maximas_times[i].Count != 0)
                 {
-                    List<string> peak_times = convert_list_double_to_list_string(cur_drd.local_maximas_times[i]);
-                    List<string> peak_amplitudes = convert_list_double_to_list_string(cur_drd.local_maximas_amplitudes[i]);
+                    List<string> peak_times = new List<string>();
+                    List<string> peak_amplitudes = new List<string>();
+
+                    if (export_all_peaks == false)
+                    {
+                        peak_times = convert_list_double_to_list_string(cur_drd.local_maximas_times[i]);
+                        peak_amplitudes = convert_list_double_to_list_string(cur_drd.local_maximas_amplitudes[i]);
+                    }
+                    else
+                    {
+                        //use the entire dataset peaks
+                        peak_times = convert_list_double_to_list_string(cur_drd.local_maximas_times_ED[i]);
+                        peak_amplitudes = convert_list_double_to_list_string(cur_drd.local_maximas_amplitudes_ED[i]);
+                    }
 
                     peak_times.Insert(0, "Peak Time (s) [" + data_direction_name[i] + "]");
                     peak_amplitudes.Insert(0, "Peak Amp. (s) [" + data_direction_name[i] + "]");
@@ -1369,6 +1390,32 @@ namespace Damping_Data_Processor
         }
 
         private int find_closest_value(double val, List<Double> list)
+        {
+            int max = list.Count;
+            int min = 0;
+            int index = max / 2;
+
+            while (max - min > 1)
+            {
+                if (val < list[index])
+                    max = index;
+                else if (val > list[index])
+                    min = index;
+                else
+                    return index;
+
+                index = (max - min) / 2 + min;
+            }
+
+            if (max != list.Count &&
+                    Math.Abs(list[max] - val) < Math.Abs(list[min] - val))
+            {
+                return max;
+            }
+            return min;
+        }
+
+        private int find_closest_value(int val, List<int> list)
         {
             int max = list.Count;
             int min = 0;
@@ -2708,6 +2755,124 @@ namespace Damping_Data_Processor
             check_checked_chart_series();
         }
 
+
+        public List<int> trim_list(List<int> list_of_index, int index_low_cutoff, int index_high_cutoff, List<int> list_to_be_trim)
+        {
+            if (list_of_index.Count != list_to_be_trim.Count)
+            {
+                return list_to_be_trim;
+            }
+
+            List<int> list_to_be_trim_new = new List<int>(list_to_be_trim);
+
+            for (int i = list_to_be_trim_new.Count - 1; i > 0; i--)
+            {
+                if (list_of_index[i] > index_high_cutoff || list_of_index[i] < index_low_cutoff)
+                {
+                    list_to_be_trim_new.RemoveAt(i);
+                }
+            }
+            return list_to_be_trim_new;
+        }
+
+        public List<double> trim_list(List<int> list_of_index, int index_low_cutoff, int index_high_cutoff, List<double> list_to_be_trim)
+        {
+            if (list_of_index.Count != list_to_be_trim.Count)
+            {
+                return list_to_be_trim;
+            }
+
+            List<double> list_to_be_trim_new = new List<double>(list_to_be_trim);
+
+            for (int i = list_to_be_trim_new.Count - 1; i > 0; i--)
+            {
+                if (list_of_index[i] > index_high_cutoff || list_of_index[i] < index_low_cutoff)
+                {
+                    list_to_be_trim_new.RemoveAt(i);
+                }
+            }
+            return list_to_be_trim_new;
+        }
+
+        public void calculate_local_maximas_entire_dataset(damping_reduction_dataset c_drd, int ddi, int window_size)
+        {
+            //calculate maximas for entire dataset////////////////////////
+            List<double> dataset_to_calc_maximas = new List<double>();
+
+            //grab the proper dataset
+            if (c_drd.is_data_filtered == true)
+            {
+                dataset_to_calc_maximas = new List<double>(c_drd.datasets_master_filtered[ddi + 1]);
+            }
+            else
+            {
+                dataset_to_calc_maximas = new List<double>(c_drd.datasets_master[ddi + 1]);
+            }
+            //abs the data
+            for (int ind = 0; ind < dataset_to_calc_maximas.Count; ind++)
+            {
+                dataset_to_calc_maximas[ind] = Math.Abs(dataset_to_calc_maximas[ind]);
+            }
+
+            //calaculte the local maxima indicies of  thedataset
+            if (peak_picking_method_combobox.SelectedIndex == 1)
+            {
+                c_drd.local_maximas_indicies_ED[ddi] = find_local_maximas1(dataset_to_calc_maximas, window_size);
+            }
+            else
+            {
+                c_drd.local_maximas_indicies_ED[ddi] = (Accord.Audio.Tools.FindPeaks(dataset_to_calc_maximas.ToArray())).ToList();
+            }
+
+            //get the corresponding time values for the maxima indeicies
+            for (int i = 0; i < c_drd.local_maximas_indicies_ED[ddi].Count; i++)
+            {
+                c_drd.local_maximas_times_ED[ddi].Add(c_drd.datasets_master[0][c_drd.local_maximas_indicies_ED[ddi][i]]);
+            }
+
+
+            //dont include last point it can be a bad data point
+            for (int i = 0; i <= c_drd.local_maximas_indicies_ED[ddi].Count - 1; i++)
+            {
+                if (c_drd.local_maximas_indicies_ED[ddi][i] < dataset_to_calc_maximas.Count - 1)
+                {
+                    //peak_times.Add(c_drd.datasets_trim[0][peak_indexs[i]]);
+                    c_drd.local_maximas_amplitudes_ED[ddi].Add(dataset_to_calc_maximas[c_drd.local_maximas_indicies_ED[ddi][i]]);
+                }
+            }
+
+            //now trim the maxima data according to the trim values and aloocate to data object//////////////////////////////
+
+            //int ind1 = find_closest_value(drd.lower_trim_index_x_relative_master_dataset, drd.local_maximas_indicies_ED[ddi]);
+            //int ind2 = find_closest_value(drd.upper_trim_index_x_relative_master_dataset - drd.lower_trim_index_x_relative_master_dataset, drd.local_maximas_indicies_ED[ddi]);
+
+
+            //int ind3 = find_closest_value(drd.lower_trim_index_x_relative_master_dataset, drd.local_maximas_times_ED[ddi]);
+            //int ind4 = find_closest_value(drd.upper_trim_index_x_relative_master_dataset - drd.lower_trim_index_x_relative_master_dataset, drd.local_maximas_times_ED[ddi]);
+
+            //drd.local_maximas_indicies[ddi] = (new List<int>(drd.local_maximas_indicies_ED[ddi])).GetRange(ind1, ind2);
+            //drd.local_maximas_times[ddi] = (new List<double>(drd.local_maximas_times_ED[ddi])).GetRange(ind1, ind2);
+
+
+            // trim_list(List<int> list_of_index, int index_low_cutoff, int index_high_cutoff, List<int> list_to_be_trim)
+
+            //drd.local_maximas_indicies[ddi] = trim_list(drd.local_maximas_indicies_ED[ddi], drd.lower_trim_index_x_relative_master_dataset, drd.upper_trim_index_x_relative_master_dataset, drd.local_maximas_indicies_ED[ddi]);
+            //drd.local_maximas_times[ddi] = trim_list(drd.local_maximas_indicies_ED[ddi], drd.lower_trim_index_x_relative_master_dataset, drd.upper_trim_index_x_relative_master_dataset, drd.local_maximas_times_ED[ddi]);
+            //drd.local_maximas_amplitudes[ddi] = trim_list(drd.local_maximas_indicies_ED[ddi], drd.lower_trim_index_x_relative_master_dataset, drd.upper_trim_index_x_relative_master_dataset, drd.local_maximas_amplitudes_ED[ddi]);
+
+            ////poor data quality with onlyy three indices, quit and move onto the next dataset
+            //if (drd.local_maximas_indicies[ddi].Count <= 3)
+            //{
+            //    results_summary_text = results_summary_text + "The poor quality of the " + data_direction_name[ddi] + " direction data resulted in no meaningful peaks extracted and the calculations were skipped.\r\n\r\n";
+            //    continue;
+            //}
+
+            //drd.local_maximas_amplitudes[ddi] = plot_peaks_chart(drd.local_maximas_indicies[ddi], selected_data_set_abs, data_direction_name[ddi] + " Peaks", ddi);
+            ////plot_peaks_chart(drd.local_maximas_indicies[ddi], selected_data_set_abs, data_direction_name[ddi] + " Peaks", ddi);
+        }
+
+
+
         public void calculate_damping_ratio_and_frequency(Boolean recalculate_damp_ratio_trimmed_freq_values = false)
         {
             changes_cursor_icon_to_loading(true);
@@ -2737,6 +2902,10 @@ namespace Damping_Data_Processor
                 drd.local_maximas_indicies.Clear();
                 drd.local_maximas_amplitudes.Clear();
                 drd.local_maximas_times.Clear();
+
+                drd.local_maximas_indicies_ED.Clear();
+                drd.local_maximas_amplitudes_ED.Clear();
+                drd.local_maximas_times_ED.Clear();
             }
 
             remove_non_signal_series_plot();
@@ -2803,6 +2972,10 @@ namespace Damping_Data_Processor
                     drd.local_maximas_indicies.Add(new List<int>());
                     drd.local_maximas_amplitudes.Add(new List<double>());
                     drd.local_maximas_times.Add(new List<double>());
+
+                    drd.local_maximas_indicies_ED.Add(new List<int>());
+                    drd.local_maximas_amplitudes_ED.Add(new List<double>());
+                    drd.local_maximas_times_ED.Add(new List<double>());
                 }
             }
 
@@ -2842,7 +3015,8 @@ namespace Damping_Data_Processor
                             window_size = Convert.ToInt32(Math.Round(((1 / natural_frequencies[ddi]) * input_data_sample_rate * 0.95) / 2));
                         }
 
-                        Console.WriteLine($"Timestamp before maximas calculation: {watch.ElapsedMilliseconds} ms");
+                        //get miximas for entire dataset set and store it within the drd
+                        calculate_local_maximas_entire_dataset(drd, ddi, window_size);
 
                         //calaculte the local maxima indicies of  thedataset
                         if (peak_picking_method_combobox.SelectedIndex == 1)
@@ -3114,7 +3288,7 @@ namespace Damping_Data_Processor
             //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             string fp3 = save_results_folder_subfolder + dataset_name + " Peaks.csv";
-            //export peaks as csv file
+            //export trimmed peaks as csv file
             try
             {
                 List<List<string>> peaks_string_data = export_peaks_csv(c_drd);
@@ -3124,6 +3298,21 @@ namespace Damping_Data_Processor
             {
                 export_error_filenames += fp3 + "/n/r";
             }
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            string fp3_1 = save_results_folder_subfolder + dataset_name + " Peaks [Entire Dataset].csv";
+            //export all peaks as csv file (even ones excluded from dataset)
+            try
+            {
+                List<List<string>> peaks_string_data = export_peaks_csv(c_drd, true);
+                process_save_dataset_as_csv(peaks_string_data, fp3_1);
+            }
+            catch
+            {
+                export_error_filenames += fp3_1 + "/n/r";
+            }
+
 
             //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3576,8 +3765,13 @@ namespace Damping_Data_Processor
 
             List<double> exp_curve_fit_values = plot_fitted_exponential_curve(p_exp_coeff[0], p_exp_coeff[1], data_direction_name[ddi], ddi);
 
-            double coffecient_of_determination = calculate_coffecient_of_determination(drd.local_maximas_amplitudes[ddi], exp_curve_fit_values, drd.local_maximas_indicies[ddi]);
-            drd.cofefficient_of_determination[ddi] = coffecient_of_determination;
+            try
+            {
+                double coffecient_of_determination = calculate_coffecient_of_determination(drd.local_maximas_amplitudes[ddi], exp_curve_fit_values, drd.local_maximas_indicies[ddi]);
+
+                drd.cofefficient_of_determination[ddi] = coffecient_of_determination;
+            }
+            catch { }
         }
 
         public string setup_dataset_results_string()
@@ -3974,10 +4168,15 @@ namespace Damping_Data_Processor
         //store other data related to calcualting damping ratio 
         public List<List<double>> natural_freq_dist_btwn_peaks = new List<List<double>>();
 
-        //found maximas
+        //found maximas (Trimmed Dataset)
         public List<List<int>> local_maximas_indicies = new List<List<int>>();
         public List<List<double>> local_maximas_amplitudes = new List<List<double>>();
         public List<List<double>> local_maximas_times = new List<List<double>>();
+
+        //found maximas (entire dataset)
+        public List<List<int>> local_maximas_indicies_ED = new List<List<int>>();
+        public List<List<double>> local_maximas_amplitudes_ED = new List<List<double>>();
+        public List<List<double>> local_maximas_times_ED = new List<List<double>>();
 
         //data results
         public List<double> natural_freq_fft = new List<double>();
