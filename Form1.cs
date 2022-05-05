@@ -2794,6 +2794,38 @@ namespace Damping_Data_Processor
             return list_to_be_trim_new;
         }
 
+
+        public void remove_false_peaks(ref List<int> peak_indecies, double data_sample_rate)
+        {
+            List<int> removal_list = new List<int>();
+
+            for(int i =1; i< peak_indecies.Count; i++)
+            {
+                double peak1 = Convert.ToDouble(peak_indecies[i]);
+                double peak2 = Convert.ToDouble(peak_indecies[i-1]);
+
+                double freq = 1 / (((Math.Abs(peak1-peak2))/ data_sample_rate)/2);
+
+                if(freq > 9)
+                {
+                    removal_list.Add(i);
+                }
+            }
+
+            int lol = 0;
+
+            if (removal_list.Count != 0)
+            {
+                //remove the high frequncy content
+                for (int i = removal_list.Count - 1; i >= 0; i--)
+                {
+                    peak_indecies.RemoveAt(removal_list[i]);
+                }
+            }
+
+        }
+
+
         public void calculate_local_maximas_entire_dataset(damping_reduction_dataset c_drd, int ddi, int window_size)
         {
             //calculate maximas for entire dataset////////////////////////
@@ -2814,15 +2846,22 @@ namespace Damping_Data_Processor
                 dataset_to_calc_maximas[ind] = Math.Abs(dataset_to_calc_maximas[ind]);
             }
 
+            List<int> local_maxima_incdies = new List<int>();
+
             //calaculte the local maxima indicies of  thedataset
             if (peak_picking_method_combobox.SelectedIndex == 1)
             {
-                c_drd.local_maximas_indicies_ED[ddi] = find_local_maximas1(dataset_to_calc_maximas, window_size);
+                local_maxima_incdies = find_local_maximas1(dataset_to_calc_maximas, window_size);
             }
             else
             {
-                c_drd.local_maximas_indicies_ED[ddi] = (Accord.Audio.Tools.FindPeaks(dataset_to_calc_maximas.ToArray())).ToList();
+                local_maxima_incdies = (Accord.Audio.Tools.FindPeaks(dataset_to_calc_maximas.ToArray())).ToList();
             }
+
+            //remove double peaks and other high frequncy content
+            remove_false_peaks(ref local_maxima_incdies, input_data_sample_rate);
+
+            c_drd.local_maximas_indicies_ED[ddi] = local_maxima_incdies;
 
             //get the corresponding time values for the maxima indeicies
             for (int i = 0; i < c_drd.local_maximas_indicies_ED[ddi].Count; i++)
@@ -3018,15 +3057,21 @@ namespace Damping_Data_Processor
                         //get miximas for entire dataset set and store it within the drd
                         calculate_local_maximas_entire_dataset(drd, ddi, window_size);
 
+                        List<int> local_maxima_indicies = new List<int>();
+
                         //calaculte the local maxima indicies of  thedataset
                         if (peak_picking_method_combobox.SelectedIndex == 1)
                         {
-                            drd.local_maximas_indicies[ddi] = find_local_maximas1(selected_data_set_abs, window_size);
+                            local_maxima_indicies = find_local_maximas1(selected_data_set_abs, window_size);
                         }
                         else
                         {
-                            drd.local_maximas_indicies[ddi] = (Accord.Audio.Tools.FindPeaks(selected_data_set_abs.ToArray())).ToList();
+                            local_maxima_indicies = (Accord.Audio.Tools.FindPeaks(selected_data_set_abs.ToArray())).ToList();
                         }
+
+                        remove_false_peaks(ref local_maxima_indicies, input_data_sample_rate);
+
+                        drd.local_maximas_indicies[ddi] = local_maxima_indicies;
 
                         //get the corresponding time values for the maxima indeicies
                         for (int i = 0; i < drd.local_maximas_indicies[ddi].Count; i++)
