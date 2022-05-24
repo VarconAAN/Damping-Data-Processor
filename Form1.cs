@@ -1335,10 +1335,6 @@ namespace Damping_Data_Processor
 
             for (int i = 0; i < datasets_xyz[0].Count; i++)
             {
-                //xy.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) + Math.Pow(datasets_xyz[2][i], 2)));
-                //xz.Add(Math.Sqrt(Math.Pow(datasets_xyz[1][i], 2) + Math.Pow(datasets_xyz[3][i], 2)));
-                //yz.Add(Math.Sqrt(Math.Pow(datasets_xyz[2][i], 2) + Math.Pow(datasets_xyz[3][i], 2)));
-
                 xy.Add(vector_sum_two_points(datasets_xyz[1][i], datasets_xyz[2][i]));
                 xz.Add(vector_sum_two_points(datasets_xyz[1][i], datasets_xyz[3][i]));
                 yz.Add(vector_sum_two_points(datasets_xyz[2][i], datasets_xyz[3][i]));
@@ -2153,23 +2149,24 @@ namespace Damping_Data_Processor
             return exp_curve_values;
         }
 
-        public List<double> plot_peaks_chart(List<int> peak_indexs, List<double> abs_data, string series_name, int data_direction_index = 0)
+
+
+        //public List<double> plot_peaks_chart(List<int> peak_indexs, List<double> abs_data, string series_name, int data_direction_index = 0)
+        public List<double> plot_peaks_chart(List<double> peak_times, List<double> peak_amplitudes, string series_name, int data_direction_index = 0)
         {
 
-            List<double> peak_times = new List<double>();
-            List<double> peak_amplitudes = new List<double>();
+            //List<double> peak_times = new List<double>();
+            //List<double> peak_amplitudes = new List<double>();
 
-            //dont include last point it can be a bad data point
-            for (int i = 0; i <= peak_indexs.Count - 1; i++)
-            {
-                if (peak_indexs[i] < abs_data.Count - 1)
-                {
-                    peak_times.Add(drd.datasets_trim[0][peak_indexs[i]]);
-                    peak_amplitudes.Add(abs_data[peak_indexs[i]]);
-                }
-            }
-
-
+            ////dont include last point it can be a bad data point
+            //for (int i = 0; i <= peak_indexs.Count - 1; i++)
+            //{
+            //    if (peak_indexs[i] < abs_data.Count - 1)
+            //    {
+            //        peak_times.Add(drd.datasets_trim[0][peak_indexs[i]]);
+            //        peak_amplitudes.Add(abs_data[peak_indexs[i]]);
+            //    }
+            //}
 
             try
             {
@@ -2856,6 +2853,13 @@ namespace Damping_Data_Processor
                 drd.datasets_filter_trim.RemoveAt(4);
                 //vector sum sets of 2 directions of data and add to main data set
                 drd.datasets_filter_trim = vector_sum_xyz_datasets(drd.datasets_filter_trim);
+
+                //remove the existing vector summed data
+                drd.datasets_master_filtered.RemoveAt(6);
+                drd.datasets_master_filtered.RemoveAt(5);
+                drd.datasets_master_filtered.RemoveAt(4);
+                //vector sum sets of 2 directions of data and add to main data set
+                drd.datasets_master_filtered = vector_sum_xyz_datasets(drd.datasets_master_filtered);
             }
 
             List<string> data_direction_name_filter = new List<string>();
@@ -2977,22 +2981,22 @@ namespace Damping_Data_Processor
                 dataset_to_calc_maximas[ind] = Math.Abs(dataset_to_calc_maximas[ind]);
             }
 
-            List<int> local_maxima_incdies = new List<int>();
+            List<int> local_maxima_indicies = new List<int>();
 
             //calaculte the local maxima indicies of  thedataset
             if (peak_picking_method_combobox.SelectedIndex == 1)
             {
-                local_maxima_incdies = find_local_maximas1(dataset_to_calc_maximas, window_size);
+                local_maxima_indicies = find_local_maximas1(dataset_to_calc_maximas, window_size);
             }
             else
             {
-                local_maxima_incdies = (Accord.Audio.Tools.FindPeaks(dataset_to_calc_maximas.ToArray())).ToList();
+                local_maxima_indicies = (Accord.Audio.Tools.FindPeaks(dataset_to_calc_maximas.ToArray())).ToList();
             }
 
             //remove double peaks and other high frequncy content
-            remove_false_peaks(ref local_maxima_incdies, input_data_sample_rate);
+            remove_false_peaks(ref local_maxima_indicies, input_data_sample_rate);
 
-            c_drd.local_maximas_indicies_ED[ddi] = local_maxima_incdies;
+            c_drd.local_maximas_indicies_ED[ddi] = local_maxima_indicies;
 
             //get the corresponding time values for the maxima indeicies
             for (int i = 0; i < c_drd.local_maximas_indicies_ED[ddi].Count; i++)
@@ -3011,34 +3015,21 @@ namespace Damping_Data_Processor
                 }
             }
 
-            //now trim the maxima data according to the trim values and aloocate to data object//////////////////////////////
+            //now get trimmed peaks
+            c_drd.local_maximas_amplitudes[ddi].Clear();
+            c_drd.local_maximas_indicies[ddi].Clear();
+            c_drd.local_maximas_times[ddi].Clear();
 
-            //int ind1 = find_closest_value(drd.lower_trim_index_x_relative_master_dataset, drd.local_maximas_indicies_ED[ddi]);
-            //int ind2 = find_closest_value(drd.upper_trim_index_x_relative_master_dataset - drd.lower_trim_index_x_relative_master_dataset, drd.local_maximas_indicies_ED[ddi]);
+            for (int i = 0; i < c_drd.local_maximas_indicies_ED[ddi].Count; i++)
+            {
+                if (c_drd.local_maximas_indicies_ED[ddi][i] > c_drd.lower_trim_index_x_relative_master_dataset && c_drd.local_maximas_indicies_ED[ddi][i] < c_drd.upper_trim_index_x_relative_master_dataset)
+                {
+                    c_drd.local_maximas_indicies[ddi].Add(c_drd.local_maximas_indicies_ED[ddi][i] - c_drd.lower_trim_index_x_relative_master_dataset);
+                    c_drd.local_maximas_times[ddi].Add(c_drd.local_maximas_times_ED[ddi][i]);
+                    c_drd.local_maximas_amplitudes[ddi].Add(c_drd.local_maximas_amplitudes_ED[ddi][i]);
+                }
+            }
 
-
-            //int ind3 = find_closest_value(drd.lower_trim_index_x_relative_master_dataset, drd.local_maximas_times_ED[ddi]);
-            //int ind4 = find_closest_value(drd.upper_trim_index_x_relative_master_dataset - drd.lower_trim_index_x_relative_master_dataset, drd.local_maximas_times_ED[ddi]);
-
-            //drd.local_maximas_indicies[ddi] = (new List<int>(drd.local_maximas_indicies_ED[ddi])).GetRange(ind1, ind2);
-            //drd.local_maximas_times[ddi] = (new List<double>(drd.local_maximas_times_ED[ddi])).GetRange(ind1, ind2);
-
-
-            // trim_list(List<int> list_of_index, int index_low_cutoff, int index_high_cutoff, List<int> list_to_be_trim)
-
-            //drd.local_maximas_indicies[ddi] = trim_list(drd.local_maximas_indicies_ED[ddi], drd.lower_trim_index_x_relative_master_dataset, drd.upper_trim_index_x_relative_master_dataset, drd.local_maximas_indicies_ED[ddi]);
-            //drd.local_maximas_times[ddi] = trim_list(drd.local_maximas_indicies_ED[ddi], drd.lower_trim_index_x_relative_master_dataset, drd.upper_trim_index_x_relative_master_dataset, drd.local_maximas_times_ED[ddi]);
-            //drd.local_maximas_amplitudes[ddi] = trim_list(drd.local_maximas_indicies_ED[ddi], drd.lower_trim_index_x_relative_master_dataset, drd.upper_trim_index_x_relative_master_dataset, drd.local_maximas_amplitudes_ED[ddi]);
-
-            ////poor data quality with onlyy three indices, quit and move onto the next dataset
-            //if (drd.local_maximas_indicies[ddi].Count <= 3)
-            //{
-            //    results_summary_text = results_summary_text + "The poor quality of the " + data_direction_name[ddi] + " direction data resulted in no meaningful peaks extracted and the calculations were skipped.\r\n\r\n";
-            //    continue;
-            //}
-
-            //drd.local_maximas_amplitudes[ddi] = plot_peaks_chart(drd.local_maximas_indicies[ddi], selected_data_set_abs, data_direction_name[ddi] + " Peaks", ddi);
-            ////plot_peaks_chart(drd.local_maximas_indicies[ddi], selected_data_set_abs, data_direction_name[ddi] + " Peaks", ddi);
         }
 
 
@@ -3188,27 +3179,27 @@ namespace Damping_Data_Processor
                         //get miximas for entire dataset set and store it within the drd
                         calculate_local_maximas_entire_dataset(drd, ddi, window_size);
 
-                        List<int> local_maxima_indicies = new List<int>();
+                        //List<int> local_maxima_indicies = new List<int>();
 
-                        //calaculte the local maxima indicies of  thedataset
-                        if (peak_picking_method_combobox.SelectedIndex == 1)
-                        {
-                            local_maxima_indicies = find_local_maximas1(selected_data_set_abs, window_size);
-                        }
-                        else
-                        {
-                            local_maxima_indicies = (Accord.Audio.Tools.FindPeaks(selected_data_set_abs.ToArray())).ToList();
-                        }
+                        ////calaculte the local maxima indicies of  thedataset
+                        //if (peak_picking_method_combobox.SelectedIndex == 1)
+                        //{
+                        //    local_maxima_indicies = find_local_maximas1(selected_data_set_abs, window_size);
+                        //}
+                        //else
+                        //{
+                        //    local_maxima_indicies = (Accord.Audio.Tools.FindPeaks(selected_data_set_abs.ToArray())).ToList();
+                        //}
 
-                        remove_false_peaks(ref local_maxima_indicies, input_data_sample_rate);
+                        //remove_false_peaks(ref local_maxima_indicies, input_data_sample_rate);
 
-                        drd.local_maximas_indicies[ddi] = local_maxima_indicies;
+                        //drd.local_maximas_indicies[ddi] = local_maxima_indicies;
 
-                        //get the corresponding time values for the maxima indeicies
-                        for (int i = 0; i < drd.local_maximas_indicies[ddi].Count; i++)
-                        {
-                            drd.local_maximas_times[ddi].Add(time_dataset[drd.local_maximas_indicies[ddi][i]]);
-                        }
+                        ////get the corresponding time values for the maxima indeicies
+                        //for (int i = 0; i < drd.local_maximas_indicies[ddi].Count; i++)
+                        //{
+                        //    drd.local_maximas_times[ddi].Add(time_dataset[drd.local_maximas_indicies[ddi][i]]);
+                        //}
 
                         Console.WriteLine($"Local Maximas Execution Time: {watch.ElapsedMilliseconds} ms");
 
@@ -3220,14 +3211,14 @@ namespace Damping_Data_Processor
                         }
 
                         //plot the peak values and return the amplitudes
-                        drd.local_maximas_amplitudes[ddi] = plot_peaks_chart(drd.local_maximas_indicies[ddi], selected_data_set_abs, data_direction_name[ddi] + " Peaks", ddi);
+                        plot_peaks_chart(drd.local_maximas_times[ddi], drd.local_maximas_amplitudes[ddi], data_direction_name[ddi] + " Peaks", ddi);
 
                         //create a temp list for drd.local_maximas_times[ddi] (cannot pass a property)
                         List<double> local_maximas_times_temp = new List<double>(drd.local_maximas_times[ddi]);
                         //calaculate the freqs based upon the distance between the located local peaks (also removes outlier data)
                         drd.natural_freq_dist_btwn_peaks[ddi] = calculate_natural_frequency_peaks(ref local_maximas_times_temp, drd.local_maximas_indicies[ddi], input_data_sample_rate, data_direction_name[ddi]);
                         //reassign the temp value back to the dataset object
-                        drd.local_maximas_times[ddi] = new List<double>(local_maximas_times_temp);
+                        //drd.local_maximas_times[ddi] = new List<double>(local_maximas_times_temp);
 
                         Console.WriteLine($"Plot found peaks and their freqs Execution Time: {watch.ElapsedMilliseconds} ms");
 
@@ -3235,7 +3226,7 @@ namespace Damping_Data_Processor
                     else
                     {
 
-                        plot_peaks_chart(drd.local_maximas_indicies[ddi], selected_data_set_abs, data_direction_name[ddi] + " Peaks", ddi);
+                        plot_peaks_chart(drd.local_maximas_times[ddi], drd.local_maximas_amplitudes[ddi], data_direction_name[ddi] + " Peaks", ddi);
 
                         plot_freq_peaks_response(drd.local_maximas_times[ddi], drd.natural_freq_dist_btwn_peaks[ddi], data_direction_name[ddi]);
 
@@ -3905,7 +3896,7 @@ namespace Damping_Data_Processor
                     //all_selected_data_set_abs.Add(single_selected_data_set_abs);
 
                     //plot peaks
-                    plot_peaks_chart(drd.local_maximas_indicies[ddi], single_selected_data_set_abs, data_direction_name[ddi] + " Peaks", ddi);
+                    plot_peaks_chart(drd.local_maximas_times[ddi], drd.local_maximas_amplitudes[ddi], data_direction_name[ddi] + " Peaks", ddi);
 
                     //exp curve fit plot
                     exp_curve_fit_and_plot(ddi, single_selected_data_set_abs, natural_frequencies);
