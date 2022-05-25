@@ -2223,6 +2223,14 @@ namespace Damping_Data_Processor
             chart_name.ChartAreas[0].AxisY.Title = y_axis_label;
 
             chart_name.ChartAreas[0].AxisX.LabelStyle.Format = "0.00";
+
+
+            chart_name.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+            chart_name.ChartAreas[0].CursorX.AutoScroll = true;
+            chart_name.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
+
+
+
         }
 
         public void plot_data_on_freq_chart(Chart chart_name, List<string> data_sets_names, List<List<double>> freq_span, List<List<double>> mag_values, string x_axis_label, string y_axis_label)
@@ -2257,6 +2265,10 @@ namespace Damping_Data_Processor
             chart_name.ChartAreas[0].AxisY.Title = y_axis_label;
 
             chart_name.ChartAreas[0].AxisX.LabelStyle.Format = "0.00";
+
+            chart_name.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+            chart_name.ChartAreas[0].CursorX.AutoScroll = true;
+            chart_name.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
 
             chart_name.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
             chart_name.ChartAreas[0].CursorX.AutoScroll = true;
@@ -2519,27 +2531,7 @@ namespace Damping_Data_Processor
             string dataset_filepath = dataset_input_filepaths[dataset_index];
             drd.dataset_input_filepath = dataset_input_filepaths[dataset_index];
 
-            ////exisitng data set (.json file)
-            //if (dataset_filepath.Contains(save_session_filetype))
-            //{
             drd = deserialize_damping_reduction_dataset(dataset_filepath);
-            //}
-            ////if a csv (new dataset)
-            //else
-            //{
-            //    //reset the global datset object
-            //    drd = new damping_reduction_dataset();
-            //    process_data_from_csv_file(dataset_filepath, ref drd);
-
-            //    //allocate other variables of drd
-            //    drd.data_direction_checkmark_tracker.Add(true);
-            //    drd.data_direction_checkmark_tracker.Add(true);
-            //    drd.data_direction_checkmark_tracker.Add(true);
-            //    drd.data_direction_checkmark_tracker.Add(false);
-            //    drd.data_direction_checkmark_tracker.Add(false);
-            //    drd.data_direction_checkmark_tracker.Add(false);
-
-            //}
 
             //send data to plot based on how much data has been processed recently
             if (drd.datasets_filter_trim.Count > 0)
