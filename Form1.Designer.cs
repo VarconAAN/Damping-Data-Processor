@@ -101,6 +101,7 @@ namespace Damping_Data_Processor
             this.nat_freq_textbox = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
             this.input_data_sample_rate_numupdown = new System.Windows.Forms.NumericUpDown();
+            this.exportTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.signal_data_chart_main)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
@@ -499,7 +500,8 @@ namespace Damping_Data_Processor
             this.importcsvFilesFromOutputFolderWhenSelectingToolStripMenuItem,
             this.recalculateVectorSumDataAfterApplyingFilterToolStripMenuItem,
             this.freqResponseTransformPlotYAxisScaleToolStripMenuItem,
-            this.automaticFilterFrequencySelectionToolStripMenuItem});
+            this.automaticFilterFrequencySelectionToolStripMenuItem,
+            this.exportTemplateToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 36);
             this.settingsToolStripMenuItem.Text = "Settings";
@@ -867,6 +869,13 @@ namespace Damping_Data_Processor
             0,
             0});
             // 
+            // exportTemplateToolStripMenuItem
+            // 
+            this.exportTemplateToolStripMenuItem.Name = "exportTemplateToolStripMenuItem";
+            this.exportTemplateToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
+            this.exportTemplateToolStripMenuItem.Text = "Export .xlsx template filepath";
+            this.exportTemplateToolStripMenuItem.Click += new System.EventHandler(this.exportTemplateToolStripMenuItem_Click);
+            // 
             // form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1004,6 +1013,7 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.NumericUpDown input_data_sample_rate_numupdown;
+        private System.Windows.Forms.ToolStripMenuItem exportTemplateToolStripMenuItem;
     }
 }
 

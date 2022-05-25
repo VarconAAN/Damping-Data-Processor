@@ -105,6 +105,9 @@ namespace Damping_Data_Processor
         //keeps track of all calculated results for session
         List<List<List<double>>> session_results_tracker = new List<List<List<double>>>();
 
+        //the name of the text file that stores the location of the output template
+        string template_path_storage_text_name = "output_template_xlsx_store.txt";
+
         string header_border = "/////////////////////////////////////////////////////////////////////////////////////////////////////////\r\n";
 
 
@@ -270,8 +273,14 @@ namespace Damping_Data_Processor
             header_averages.Add("Damping Ratio Peaks frequency (%) Average");
             header_averages.Add("Damping Ratio [Peaks+DFT] frequency (%) Average");
 
+            string results_wb_filepath = get_output_template_filepath(template_path_storage_text_name);
+            //string results_wb_filepath = @"C:\Users\aanderson\source\repos\Damping Data Processor\Damping Reduction Results Template 2.xlsx";
 
-            string results_wb_filepath = @"C:\Users\aanderson\source\repos\Damping Data Processor\Damping Reduction Results Template 2.xlsx";
+            if (String.IsNullOrEmpty(results_wb_filepath))
+            {
+                FlexibleMessageBox.Show("Could not generate results summary excel sheet due to invalid output template filepath selected by user");
+                return;
+            }
 
             //keeps track of what sheet the reuslst are to be inserted
             int sheet_counter = 1;
@@ -4265,6 +4274,64 @@ namespace Damping_Data_Processor
         {
             save_dataset_on_form_close();
         }
+
+        private void exportTemplateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            update_xlsx_template_path();
+        }
+
+        public void update_xlsx_template_path()
+        {
+            string template_filepath = string.Empty;
+            template_filepath = get_output_template_filepath(template_path_storage_text_name);
+
+            template_filepath = show_dialog("Input filepath of excel (.xlsx) template for results output", "Filepath of template file", template_filepath);
+            if (File.Exists(template_filepath) && Path.GetExtension(template_filepath) == ".xlsx")
+            {
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, template_path_storage_text_name);
+                File.WriteAllText(path, template_filepath);
+                FlexibleMessageBox.Show("Output template succesfully updated");
+            }
+            else
+            {
+                FlexibleMessageBox.Show("Not a valid filepath for the output template");
+            }
+        }
+
+        public string get_output_template_filepath(string txt_filename)
+        {
+            string template_filepath;
+            try
+            {
+                template_filepath = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, template_path_storage_text_name));
+            }
+            catch { return string.Empty; }
+            return template_filepath;
+        }
+
+
+        public string show_dialog(string text, string caption, string default_input = " ")
+        {
+            Form prompt = new Form()
+            {
+                Width = 500,
+                Height = 150,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = caption,
+                StartPosition = FormStartPosition.CenterScreen
+            };
+            Label textLabel = new Label() { Left = 50, Top = 20, Text = text, Width = 400 };
+            TextBox textBox = new TextBox() { Left = 50, Top = 50, Width = 400, Text = default_input };
+            Button confirmation = new Button() { Text = "Ok", Left = 350, Width = 100, Top = 70, DialogResult = DialogResult.OK };
+            confirmation.Click += (sender, e) => { prompt.Close(); };
+            prompt.Controls.Add(textBox);
+            prompt.Controls.Add(confirmation);
+            prompt.Controls.Add(textLabel);
+            prompt.AcceptButton = confirmation;
+
+            return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
+        }
+
 
         //useless control functions
 
