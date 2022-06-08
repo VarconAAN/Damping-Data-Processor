@@ -19,25 +19,20 @@ using JR.Utils.GUI.Forms;
 using ClosedXML;
 using ClosedXML.Excel;
 
-
-
-
 namespace Damping_Data_Processor
 {
-
-
     public partial class form1 : Form
     {
-
         //GLOBAL VARIABLES
 
         //this class variable stores all current info for the current selected dataset
         public damping_reduction_dataset drd = new damping_reduction_dataset();
 
-        //allocate vertical annotation
+        //allocate vertical annotation (trim lines for main chart)
         VerticalLineAnnotation lower_data_boundary_vertical_line = new VerticalLineAnnotation();
         VerticalLineAnnotation upper_data_boundary_vertical_line = new VerticalLineAnnotation();
 
+        //allocate vertical annotation (trim lines for dist btwn peaks chart)
         VerticalLineAnnotation freq_peaks_trim_vertical_line_1 = new VerticalLineAnnotation();
         VerticalLineAnnotation freq_peaks_trim_vertical_line_2 = new VerticalLineAnnotation();
         HorizontalLineAnnotation freq_peaks_trim_horizontal_line_1 = new HorizontalLineAnnotation();
@@ -46,23 +41,22 @@ namespace Damping_Data_Processor
         string current_selected_dataset_filepath = string.Empty;
 
         //pixel width of charts, used to samplke data for plotting
-        int chart_width = 1389;
+        int chart_width = 1384;
 
         //variables that holds the freq response of for all direction for the current csv
         List<List<double>> real_spectrum = new List<List<double>>();
         List<List<double>> freq_span = new List<List<double>>();
-
-
 
         //folder picked by user with all input data
         string input_folder = string.Empty;
 
         //stores all csv filepath found in the slected input folder
         List<string> dataset_input_filepaths = new List<string>();
+
         //stores all csv filepath found in the slected input folder (in short form for readability)
         List<string> dataset_input_filepaths_short = new List<string>();
 
-        //holds the header when exportimng data
+        //holds the header when exporting data
         List<string> acceleration_dataset_csv_header = new List<string>();
 
         //sample rate of input data
@@ -77,50 +71,46 @@ namespace Damping_Data_Processor
         //y label of data chart
         string y_axis_label_data_chart = "Acceleration (m/s^2)";
 
+        //list of strings that store the summary results of each dataset
         List<string> dataset_result_summary_text_list = new List<string>();
 
+        //index of combo dropdown list for dataset selection
         int current_selected_csv_checkedlistbox_index = 0;
 
+        //folder path  for saving the output files
         string save_results_folder = string.Empty;
 
+        //name of 0utput folder
         string output_folder_name = @"Damping Reduction Output\";
 
+        //name of storage folder
         string damping_reduction_data_object_storage_folder = @"Damping Datset Object Data Storage\";
 
         //the file extension (custom to this software) (damping reduction data sets)
         string dataset_object_file_extension = ".json";
-
-        //stores all peak freq estimations for miltiple data directions (used for trimming)
-        //List<List<double>> peak_amplitudes_storage = new List<List<double>>();
-        //List<List<double>> freq_peaks_storage = new List<List<double>>();
-        //List<List<int>> local_maximas_indexs_storage = new List<List<int>>();
-        //List<List<double>> local_maximas_time_values_storage = new List<List<double>>();
-
 
         //colors for plotting
         List<Color> peak_point_colors = new List<Color>();
         List<Color> exp_curve_colors = new List<Color>();
         List<Color> signal_colors = new List<Color>();
 
-        //keeps track of all calculated results for session
+        //keeps track of all calculated results for session per dataset
         List<List<List<double>>> session_results_tracker = new List<List<List<double>>>();
 
         //the name of the text file that stores the location of the output template
         string template_path_storage_text_name = "output_template_xlsx_store.txt";
 
+        //used in summary text
         string header_border = "/////////////////////////////////////////////////////////////////////////////////////////////////////////\r\n";
-
-
-
 
         public form1()
         {
-
             InitializeComponent();
             //scaling the app view
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 
+            //allocating default lists///////////////////////////////////////////////////////
             acceleration_dataset_csv_header.Add("Time (Seconds)");
             acceleration_dataset_csv_header.Add("X " + y_axis_label_data_chart);
             acceleration_dataset_csv_header.Add("Y " + y_axis_label_data_chart);
@@ -145,11 +135,10 @@ namespace Damping_Data_Processor
             manual_freq_est_numupdown.Enabled = false;
             label7.Enabled = false;
 
-
             //set default value in the comboboxs;
             linear_or_log_combobox.SelectedIndex = 0;
 
-
+            //set colors for plots
             peak_point_colors.Add(Color.Blue);
             peak_point_colors.Add(Color.Green);
             peak_point_colors.Add(Color.Red);
@@ -171,7 +160,7 @@ namespace Damping_Data_Processor
             signal_colors.Add(Color.Violet);
             signal_colors.Add(Color.SaddleBrown);
 
-
+            //set possible values for the automatic bandpass filter frequencies
             bandpass_freq_buffer_choices_combobox.Items.Add(0.05);
             bandpass_freq_buffer_choices_combobox.Items.Add(0.1);
             bandpass_freq_buffer_choices_combobox.Items.Add(0.2);
@@ -179,13 +168,16 @@ namespace Damping_Data_Processor
             bandpass_freq_buffer_choices_combobox.Items.Add(0.4);
             bandpass_freq_buffer_choices_combobox.Items.Add(0.5);
             bandpass_freq_buffer_choices_combobox.Items.Add(0.6);
-
+            //default of 0.2 hz buffer
             bandpass_freq_buffer_choices_combobox.SelectedIndex = 2;
 
+            //get the default valiue of the input data sample rate number box
             input_data_sample_rate = Convert.ToDouble(input_data_sample_rate_numupdown.Value);
 
+            //disable most buttons until a dataset is loaded
             enable_all_user_controls(false);
 
+            //add titles to chart controls
             signal_data_chart_main.Titles.Add("Absolute Signal Data");
             freq_dft_chart.Titles.Add("DFT Frequency Response");
             freq_peaks_chart.Titles.Add("Frequency Samples based on Distance btwn Peaks");
@@ -307,7 +299,7 @@ namespace Damping_Data_Processor
                             if (session_results_tracker[i][data_direction_index].Count > 0)
                             {
                                 //check if there is data
-                                if (maxima_ind_ED[i].Count > 0)
+                                if (maxima_ind_ED[i].Count > 0 && maxima_time[i].Count>0)
                                 {
 
                                     sheet_counter++;
@@ -2177,6 +2169,12 @@ namespace Damping_Data_Processor
             //    }
             //}
 
+            if(peak_times.Count != peak_amplitudes.Count)
+            {
+                FlexibleMessageBox.Show("There was an issue plotting the peaks");
+                return peak_amplitudes;
+            }
+
             try
             {
                 System.Windows.Forms.DataVisualization.Charting.Series series = signal_data_chart_main.Series.Add(series_name);
@@ -2463,8 +2461,6 @@ namespace Damping_Data_Processor
 
         public void update_program_after_input_folder_select()
         {
-
-
             //clear all visible UI elements
             summary_results_textbox.Clear();
             activity_log_textbox.Clear();
@@ -2478,10 +2474,8 @@ namespace Damping_Data_Processor
             //clear all saved summaries
             dataset_result_summary_text_list.Clear();
 
-
             //open windows explorer to retrieve user folder
             select_folder(out input_folder);
-
             if (input_folder == string.Empty)
             {
                 return;
@@ -3714,6 +3708,7 @@ namespace Damping_Data_Processor
 
         public void scan_input_folder_for_datasets_and_convert_to_dataset_objects()
         {
+            //ERROR CHECKING 
             if (string.IsNullOrEmpty(input_folder))
             {
                 return;
@@ -4410,7 +4405,10 @@ namespace Damping_Data_Processor
 
         }
 
+        private void menu_strip_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
 
+        }
     }
 
 
@@ -4486,7 +4484,6 @@ namespace Damping_Data_Processor
 
         //store screencaps of the three plots
         public List<Byte[]> chart_screenshot_tracker_byte_array = new List<Byte[]>();
-
 
         //store the per direction
         public List<double> max_displacement = new List<double>();

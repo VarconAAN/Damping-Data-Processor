@@ -76,6 +76,7 @@ namespace Damping_Data_Processor
             this.linear_or_log_combobox = new System.Windows.Forms.ToolStripComboBox();
             this.automaticFilterFrequencySelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bandpass_freq_buffer_choices_combobox = new System.Windows.Forms.ToolStripComboBox();
+            this.exportTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutStructuralDampingReductionProcessorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -101,7 +102,6 @@ namespace Damping_Data_Processor
             this.nat_freq_textbox = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
             this.input_data_sample_rate_numupdown = new System.Windows.Forms.NumericUpDown();
-            this.exportTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.signal_data_chart_main)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
@@ -437,6 +437,7 @@ namespace Damping_Data_Processor
             this.menu_strip.Size = new System.Drawing.Size(1447, 40);
             this.menu_strip.TabIndex = 48;
             this.menu_strip.Text = "menuStrip1";
+            this.menu_strip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menu_strip_ItemClicked);
             // 
             // fileToolStripMenuItem
             // 
@@ -449,7 +450,7 @@ namespace Damping_Data_Processor
             // selectInputFolderToolStripMenuItem
             // 
             this.selectInputFolderToolStripMenuItem.Name = "selectInputFolderToolStripMenuItem";
-            this.selectInputFolderToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.selectInputFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.selectInputFolderToolStripMenuItem.Text = "Select input folder";
             this.selectInputFolderToolStripMenuItem.Click += new System.EventHandler(this.selectInputFolderToolStripMenuItem_Click);
             // 
@@ -557,6 +558,13 @@ namespace Damping_Data_Processor
             // 
             this.bandpass_freq_buffer_choices_combobox.Name = "bandpass_freq_buffer_choices_combobox";
             this.bandpass_freq_buffer_choices_combobox.Size = new System.Drawing.Size(121, 23);
+            // 
+            // exportTemplateToolStripMenuItem
+            // 
+            this.exportTemplateToolStripMenuItem.Name = "exportTemplateToolStripMenuItem";
+            this.exportTemplateToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
+            this.exportTemplateToolStripMenuItem.Text = "Export .xlsx template filepath";
+            this.exportTemplateToolStripMenuItem.Click += new System.EventHandler(this.exportTemplateToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
@@ -868,13 +876,6 @@ namespace Damping_Data_Processor
             0,
             0,
             0});
-            // 
-            // exportTemplateToolStripMenuItem
-            // 
-            this.exportTemplateToolStripMenuItem.Name = "exportTemplateToolStripMenuItem";
-            this.exportTemplateToolStripMenuItem.Size = new System.Drawing.Size(411, 22);
-            this.exportTemplateToolStripMenuItem.Text = "Export .xlsx template filepath";
-            this.exportTemplateToolStripMenuItem.Click += new System.EventHandler(this.exportTemplateToolStripMenuItem_Click);
             // 
             // form1
             // 
