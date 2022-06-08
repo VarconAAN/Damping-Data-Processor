@@ -299,7 +299,7 @@ namespace Damping_Data_Processor
                             if (session_results_tracker[i][data_direction_index].Count > 0)
                             {
                                 //check if there is data
-                                if (maxima_ind_ED[i].Count > 0 && maxima_time[i].Count>0)
+                                if (maxima_ind_ED[i].Count > 0 && maxima_time[i].Count > 0)
                                 {
 
                                     sheet_counter++;
@@ -2169,7 +2169,7 @@ namespace Damping_Data_Processor
             //    }
             //}
 
-            if(peak_times.Count != peak_amplitudes.Count)
+            if (peak_times.Count != peak_amplitudes.Count)
             {
                 FlexibleMessageBox.Show("There was an issue plotting the peaks");
                 return peak_amplitudes;
@@ -2517,6 +2517,11 @@ namespace Damping_Data_Processor
 
         public void new_dataset_selected(int dataset_index)
         {
+            if (dataset_index < 0)
+            {
+                return;
+            }
+
             nat_freq_textbox.Text = String.Empty;
 
             changes_cursor_icon_to_loading(true);
@@ -3682,12 +3687,18 @@ namespace Damping_Data_Processor
                     }
                 }
             }
+
+
+
+
             //remove the repeated input files
             foreach (int index in index_remove_list)
             {
                 dataset_input_filepaths.RemoveAt(index);
                 dataset_input_filepaths_short.RemoveAt(index);
             }
+
+            //string temp_ds_name = dataset_input_filepaths_short[select_data_set_tool_strip_combo_box.SelectedIndex];
 
             ////save the selected data names
             //string temp_dataset_name = String.Empty;
@@ -3697,12 +3708,16 @@ namespace Damping_Data_Processor
             //}
             //int temp_dataset_index = -1;
 
-            //add short csv files names to combolist dropdown box
-            select_data_set_tool_strip_combo_box.Items.Clear();
-            for (int i = 0; i < dataset_input_filepaths.Count; i++)
-            {
-                select_data_set_tool_strip_combo_box.Items.Add(dataset_input_filepaths_short[i]);
-            }
+            ////add short csv files names to combolist dropdown box
+            //select_data_set_tool_strip_combo_box.Items.Clear();
+            //for (int i = 0; i < dataset_input_filepaths.Count; i++)
+            //{
+            //    select_data_set_tool_strip_combo_box.Items.Add(dataset_input_filepaths_short[i]);
+            //    //if(temp_ds_name == dataset_input_filepaths_short[i])
+            //    //{
+            //    //    select_data_set_tool_strip_combo_box.SelectedIndex = i;
+            //    //}
+            //}
 
         }
 
@@ -4409,6 +4424,57 @@ namespace Damping_Data_Processor
         {
 
         }
+
+        private void next_dataset_button_Click(object sender, EventArgs e)
+        {
+            next_or_previous_button(true);
+
+        }
+
+        private void prev_dataset_button_Click(object sender, EventArgs e)
+        {
+            next_or_previous_button(false);
+        }
+
+        public void next_or_previous_button(Boolean next_or_prev)
+        {
+            if (select_data_set_tool_strip_combo_box.Items.Count == 0)
+            {
+                return;
+            }
+            if (-1 == select_data_set_tool_strip_combo_box.SelectedIndex)
+            {
+                return;
+            }
+
+            int current_ds_index = select_data_set_tool_strip_combo_box.SelectedIndex;
+            int max_ds_index = select_data_set_tool_strip_combo_box.Items.Count - 1;
+
+            //next = true
+            //prev = false
+            if (next_or_prev == true)
+            {
+                if (current_ds_index < max_ds_index)
+                {
+                    current_ds_index++;
+                }
+            }
+            else //if previous
+            {
+                if (current_ds_index > 0)
+                {
+                    current_ds_index--;
+                }
+            }
+
+            if (current_ds_index != select_data_set_tool_strip_combo_box.SelectedIndex)
+            {
+                select_data_set_tool_strip_combo_box.SelectedIndex = current_ds_index;
+                new_dataset_selected(select_data_set_tool_strip_combo_box.SelectedIndex);
+            }
+
+        }
+
     }
 
 

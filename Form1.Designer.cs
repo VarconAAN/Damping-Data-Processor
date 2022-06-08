@@ -102,6 +102,8 @@ namespace Damping_Data_Processor
             this.nat_freq_textbox = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
             this.input_data_sample_rate_numupdown = new System.Windows.Forms.NumericUpDown();
+            this.next_dataset_button = new System.Windows.Forms.ToolStripMenuItem();
+            this.prev_dataset_button = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.signal_data_chart_main)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.low_freq_cutoff_numupdown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.high_freq_cutoff_numupdown)).BeginInit();
@@ -427,7 +429,9 @@ namespace Damping_Data_Processor
             this.menu_strip.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.menu_strip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
+            this.prev_dataset_button,
             this.select_data_set_tool_strip_combo_box,
+            this.next_dataset_button,
             this.saveDatasetToolStripMenuItem,
             this.exportResultsToolStripMenuItem,
             this.settingsToolStripMenuItem,
@@ -877,6 +881,26 @@ namespace Damping_Data_Processor
             0,
             0});
             // 
+            // next_dataset_button
+            // 
+            this.next_dataset_button.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.next_dataset_button.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Bold);
+            this.next_dataset_button.Name = "next_dataset_button";
+            this.next_dataset_button.Size = new System.Drawing.Size(38, 36);
+            this.next_dataset_button.Text = ">";
+            this.next_dataset_button.ToolTipText = "Next Dataset";
+            this.next_dataset_button.Click += new System.EventHandler(this.next_dataset_button_Click);
+            // 
+            // prev_dataset_button
+            // 
+            this.prev_dataset_button.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.prev_dataset_button.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Bold);
+            this.prev_dataset_button.Name = "prev_dataset_button";
+            this.prev_dataset_button.Size = new System.Drawing.Size(38, 36);
+            this.prev_dataset_button.Text = "<";
+            this.prev_dataset_button.ToolTipText = "Previous Dataset";
+            this.prev_dataset_button.Click += new System.EventHandler(this.prev_dataset_button_Click);
+            // 
             // form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1015,6 +1039,8 @@ namespace Damping_Data_Processor
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.NumericUpDown input_data_sample_rate_numupdown;
         private System.Windows.Forms.ToolStripMenuItem exportTemplateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem prev_dataset_button;
+        private System.Windows.Forms.ToolStripMenuItem next_dataset_button;
     }
 }
 
