@@ -2069,23 +2069,27 @@ namespace Damping_Data_Processor
 
         public void plot_freq_peaks_response(List<double> time_value, List<double> frequency_peaks, string series_name)
         {
-            if (time_value.Count > frequency_peaks.Count)
+
+            //time values dont match the freq peaks due to peaks being rejected
+            List<double> time_value_temp = new List<double>();
+
+            for(int i = 0; i< frequency_peaks.Count; i++)
             {
-                time_value.RemoveAt(time_value.Count - 1);
+                time_value_temp.Add(time_value[i]);
             }
 
-            if (time_value.Count() != frequency_peaks.Count())
-            {
-                string message = "freq peaks plot data is not same length";
-                string title = "Error";
-                FlexibleMessageBox.Show(message, title);
-                return;
-            }
+            //if (time_value.Count() != frequency_peaks.Count())
+            //{
+            //    string message = "freq peaks plot data is not same length";
+            //    string title = "Error";
+            //    FlexibleMessageBox.Show(message, title);
+            //    return;
+            //}
 
             System.Windows.Forms.DataVisualization.Charting.Series series = freq_peaks_chart.Series.Add(series_name + " Freq. Resp.");
             series.ChartType = SeriesChartType.Point;
             //series.Points.DataBindXY(time_peaks, frequency_peaks);
-            series.Points.DataBindXY(time_value, frequency_peaks);
+            series.Points.DataBindXY(time_value_temp, frequency_peaks);
             series.BorderWidth = 1;
             series.Color = signal_colors[data_direction_name.IndexOf(series_name)];
             series.ToolTip = "#SERIESNAME\nX: #VALX\nY: #VAL";
@@ -2171,8 +2175,15 @@ namespace Damping_Data_Processor
 
             if (peak_times.Count != peak_amplitudes.Count)
             {
-                FlexibleMessageBox.Show("There was an issue plotting the peaks");
-                return peak_amplitudes;
+                //if (peak_amplitudes.Count> peak_times.Count)
+                //{
+
+                //}
+                //else
+                //{
+                    FlexibleMessageBox.Show("There was an issue plotting the peaks");
+                    return peak_amplitudes;
+                //}
             }
 
             try
@@ -2542,6 +2553,7 @@ namespace Damping_Data_Processor
             drd = deserialize_damping_reduction_dataset(dataset_filepath);
 
             //send data to plot based on how much data has been processed recently
+            
             if (drd.datasets_filter_trim.Count > 0)
             {
                 plot_data_on_chart(signal_data_chart_main, data_direction_name, drd.datasets_filter_trim, "Time (Seconds)", y_axis_label_data_chart);
@@ -3008,7 +3020,7 @@ namespace Damping_Data_Processor
             //dont include last point it can be a bad data point
             for (int i = 0; i <= c_drd.local_maximas_indicies_ED[ddi].Count - 1; i++)
             {
-                if (c_drd.local_maximas_indicies_ED[ddi][i] < dataset_to_calc_maximas.Count - 1)
+                if (c_drd.local_maximas_indicies_ED[ddi][i] < dataset_to_calc_maximas.Count)
                 {
                     //peak_times.Add(c_drd.datasets_trim[0][peak_indexs[i]]);
                     c_drd.local_maximas_amplitudes_ED[ddi].Add(dataset_to_calc_maximas[c_drd.local_maximas_indicies_ED[ddi][i]]);
@@ -3029,6 +3041,7 @@ namespace Damping_Data_Processor
                     c_drd.local_maximas_amplitudes[ddi].Add(c_drd.local_maximas_amplitudes_ED[ddi][i]);
                 }
             }
+            int lol = 9;
 
         }
 
@@ -4470,7 +4483,7 @@ namespace Damping_Data_Processor
             if (current_ds_index != select_data_set_tool_strip_combo_box.SelectedIndex)
             {
                 select_data_set_tool_strip_combo_box.SelectedIndex = current_ds_index;
-                new_dataset_selected(select_data_set_tool_strip_combo_box.SelectedIndex);
+                //new_dataset_selected(select_data_set_tool_strip_combo_box.SelectedIndex);
             }
 
         }
